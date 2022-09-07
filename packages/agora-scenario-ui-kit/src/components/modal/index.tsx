@@ -3,7 +3,6 @@ import classnames from 'classnames';
 import { BaseProps } from '~ui-kit/components/util/type';
 import './index.css';
 import { SvgIconEnum, SvgImg } from '../svg-img';
-import { OverlayWrap } from '../overlay-wrap';
 import { themeContext } from '~ui-kit';
 export interface ModalProps extends BaseProps {
   /** 标题 */
@@ -174,7 +173,5 @@ export const Modal: ModalType = ({
     </div>
   );
 
-  const resultJsx = animate ? <OverlayWrap opened={opened}>{modalJsx}</OverlayWrap> : modalJsx;
-
-  return hasMask ? <div className="modal-mask">{resultJsx}</div> : resultJsx;
+  return hasMask ? <div className="modal-mask">{modalJsx}</div> : modalJsx;
 };
