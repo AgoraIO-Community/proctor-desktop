@@ -115,6 +115,7 @@
     }
   },
   "dependencies": {
-    "agora-proctor-sdk": "1.0.0"
+    "agora-proctor-sdk": "1.0.0",
+    "antd": "4.23.0"
   }
 }

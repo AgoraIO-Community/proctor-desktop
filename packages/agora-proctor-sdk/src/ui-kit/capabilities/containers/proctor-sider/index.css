@@ -1,0 +1,17 @@
+.fcr_proctor_sider {
+  width: 254px;
+  min-height: 100vh;
+  padding: 28px;
+}
+.fcr_proctor_sider_info_title {
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 15px;
+  color: #bdbec6;
+}
+.fcr_proctor_sider_info_val {
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 19px;
+  color: #000000;
+}
