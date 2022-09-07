@@ -1,11 +1,11 @@
-import { EduStream, EduUserStruct } from 'agora-edu-core';
-import { AgoraRteVideoSourceType } from 'agora-rte-sdk';
-import { EduStreamUI } from '../stores/common/stream/struct';
+import { EduStream, EduUserStruct } from "agora-edu-core";
+import { AgoraRteVideoSourceType } from "agora-rte-sdk";
+import { EduStreamUI } from "../stores/common/stream/struct";
 
 export const extractUserStreams = (
   users: Map<string, EduUserStruct>,
   streamByUserUuid: Map<string, Set<string>>,
-  streamByStreamUuid: Map<string, EduStream>,
+  streamByStreamUuid: Map<string, EduStream>
 ) => {
   const streams = new Set<EduStream>();
   for (const user of users.values()) {
@@ -22,7 +22,7 @@ export const extractUserStreams = (
 
 export const extractStreamBySourceType = (
   streams: Set<EduStreamUI>,
-  sourceType: AgoraRteVideoSourceType,
+  sourceType: AgoraRteVideoSourceType
 ) => {
   for (const stream of streams) {
     if (stream.stream.videoSourceType === sourceType) {

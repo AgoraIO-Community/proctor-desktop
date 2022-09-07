@@ -3,12 +3,7 @@
     "target": "es6",
     "experimentalDecorators": true,
     "module": "esnext",
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext",
-      "webworker"
-    ],
+    "lib": ["dom", "dom.iterable", "esnext", "webworker"],
     "outDir": "lib",
     "noImplicitAny": true,
     "noImplicitThis": true,
@@ -48,14 +43,11 @@
       "~hooks": ["./src/infra/hooks"],
       "~hooks/*": ["./src/infra/hooks/*"],
       "agora-chat-widget": ["../agora-chat-widget/src"],
-      "agora-proctor-sdk": ["../agora-proctor-sdk/src"]
+      "agora-proctor-sdk": ["../agora-proctor-sdk/src"],
+      "agora-edu-core": ["../agora-edu-core/src"],
+      "agora-rte-sdk": ["../agora-rte-sdk/src"]
     }
   },
-  "include": [
-    "src"
-  ],
-  "exclude": [
-    "node_modules",
-    "**/*/*.stories.tsx"
-  ],
+  "include": ["src", "../agora-proctor-demo/src/api/request.ts"],
+  "exclude": ["node_modules", "**/*/*.stories.tsx"]
 }

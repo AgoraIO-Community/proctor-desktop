@@ -1,4 +1,5 @@
 import { EduRegion } from "agora-edu-core";
+import { request } from "../../api/request";
 
 const REACT_APP_AGORA_APP_TOKEN_DOMAIN =
   process.env.REACT_APP_AGORA_APP_TOKEN_DOMAIN;
@@ -65,5 +66,21 @@ export class HomeApi {
     }
 
     HomeApi.shared.builderDomain = tokenDomain;
+  }
+  async loginV3(
+    userUuid: string,
+    roomUuid: string,
+    role: number
+  ): Promise<{
+    appId: string;
+    roomUuid: string;
+    userUuid: string;
+    role: number;
+    token: string;
+  }> {
+    const { data } = await request.get(
+      `${this.domain}/edu/v3/rooms/${roomUuid}/roles/${role}/users/${userUuid}/token`
+    );
+    return data.data;
   }
 }

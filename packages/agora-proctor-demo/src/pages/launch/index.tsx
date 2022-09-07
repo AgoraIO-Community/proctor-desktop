@@ -1,9 +1,9 @@
-import { useCallback, useEffect } from 'react';
-import { AgoraEduSDK, LaunchOption } from 'agora-proctor-sdk';
-import { isEmpty } from 'lodash';
-import { observer } from 'mobx-react';
-import { useHistory } from 'react-router-dom';
-import { useHomeStore } from '../../utils/hooks';
+import { useCallback, useEffect } from "react";
+import { AgoraEduSDK, LaunchOption } from "agora-proctor-sdk";
+import { isEmpty } from "lodash";
+import { observer } from "mobx-react";
+import { useHistory } from "react-router-dom";
+import { useHomeStore } from "../../utils/hooks";
 
 export const LaunchPage = observer(() => {
   const homeStore = useHomeStore();
@@ -14,7 +14,7 @@ export const LaunchPage = observer(() => {
 
   useEffect(() => {
     if (isEmpty(launchOption)) {
-      history.push('/');
+      history.push("/");
       return;
     }
   }, []);
@@ -25,20 +25,18 @@ export const LaunchPage = observer(() => {
         JSON.stringify({
           host: homeStore.launchOption.sdkDomain,
           uiConfigs: homeStore.launchOption.scenes,
-        }),
+        })
       );
 
       AgoraEduSDK.config({
         appId: launchOption.appId,
-        region: launchOption.region ?? 'CN',
+        region: launchOption.region ?? "CN",
       });
 
       // const recordUrl = `https://solutions-apaas.agora.io/apaas/record/dev/${CLASSROOM_SDK_VERSION}/record_page.html`;
-      const recordUrl = `https://agora-adc-artifacts.s3.cn-north-1.amazonaws.com.cn/apaas/record/dev/${CLASSROOM_SDK_VERSION}/record_page.html`;
       AgoraEduSDK.launch(dom, {
         ...launchOption,
         // TODO:  Here you need to pass in the address of the recording page posted by the developer himself
-        recordUrl,
       } as unknown as LaunchOption);
     }
   }, []);
@@ -48,6 +46,7 @@ export const LaunchPage = observer(() => {
       ref={mountLaunch}
       id="app"
       className="bg-background"
-      style={{ width: '100%', height: '100%' }}></div>
+      style={{ width: "100%", height: "100%" }}
+    ></div>
   );
 });

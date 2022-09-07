@@ -41,6 +41,7 @@ const config = {
       template: template,
       inject: true,
     }),
+
     new webpack.DefinePlugin({
       NODE_ENV: JSON.stringify("development"),
     }),

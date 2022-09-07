@@ -28,7 +28,9 @@
     "paths": {
       "~ui-kit": ["../agora-scenario-ui-kit/src"],
       "~ui-kit/*": ["../agora-scenario-ui-kit/src/*"],
-      "agora-proctor-sdk": ["../agora-proctor-sdk/src"]
+      "agora-proctor-sdk": ["../agora-proctor-sdk/src/infra/api"],
+      "agora-edu-core": ["../agora-edu-core/src"],
+      "agora-rte-sdk": ["../agora-rte-sdk/src"]
     }
   },
   "include": ["src"],
