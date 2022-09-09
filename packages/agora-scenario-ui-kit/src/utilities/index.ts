@@ -1,26 +1,7 @@
-import { createElement, useContext, createContext } from 'react';
-import { Z_INDEX_RULES } from './style-config';
+import { createElement, useContext, createContext } from "react";
+import { Z_INDEX_RULES } from "./style-config";
 
-export type I18nLanguage = 'zh' | 'en';
-
-export const makeContainer = (name: string) => {
-  const Context = createContext(null as any);
-
-  return {
-    Context,
-    Provider: <T>({ children, value }: { children: React.ReactNode; value: T }) => {
-      Context.displayName = name;
-      return createElement(Context.Provider, { value }, children);
-    },
-    useContext: <T>() => {
-      const context = useContext<T>(Context);
-      if (!context) {
-        throw new Error(`useContext must be used within a ${name}`);
-      }
-      return context;
-    },
-  };
-};
+export type I18nLanguage = "zh" | "en";
 
 export const getOS = () => {
   let ua = navigator.userAgent,
@@ -36,7 +17,7 @@ export const getOS = () => {
       (navigator.maxTouchPoints &&
         navigator.maxTouchPoints > 2 &&
         /MacIntel/.test(navigator.platform)) ||
-      'ontouchend' in document,
+      "ontouchend" in document,
     isPhone = /(?:iPhone)/.test(ua) && !isTablet,
     isPc = !isPhone && !isAndroid && !isSymbian;
   return {

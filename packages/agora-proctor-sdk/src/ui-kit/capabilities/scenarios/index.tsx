@@ -2,7 +2,7 @@ import { useStore } from '@/infra/hooks/ui-store';
 import { EduClassroomConfig, EduRoleTypeEnum, EduRoomSubtypeEnum, EduRoomTypeEnum } from 'agora-edu-core';
 import { observer } from 'mobx-react';
 import { useLayoutEffect, useState } from 'react';
-import { RoomPretestContainer } from '~containers/pretest';
+import { PretestContainer } from '~containers/pretest';
 import { ExamineeScenario } from './examinee';
 import { ProctorScenario } from './proctor';
 
@@ -26,7 +26,7 @@ export const Scenarios: React.FC<ScenariosProps> = observer(
 
     return initialized ? (
       showPretest ? (
-        <RoomPretestContainer onOK={() => setPretest(false)} />
+        <PretestContainer />
       ) : (
         renderSceneByRoleType(EduClassroomConfig.shared.sessionInfo.role)
       )
