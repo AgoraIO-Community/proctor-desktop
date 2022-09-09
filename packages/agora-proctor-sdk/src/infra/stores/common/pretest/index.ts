@@ -1,50 +1,57 @@
-import { AgoraRteMediaSourceState, bound, Logger } from 'agora-rte-sdk';
-import { action, computed, Lambda, observable } from 'mobx';
-import { EduUIStoreBase } from '../base';
-import { CameraPlaceholderType, DeviceStateChangedReason } from '../type';
-import { v4 as uuidv4 } from 'uuid';
-import { computedFn } from 'mobx-utils';
-import { AgoraEduClassroomEvent, BeautyType, DEVICE_DISABLE, EduEventCenter } from 'agora-edu-core';
-import { transI18n } from '~ui-kit';
+import {
+  AgoraEduClassroomEvent,
+  BeautyType,
+  DEVICE_DISABLE,
+  EduEventCenter,
+} from "agora-edu-core";
+import { AgoraRteMediaSourceState, bound, Logger } from "agora-rte-sdk";
+import { action, computed, Lambda, observable } from "mobx";
+import { computedFn } from "mobx-utils";
+import { v4 as uuidv4 } from "uuid";
+import { transI18n } from "~ui-kit";
+import { EduUIStoreBase } from "../base";
+import { CameraPlaceholderType, DeviceStateChangedReason } from "../type";
 
 export type PretestToast = {
   id: string;
-  type: 'video' | 'audio_recording' | 'audio_playback' | 'error';
+  type: "video" | "audio_recording" | "audio_playback" | "error";
   info: string;
 };
 
-type AddToastArgs = Omit<PretestToast, 'id'>;
+type AddToastArgs = Omit<PretestToast, "id">;
+
+type StepType = "one" | "two" | "three";
 
 export class PretestUIStore extends EduUIStoreBase {
   private readonly _disposers = new Set<Lambda>();
 
   onInstall() {
     // 处理视频设备变动
-    const videoDisposer = computed(() => this.classroomStore.mediaStore.videoCameraDevices).observe(
-      ({ newValue, oldValue }) => {
-        // 避免初始化阶段触发新设备的弹窗通知
-        if (oldValue && oldValue.length > 1) {
-          if (newValue.length > oldValue.length) {
-            this.addToast({
-              type: 'video',
-              info: DeviceStateChangedReason.newDeviceDetected,
-            });
-          }
-        }
-      },
-    );
-
-    this._disposers.add(videoDisposer);
-
-    // 处理录音设备变动
-    const audioRecordingDisposer = computed(
-      () => this.classroomStore.mediaStore.audioRecordingDevices,
+    const videoDisposer = computed(
+      () => this.classroomStore.mediaStore.videoCameraDevices
     ).observe(({ newValue, oldValue }) => {
       // 避免初始化阶段触发新设备的弹窗通知
       if (oldValue && oldValue.length > 1) {
         if (newValue.length > oldValue.length) {
           this.addToast({
-            type: 'audio_recording',
+            type: "video",
+            info: DeviceStateChangedReason.newDeviceDetected,
+          });
+        }
+      }
+    });
+
+    this._disposers.add(videoDisposer);
+
+    // 处理录音设备变动
+    const audioRecordingDisposer = computed(
+      () => this.classroomStore.mediaStore.audioRecordingDevices
+    ).observe(({ newValue, oldValue }) => {
+      // 避免初始化阶段触发新设备的弹窗通知
+      if (oldValue && oldValue.length > 1) {
+        if (newValue.length > oldValue.length) {
+          this.addToast({
+            type: "audio_recording",
             info: DeviceStateChangedReason.newDeviceDetected,
           });
         }
@@ -55,13 +62,13 @@ export class PretestUIStore extends EduUIStoreBase {
 
     // 处理扬声器设备变动
     const playbackDisposer = computed(
-      () => this.classroomStore.mediaStore.audioPlaybackDevices,
+      () => this.classroomStore.mediaStore.audioPlaybackDevices
     ).observe(({ newValue, oldValue }) => {
       // 避免初始化阶段触发新设备的弹窗通知
       if (oldValue && oldValue.length > 0) {
         if (newValue.length > oldValue.length) {
           this.addToast({
-            type: 'audio_playback',
+            type: "audio_playback",
             info: DeviceStateChangedReason.newDeviceDetected,
           });
         }
@@ -82,19 +89,19 @@ export class PretestUIStore extends EduUIStoreBase {
     switch (type) {
       case AgoraEduClassroomEvent.CurrentCamUnplugged:
         this.addToast({
-          type: 'error',
+          type: "error",
           info: DeviceStateChangedReason.cameraUnplugged,
         });
         break;
       case AgoraEduClassroomEvent.CurrentMicUnplugged:
         this.addToast({
-          type: 'error',
+          type: "error",
           info: DeviceStateChangedReason.micUnplugged,
         });
         break;
       case AgoraEduClassroomEvent.CurrentSpeakerUnplugged:
         this.addToast({
-          type: 'error',
+          type: "error",
           info: DeviceStateChangedReason.playbackUnplugged,
         });
         break;
@@ -120,12 +127,17 @@ export class PretestUIStore extends EduUIStoreBase {
   @observable playbackTesting = false;
 
   /**
+   * 当前步骤
+   */
+  @observable currentStep: StepType = "one";
+
+  /**
    * 视频消息 Toast 列表
    * @returns
    */
   @computed
   get videoToastQueue() {
-    return this.toastQueue.filter((t) => t.type === 'video');
+    return this.toastQueue.filter((t) => t.type === "video");
   }
 
   /**
@@ -134,7 +146,7 @@ export class PretestUIStore extends EduUIStoreBase {
    */
   @computed
   get audioPlaybackToastQueue() {
-    return this.toastQueue.filter((t) => t.type === 'audio_playback');
+    return this.toastQueue.filter((t) => t.type === "audio_playback");
   }
 
   /**
@@ -143,7 +155,7 @@ export class PretestUIStore extends EduUIStoreBase {
    */
   @computed
   get audioRecordingToastQueue() {
-    return this.toastQueue.filter((t) => t.type === 'audio_recording');
+    return this.toastQueue.filter((t) => t.type === "audio_recording");
   }
 
   /**
@@ -152,7 +164,7 @@ export class PretestUIStore extends EduUIStoreBase {
    */
   @computed
   get errorToastQueue() {
-    return this.toastQueue.filter((t) => t.type === 'error');
+    return this.toastQueue.filter((t) => t.type === "error");
   }
 
   /**
@@ -161,7 +173,10 @@ export class PretestUIStore extends EduUIStoreBase {
    */
   @computed get cameraDevicesList() {
     return this.classroomStore.mediaStore.videoCameraDevices.map((item) => ({
-      label: item.deviceid === DEVICE_DISABLE ? transI18n('disabled') : item.devicename,
+      label:
+        item.deviceid === DEVICE_DISABLE
+          ? transI18n("disabled")
+          : item.devicename,
       value: item.deviceid,
     }));
   }
@@ -172,7 +187,10 @@ export class PretestUIStore extends EduUIStoreBase {
    */
   @computed get recordingDevicesList() {
     return this.classroomStore.mediaStore.audioRecordingDevices.map((item) => ({
-      label: item.deviceid === DEVICE_DISABLE ? transI18n('disabled') : item.devicename,
+      label:
+        item.deviceid === DEVICE_DISABLE
+          ? transI18n("disabled")
+          : item.devicename,
       value: item.deviceid,
     }));
   }
@@ -182,16 +200,17 @@ export class PretestUIStore extends EduUIStoreBase {
    * @returns
    */
   @computed get playbackDevicesList() {
-    const playbackDevicesList = this.classroomStore.mediaStore.audioPlaybackDevices.map((item) => ({
-      label: item.devicename,
-      value: item.deviceid,
-    }));
+    const playbackDevicesList =
+      this.classroomStore.mediaStore.audioPlaybackDevices.map((item) => ({
+        label: item.devicename,
+        value: item.deviceid,
+      }));
     return playbackDevicesList.length
       ? playbackDevicesList
       : [
           {
             label: transI18n(`media.default`),
-            value: 'default',
+            value: "default",
           },
         ];
   }
@@ -201,7 +220,7 @@ export class PretestUIStore extends EduUIStoreBase {
    * @returns
    */
   @computed get currentCameraDeviceId(): string {
-    return this.classroomStore.mediaStore.cameraDeviceId ?? '';
+    return this.classroomStore.mediaStore.cameraDeviceId ?? "";
   }
 
   /**
@@ -209,7 +228,7 @@ export class PretestUIStore extends EduUIStoreBase {
    * @returns
    */
   @computed get currentRecordingDeviceId(): string {
-    return this.classroomStore.mediaStore.recordingDeviceId ?? '';
+    return this.classroomStore.mediaStore.recordingDeviceId ?? "";
   }
 
   /**
@@ -217,7 +236,7 @@ export class PretestUIStore extends EduUIStoreBase {
    * @returns
    */
   @computed get currentPlaybackDeviceId(): string {
-    return this.classroomStore.mediaStore.playbackDeviceId ?? 'default';
+    return this.classroomStore.mediaStore.playbackDeviceId ?? "default";
   }
 
   /**
@@ -277,7 +296,7 @@ export class PretestUIStore extends EduUIStoreBase {
    * @returns Icon 类型
    */
   @computed get localMicIconType() {
-    return this.localMicOff ? 'microphone-off' : 'microphone-on';
+    return this.localMicOff ? "microphone-off" : "microphone-on";
   }
 
   /**
@@ -334,7 +353,9 @@ export class PretestUIStore extends EduUIStoreBase {
    */
   @computed
   get whiteningValue() {
-    return Math.ceil(this.classroomStore.mediaStore.beautyEffectOptions.lighteningLevel * 100);
+    return Math.ceil(
+      this.classroomStore.mediaStore.beautyEffectOptions.lighteningLevel * 100
+    );
   }
 
   /**
@@ -343,7 +364,9 @@ export class PretestUIStore extends EduUIStoreBase {
    */
   @computed
   get ruddyValue() {
-    return Math.ceil(this.classroomStore.mediaStore.beautyEffectOptions.rednessLevel * 100);
+    return Math.ceil(
+      this.classroomStore.mediaStore.beautyEffectOptions.rednessLevel * 100
+    );
   }
 
   /**
@@ -352,7 +375,9 @@ export class PretestUIStore extends EduUIStoreBase {
    */
   @computed
   get buffingValue() {
-    return Math.ceil(this.classroomStore.mediaStore.beautyEffectOptions.smoothnessLevel * 100);
+    return Math.ceil(
+      this.classroomStore.mediaStore.beautyEffectOptions.smoothnessLevel * 100
+    );
   }
 
   /**
@@ -376,8 +401,8 @@ export class PretestUIStore extends EduUIStoreBase {
    */
   activeBeautyTypeIcon = computedFn((item) =>
     this.activeBeautyType === item.id
-      ? { icon: item.icon, color: '#fff' }
-      : { icon: item.icon, color: 'rgba(255,255,255,.5)' },
+      ? { icon: item.icon, color: "#fff" }
+      : { icon: item.icon, color: "rgba(255,255,255,.5)" }
   );
 
   /**
@@ -557,6 +582,15 @@ export class PretestUIStore extends EduUIStoreBase {
   @bound
   setupLocalVideo(dom: HTMLElement, mirror: boolean) {
     this.classroomStore.mediaStore.setupLocalVideo(dom, mirror);
+  }
+
+  /**
+   * 设置当前的步骤
+   * @param step
+   */
+  @action.bound
+  setCurrentStep(step: StepType) {
+    this.currentStep = step;
   }
 
   @bound
