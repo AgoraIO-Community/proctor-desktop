@@ -20,6 +20,8 @@ import { BeautyType, EduRteEngineConfig, EduRteRuntimePlatform } from 'agora-edu
 import { isProduction } from '@/infra/utils/env';
 import { PretestToast } from '@/infra/stores/common/pretest';
 import { InteractionStateColors } from '~ui-kit/utilities/state-color';
+import { AgoraModal } from '@/ui-kit/components/modal';
+import { StudentPretest } from './student-pretest';
 declare global {
   interface Window {
     process: {
@@ -440,30 +442,38 @@ export const RoomPretest: React.FC<PretestProps> = ({ className, onOK, ...restPr
   });
 
   return (
-    <div className="fixed-container">
-      <Modal
-        title={transI18n('pretest.settingTitle')}
-        style={{ width: 720 }}
-        footer={[
-          <Button key="ok" action="ok">
-            {transI18n('pretest.finishTest')}
-          </Button>,
-        ]}
-        onOk={onOK}
-        onCancel={() => { }}
-        btnId="device_assert">
-        <div className={cls} {...restProps}>
-          <PretestNotificationCenter />
-          <div className="pretest-left">
-            <CameraDeviceManager />
-          </div>
-          <div className="pretest-right">
-            <RecordingDeviceManager />
-            <PlayoutDeviceManager />
-          </div>
-        </div>
-      </Modal>
-    </div>
+
+    <AgoraModal 
+      centered
+      open={true}
+      width={731}>
+        <StudentPretest/>
+    </AgoraModal>
+
+    // <div className="fixed-container">
+    //   <Modal
+    //     title={transI18n('pretest.settingTitle')}
+    //     style={{ width: 720 }}
+    //     footer={[
+    //       <Button key="ok" action="ok">
+    //         {transI18n('pretest.finishTest')}
+    //       </Button>,
+    //     ]}
+    //     onOk={onOK}
+    //     onCancel={() => { }}
+    //     btnId="device_assert">
+    //     <div className={cls} {...restProps}>
+    //       <PretestNotificationCenter />
+    //       <div className="pretest-left">
+    //         <CameraDeviceManager />
+    //       </div>
+    //       <div className="pretest-right">
+    //         <RecordingDeviceManager />
+    //         <PlayoutDeviceManager />
+    //       </div>
+    //     </div>
+    //   </Modal>
+    // </div>
   );
 };
 
