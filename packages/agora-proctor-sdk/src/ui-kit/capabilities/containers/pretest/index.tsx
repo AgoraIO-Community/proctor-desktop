@@ -1,7 +1,16 @@
-import { observer } from "mobx-react";
 
+import { StudentPretest } from './student-pretest';
+import { observer } from "mobx-react";
+import { AgoraModal } from '@/ui-kit/components/modal';
 
 
 export const PretestContainer = observer(() => {
-    return <div />
+    return (
+      <AgoraModal 
+      centered
+      open={true}
+      width={731}>
+        <StudentPretest/>
+    </AgoraModal>
+)
 });

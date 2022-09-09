@@ -38,6 +38,7 @@ import {
   LaunchWindowOption,
   WindowID,
 } from "./type";
+import 'antd/dist/antd.css';
 
 export * from "./type";
 
