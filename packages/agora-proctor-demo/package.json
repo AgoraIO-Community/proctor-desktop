@@ -116,5 +116,8 @@
   },
   "dependencies": {
     "agora-proctor-sdk": "1.0.0"
+  },
+  "devDependencies": {
+    "@types/styled-components": "5.1.26"
   }
 }
