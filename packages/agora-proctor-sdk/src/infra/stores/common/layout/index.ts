@@ -1,13 +1,26 @@
-import { AgoraEduClassroomEvent, ClassroomState, EduEventCenter } from 'agora-edu-core';
-import { action, computed, observable, runInAction } from 'mobx';
-import { EduUIStoreBase } from '../base';
-import uuidv4 from 'uuid';
-import { transI18n } from '~ui-kit';
-import { bound } from 'agora-rte-sdk';
-
+import {
+  AgoraEduClassroomEvent,
+  ClassroomState,
+  EduEventCenter,
+} from "agora-edu-core";
+import { action, computed, observable, runInAction } from "mobx";
+import { EduUIStoreBase } from "../base";
+import uuidv4 from "uuid";
+import { transI18n } from "~ui-kit";
+import { bound } from "agora-rte-sdk";
+import { VideosWallLayoutEnum } from "../type";
+import { iterateMap } from "agora-edu-core";
 export class LayoutUIStore extends EduUIStoreBase {
+  @observable currentTab = "ALL_VIDEOS";
+
+  @observable videosWallLayout: VideosWallLayoutEnum =
+    VideosWallLayoutEnum.Compact;
+
   @observable
   awardAnims: { id: string }[] = [];
+
+  @observable
+  studentTabItemsMap: Map<string, { label: string; key: string }> = new Map();
 
   @computed
   get isInSubRoom() {
@@ -15,15 +28,24 @@ export class LayoutUIStore extends EduUIStoreBase {
   }
 
   @computed
+  get studentTabItems() {
+    const { list } = iterateMap(this.studentTabItemsMap, {
+      onMap: (_key, item) => item,
+    });
+    return list;
+  }
+
+  @computed
   get loadingText() {
     if (this.classroomStore.remoteControlStore.remoteControlRequesting) {
-      const studentName = this.classroomStore.remoteControlStore.currentStudent?.userName;
-      return transI18n('fcr_share_reminded_student_agree', {
+      const studentName =
+        this.classroomStore.remoteControlStore.currentStudent?.userName;
+      return transI18n("fcr_share_reminded_student_agree", {
         reason1: studentName,
         reason2: studentName,
       });
     }
-    return '';
+    return "";
   }
 
   /**
@@ -55,17 +77,42 @@ export class LayoutUIStore extends EduUIStoreBase {
       });
     }
   }
+  @action.bound
+  setCurrentTab = (key: string) => {
+    this.currentTab = key;
+  };
+  @action.bound
+  addStudentTab = (userUuid: string, userName: string) => {
+    if (this.studentTabItemsMap.has(userUuid)) return;
+    this.studentTabItemsMap.set(userUuid, { label: userName, key: userUuid });
+    this.setCurrentTab(userUuid);
+  };
+  @action.bound
+  removeStudentTab = (userUuid: string) => {
+    if (!this.studentTabItemsMap.has(userUuid)) return;
+    this.studentTabItemsMap.delete(userUuid);
+    this.setCurrentTab(
+      this.studentTabItems.length > 0
+        ? this.studentTabItems[this.studentTabItems.length - 1].key
+        : "ALL_VIDEOS"
+    );
+  };
 
   @action.bound
   removeAward(id: string) {
     this.awardAnims = this.awardAnims.filter((anim) => anim.id !== id);
+  }
+  @action.bound
+  setVideosWallLayout(layout: VideosWallLayoutEnum) {
+    this.videosWallLayout = layout;
   }
   /**
    * 教室加载状态
    */
   @computed get loading(): boolean {
     const classroomState = this.classroomStore.connectionStore.classroomState;
-    const remoteControlRequesting = this.classroomStore.remoteControlStore.remoteControlRequesting;
+    const remoteControlRequesting =
+      this.classroomStore.remoteControlStore.remoteControlRequesting;
     return (
       classroomState === ClassroomState.Connecting ||
       classroomState === ClassroomState.Reconnecting ||

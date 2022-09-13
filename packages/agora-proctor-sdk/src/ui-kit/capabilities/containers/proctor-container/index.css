@@ -1,4 +1,4 @@
 .fcr_proctor_container {
   display: flex;
-  min-width: 100vw;
+  width: 100%;
 }

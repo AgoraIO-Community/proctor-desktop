@@ -133,3 +133,8 @@ export interface CabinetItem {
   name: string;
   iconType?: string;
 }
+
+export enum VideosWallLayoutEnum {
+  Loose = 4,
+  Compact = 6,
+}
