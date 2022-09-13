@@ -126,7 +126,7 @@ export const PreTestSpeaker: FC = observer(() => {
   );
 });
 
-export const PureVideo: FC = observer(() => {
+export const PureVideo: FC<{ height?: string }> = observer((props) => {
   const {
     pretestUIStore: { setupLocalVideo },
   } = useStore();
@@ -139,7 +139,7 @@ export const PureVideo: FC = observer(() => {
     }
   }, [ref]);
 
-  return <VideoContainer ref={ref} />;
+  return <VideoContainer ref={ref} height={props.height} />;
 });
 
 const VolumeDance: FC = observer(() => {
@@ -161,9 +161,9 @@ const VolumeDance: FC = observer(() => {
   );
 });
 
-const VideoContainer = styled.div`
+const VideoContainer = styled.div<{ height?: string }>`
   width: 100%;
-  height: 175px;
+  height: ${(props) => (props.height ? props.height : "175px")};
   ${AgoraMidBorderRadius}
   overflow: hidden;
   margin-top: 8px;

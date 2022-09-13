@@ -5,7 +5,7 @@ import {
   EduEventCenter,
 } from "agora-edu-core";
 import { AgoraRteMediaSourceState, bound, Logger } from "agora-rte-sdk";
-import { action, computed, Lambda, observable } from "mobx";
+import { action, computed, Lambda, observable, runInAction } from "mobx";
 import { computedFn } from "mobx-utils";
 import { v4 as uuidv4 } from "uuid";
 import { transI18n } from "~ui-kit";
@@ -20,7 +20,12 @@ export type PretestToast = {
 
 type AddToastArgs = Omit<PretestToast, "id">;
 
-type StepType = "one" | "two" | "three";
+export enum EnumStep {
+  one = 0,
+  two,
+  three,
+  finished,
+}
 
 export class PretestUIStore extends EduUIStoreBase {
   private readonly _disposers = new Set<Lambda>();
@@ -129,7 +134,9 @@ export class PretestUIStore extends EduUIStoreBase {
   /**
    * 当前步骤
    */
-  @observable currentStep: StepType = "one";
+  @observable currentStep: number = EnumStep["one"];
+
+  @observable snapshotImage: string = "";
 
   /**
    * 视频消息 Toast 列表
@@ -396,6 +403,46 @@ export class PretestUIStore extends EduUIStoreBase {
     }
   }
 
+  @computed
+  get headerStep() {
+    if (
+      this.currentStep === EnumStep["three"] ||
+      this.currentStep === EnumStep["finished"]
+    ) {
+      return EnumStep["three"];
+    }
+    return this.currentStep;
+  }
+
+  /**
+   * 是否在屏幕分享中
+   */
+  @computed
+  get isScreenSharing() {
+    return (
+      this.classroomStore.mediaStore.localScreenShareTrackState ===
+        AgoraRteMediaSourceState.started ||
+      this.classroomStore.mediaStore.localScreenShareTrackState ===
+        AgoraRteMediaSourceState.starting
+    );
+  }
+
+  @computed
+  get stepupStates() {
+    return [
+      this.classroomStore.mediaStore.localCameraTrackState ===
+        AgoraRteMediaSourceState.started ||
+        this.classroomStore.mediaStore.localCameraTrackState ===
+          AgoraRteMediaSourceState.starting,
+      this.classroomStore.mediaStore.localMicTrackState ===
+        AgoraRteMediaSourceState.started ||
+        this.classroomStore.mediaStore.localMicTrackState ===
+          AgoraRteMediaSourceState.starting,
+      this.snapshotImage,
+      this.isScreenSharing,
+    ];
+  }
+
   /**
    * 美颜类型 Icon
    */
@@ -589,8 +636,99 @@ export class PretestUIStore extends EduUIStoreBase {
    * @param step
    */
   @action.bound
-  setCurrentStep(step: StepType) {
+  setCurrentStep(step: number) {
     this.currentStep = step;
+  }
+
+  /**
+   * 设置上一步
+   */
+  @action.bound
+  setPrevStep() {
+    let currentStep = this.currentStep - 1;
+    this.setCurrentStep(currentStep);
+  }
+
+  @bound
+  backToMainPage() {
+    // back to main page
+  }
+
+  /**
+   * 设置下一步
+   */
+  @action.bound
+  setNextStep() {
+    let currentStep = this.currentStep + 1;
+    this.setCurrentStep(currentStep);
+  }
+
+  /**
+   *  处理弹窗左下角按钮操作
+   */
+  @action.bound
+  handleLeftBtnAction() {
+    if (this.currentStep <= 0) {
+      this.backToMainPage();
+    } else {
+      this.setPrevStep();
+    }
+  }
+
+  /**
+   * 截图
+   */
+  @bound
+  async getSnapshot() {
+    let imageData =
+      await this.classroomStore.mediaStore.mediaControl.getCurrentFrameData(
+        "",
+        "",
+        true
+      );
+    const canvas = document.createElement("canvas");
+    canvas.width = imageData.width;
+    canvas.height = imageData.height;
+    const canvasCtx = canvas.getContext("2d") as CanvasRenderingContext2D;
+    canvasCtx.putImageData(imageData, 0, 0);
+    const base64 = canvas.toDataURL("image/jpeg", 1.0);
+    return base64;
+  }
+
+  @bound
+  startLocalScreenShare() {
+    if (!this.classroomStore.mediaStore.hasScreenSharePermission()) {
+      this.shareUIStore.addToast(
+        transI18n("toast2.screen_permission_denied"),
+        "warning"
+      );
+    }
+
+    return this.classroomStore.mediaStore.startScreenShareCapture();
+  }
+
+  /**
+   * 渲染视频渲染
+   * @param dom HTMLElement
+   * @returns
+   */
+  @bound
+  setupLocalScreenShare(dom: HTMLElement) {
+    return this.classroomStore.mediaStore.setupLocalScreenShare(dom);
+  }
+
+  @action.bound
+  async getSnapshotImage() {
+    if (this.snapshotImage) {
+      runInAction(() => {
+        this.snapshotImage = "";
+      });
+    } else {
+      let base64 = await this.getSnapshot();
+      runInAction(() => {
+        this.snapshotImage = base64;
+      });
+    }
   }
 
   @bound

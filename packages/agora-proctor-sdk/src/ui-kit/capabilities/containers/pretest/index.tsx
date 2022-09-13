@@ -1,3 +1,4 @@
+import { useStore } from "@/infra/hooks/ui-store";
 import { AgoraButton } from "@/ui-kit/components/button";
 import { AgoraModal } from "@/ui-kit/components/modal";
 import { observer } from "mobx-react";
@@ -6,19 +7,34 @@ import { StudentPretest } from "./student-pretest";
 
 export const PretestContainer = observer(() => {
   return (
-    <AgoraModal centered open={true} width={731} footer={<PretestFooter />}>
+    <AgoraModal
+      centered
+      open={true}
+      width={730}
+      footer={<PretestFooter />}
+      placement="bottom"
+    >
       <StudentPretest />
     </AgoraModal>
   );
 });
 
 const PretestFooter = observer(() => {
+  const {
+    pretestUIStore: { setNextStep, currentStep, handleLeftBtnAction },
+  } = useStore();
+
   return (
     <FooterContainer>
-      <AgoraButton size="large" type="primary" subType="original">
-        prev
+      <AgoraButton
+        size="large"
+        type="primary"
+        subType="original"
+        onClick={handleLeftBtnAction}
+      >
+        {currentStep <= 0 ? "cancel" : "prev"}
       </AgoraButton>
-      <AgoraButton size="large" type="primary">
+      <AgoraButton size="large" type="primary" onClick={() => setNextStep()}>
         next
       </AgoraButton>
     </FooterContainer>
