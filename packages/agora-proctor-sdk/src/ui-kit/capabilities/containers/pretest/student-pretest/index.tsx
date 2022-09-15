@@ -1,72 +1,49 @@
-import { AgoraStep, AgoraSteps } from "@/ui-kit/components/steps"
-import { Col, Row } from 'antd';
-import styled, { css } from "styled-components"
+import { useStore } from "@/infra/hooks/ui-store";
+import { AgoraStep, AgoraSteps } from "@/ui-kit/components/steps";
+import { observer } from "mobx-react";
+import styled from "styled-components";
+import { Conclusion } from "./conclusion";
+import { DeviceTest } from "./device-test";
+import { ImageSnapshot } from "./image-snapshot";
+import { ShareScreen } from "./share-screen";
 
-export const StudentPretest = () => {
+export const StudentPretest = observer(() => {
+  const {
+    pretestUIStore: { currentStep, headerStep },
+  } = useStore();
 
-    return (
-        <Container>
-            <PreTestHeader>Exam Prep</PreTestHeader>
-            <AgoraSteps current={1} progressDot>
-                <AgoraStep title="01" description="Device Test" />
-                <AgoraStep title="02" description="Take your photo" />
-                <AgoraStep title="03" description="Share entire screen" />
-            </AgoraSteps>
-            <ProcessInfo>Please 进行设备检测</ProcessInfo>
-            <StyledRow>
-                <Col span={12}>
-                    <ItemTitle>Camera</ItemTitle>
-                    <Card>
-                        camera 1
-                    </Card>
-                </Col>
-                <Col span={12}>
-                    <ItemTitle>Microphone</ItemTitle>
-                    <Card>
-                        card 2
-                    </Card>
-                    <ItemTitle>Speaker</ItemTitle>
-                    <Card>
-                       card 3
-                    </Card>
-                </Col>
-            </StyledRow>
-        </Container>
-    )
-}
+  return (
+    <Container>
+      <PreTestHeader>Exam Prep</PreTestHeader>
+      <AgoraSteps current={headerStep} progressDot>
+        <AgoraStep title="01" description="Device Test" />
+        <AgoraStep title="02" description="Take your photo" />
+        <AgoraStep title="03" description="Share entire screen" />
+      </AgoraSteps>
+      <ProcessInfo>Please 进行设备检测</ProcessInfo>
+      {currentStep === 0 && <DeviceTest />}
+      {currentStep === 1 && <ImageSnapshot />}
+      {currentStep === 2 && <ShareScreen />}
+      {currentStep === 3 && <Conclusion />}
+    </Container>
+  );
+});
 
-
-const CardRadius = css`
-    border-radius: 24px;
-`
 const Container = styled.div`
-    height: 663px;
-    box-sizing: border-box;
-`
+  height: 556px;
+  box-sizing: border-box;
+`;
 const PreTestHeader = styled.p`
-    font-weight: 800;
-    font-size: 26px;
-    line-height: 14px;
-    text-align: center;
-    margin-top: 36px;
-`
-const StyledRow = styled(Row)`
-    padding: 0 29px;
-`
-const ProcessInfo = styled(PreTestHeader)`
-    font-size: 18px;
-    font-weight: 400;
-    margin-top: 60px;
-    margin-bottom: 40px;
-`
-const ItemTitle = styled(PreTestHeader)`
-    text-align: left;
-    font-size: 16px;
-    margin-top: 0;
-`
+  font-weight: 800;
+  font-size: 26px;
+  line-height: 14px;
+  text-align: center;
+  padding-top: 36px;
+`;
 
-const Card = styled.div`
-    ${CardRadius}
-    background: rgb(51, 50, 68, 0.05);
-    padding: 6px;
-`
+const ProcessInfo = styled(PreTestHeader)`
+  font-size: 18px;
+  font-weight: 400;
+  padding: 30px 0;
+  margin-bottom: 0;
+`;
