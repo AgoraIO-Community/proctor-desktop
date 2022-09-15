@@ -4,3 +4,5 @@ import { css } from "styled-components";
 export const AgoraMidBorderRadius = css`
   border-radius: 24px;
 `;
+
+export const AgoraBaseTextColor = "#000";

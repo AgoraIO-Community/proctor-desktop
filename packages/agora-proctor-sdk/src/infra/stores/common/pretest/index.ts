@@ -427,6 +427,23 @@ export class PretestUIStore extends EduUIStoreBase {
     );
   }
 
+  /**
+   * 是否选择了多媒体
+   */
+  @computed
+  get isMediaReady() {
+    return (
+      (this.classroomStore.mediaStore.localCameraTrackState ===
+        AgoraRteMediaSourceState.started ||
+        this.classroomStore.mediaStore.localCameraTrackState ===
+          AgoraRteMediaSourceState.starting) &&
+      (this.classroomStore.mediaStore.localMicTrackState ===
+        AgoraRteMediaSourceState.started ||
+        this.classroomStore.mediaStore.localMicTrackState ===
+          AgoraRteMediaSourceState.starting)
+    );
+  }
+
   @computed
   get stepupStates() {
     return [
@@ -441,6 +458,24 @@ export class PretestUIStore extends EduUIStoreBase {
       this.snapshotImage,
       this.isScreenSharing,
     ];
+  }
+
+  /**
+   * 右下角按钮点击状态
+   */
+  @computed
+  get rightBtnDisable() {
+    if (this.currentStep === 0) return !this.isMediaReady;
+    if (this.currentStep === 1) return !this.snapshotImage;
+    if (this.currentStep === 2) return !this.isScreenSharing;
+    if (this.currentStep === 3) return this.stepupStates.every((item) => !item);
+  }
+
+  @computed
+  get rightBtnText() {
+    if (this.currentStep === 0 || this.currentStep === 1) return "next";
+    if (this.currentStep === 2) return "confirm";
+    if (this.currentStep === 3) return "join exam";
   }
 
   /**
@@ -650,16 +685,23 @@ export class PretestUIStore extends EduUIStoreBase {
   }
 
   @bound
-  backToMainPage() {
-    // back to main page
+  private _backToLoginPage() {
+    // back to login page
+    console.log("back to login page");
   }
 
   /**
    * 设置下一步
    */
   @action.bound
-  setNextStep() {
+  setNextStep(okCallback: () => void) {
     let currentStep = this.currentStep + 1;
+    if (currentStep > EnumStep["finished"]) {
+      // finish
+      // todo join the exam
+      okCallback();
+      return;
+    }
     this.setCurrentStep(currentStep);
   }
 
@@ -669,7 +711,7 @@ export class PretestUIStore extends EduUIStoreBase {
   @action.bound
   handleLeftBtnAction() {
     if (this.currentStep <= 0) {
-      this.backToMainPage();
+      this._backToLoginPage();
     } else {
       this.setPrevStep();
     }
