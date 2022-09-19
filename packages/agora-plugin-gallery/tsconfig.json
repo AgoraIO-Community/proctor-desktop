@@ -1,0 +1,3 @@
+{
+  "extends": "../agora-proctor-sdk/tsconfig.json"
+}

@@ -1,12 +1,3 @@
-import { AGError, AgoraRteLogLevel, Log } from "agora-rte-sdk";
-import { DeviceSettingUIStore } from "./device-setting/index";
-import { NavigationBarUIStore } from "./nav-ui";
-import { EduShareUIStore } from "./share-ui";
-import { StreamUIStore } from "./stream";
-import { LayoutUIStore } from "./layout";
-import { EduUIStoreBase } from "./base";
-import { NotificationUIStore } from "./notification-ui";
-import { PretestUIStore } from "./pretest";
 import {
   AGServiceErrorCode,
   EduClassroomConfig,
@@ -20,6 +11,15 @@ import { ConvertMediaOptionsConfig } from "@/infra/api";
 import { SubscriptionUIStore } from "./subscription";
 import { transI18n } from "~ui-kit";
 import { UsersUIStore } from "./users";
+import { AGError, AgoraRteLogLevel, Log } from "agora-rte-sdk";
+import { EduUIStoreBase } from "./base";
+import { DeviceSettingUIStore } from "./device-setting/index";
+import { LayoutUIStore } from "./layout";
+import { NavigationBarUIStore } from "./nav-ui";
+import { NotificationUIStore } from "./notification-ui";
+import { PretestUIStore } from "./pretest";
+import { EduShareUIStore } from "./share-ui";
+import { StreamUIStore } from "./stream";
 @Log.attach({ level: AgoraRteLogLevel.INFO })
 export class EduClassroomUIStore {
   protected _classroomStore: EduClassroomStore;

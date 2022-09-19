@@ -16,7 +16,7 @@ lerna bootstrap
 
 ```bash
 # 拷贝配置文件到demo目录
-cp .env.example packages/agora-classroom-sdk/.env
+cp .env.example packages/agora-proctor-sdk/.env
 
 # 按照模板配置你的项目
 ```

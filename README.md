@@ -15,8 +15,8 @@ yarn bootstrap
 ## Config
 
 ```bash
-# copy config template to agora-classroom-sdk project
-cp .env.example packages/agora-classroom-sdk/.env
+# copy config template to agora-proctor-sdk project
+cp .env.example packages/agora-proctor-sdk/.env
 
 # fill the config with your agora.io development environment
 ```
