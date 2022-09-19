@@ -1,29 +1,52 @@
 import { useStore } from "@/infra/hooks/ui-store";
 import { AgoraButton } from "@/ui-kit/components/button";
 import { AgoraModal } from "@/ui-kit/components/modal";
+import { EduClassroomConfig, EduRoleTypeEnum } from "agora-edu-core";
 import { observer } from "mobx-react";
 import { FC } from "react";
 import styled from "styled-components";
-import { StudentPretest } from "./student-pretest";
+import { StudentPretest, TeacherPretest } from "./student-pretest";
 
 interface pretestProps {
   onOk: () => void;
 }
 export const PretestContainer: FC<pretestProps> = observer(({ onOk }) => {
+  const isTeacher =
+    EduClassroomConfig.shared.sessionInfo.role === EduRoleTypeEnum.teacher;
+  return isTeacher ? (
+    <TeacherPretestModal onOk={onOk}></TeacherPretestModal>
+  ) : (
+    <StudentPretestModal onOk={onOk}></StudentPretestModal>
+  );
+});
+
+const StudentPretestModal: FC<pretestProps> = observer(({ onOk }) => {
   return (
     <AgoraModal
       centered
       open={true}
       width={730}
-      footer={<PretestFooter onOk={onOk} />}
+      footer={<StudentPretestFooter onOk={onOk} />}
       placement="bottom"
     >
       <StudentPretest />
     </AgoraModal>
   );
 });
-
-const PretestFooter: FC<pretestProps> = observer(({ onOk }) => {
+const TeacherPretestModal: FC<pretestProps> = observer(({ onOk }) => {
+  return (
+    <AgoraModal
+      centered
+      open={true}
+      width={730}
+      footer={<TeacherPretestFooter onOk={onOk} />}
+      placement="bottom"
+    >
+      <TeacherPretest />
+    </AgoraModal>
+  );
+});
+const StudentPretestFooter: FC<pretestProps> = observer(({ onOk }) => {
   const {
     pretestUIStore: {
       setNextStep,
@@ -56,7 +79,19 @@ const PretestFooter: FC<pretestProps> = observer(({ onOk }) => {
     </FooterContainer>
   );
 });
+const TeacherPretestFooter: FC<pretestProps> = observer(({ onOk }) => {
+  const {
+    pretestUIStore: { rightBtnText },
+  } = useStore();
 
+  return (
+    <FooterContainer>
+      <AgoraButton size="large" type="primary" onClick={onOk} width="200px">
+        {rightBtnText}
+      </AgoraButton>
+    </FooterContainer>
+  );
+});
 const FooterContainer = styled.div`
   display: flex;
   height: 100%;

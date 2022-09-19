@@ -98,7 +98,7 @@ export class EduClassroomUIStore {
     return this._groupUIStore;
   }
   get usersUIStore() {
-    return this._groupUIStore;
+    return this._usersUIStore;
   }
 
   /**

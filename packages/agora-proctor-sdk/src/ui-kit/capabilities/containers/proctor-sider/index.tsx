@@ -1,7 +1,12 @@
+import { useStore } from "@/infra/hooks/ui-store";
 import { Button } from "antd";
+import { observer } from "mobx-react";
 import { SvgIconEnum, SvgImg } from "~ui-kit";
 import "./index.css";
-export const ProctorSider = () => {
+export const ProctorSider = observer(() => {
+  const {
+    usersUIStore: { studentListByUserUuidPrefix },
+  } = useStore();
   return (
     <div className={"fcr_proctor_sider"}>
       <div className={"fcr_proctor_sider_logo"}>灵动课堂</div>
@@ -17,7 +22,7 @@ export const ProctorSider = () => {
           </div>
           <div>
             <SvgImg type={SvgIconEnum.PEOPLE}></SvgImg>
-            <span>20</span>
+            <span>{studentListByUserUuidPrefix.size}</span>
           </div>
         </div>
         <div>
@@ -28,4 +33,4 @@ export const ProctorSider = () => {
       </div>
     </div>
   );
-};
+});

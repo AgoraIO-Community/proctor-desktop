@@ -11,6 +11,7 @@ import { SvgIconEnum, SvgImg } from "~ui-kit";
 
 export const AllVideos = observer(() => {
   const {
+    usersUIStore: { studentListByUserUuidPrefix },
     layoutUIStore: { videosWallLayout },
   } = useStore();
   const containerRef = useRef<HTMLDivElement>(null);
@@ -42,59 +43,65 @@ export const AllVideos = observer(() => {
   };
   return (
     <div className="fcr-all-videos-tab" ref={containerRef}>
-      <div className="fcr-all-videos-tab-controller">
-        <div className="fcr-all-videos-tab-controller-prev" onClick={prev}>
-          <SvgImg type={SvgIconEnum.TRIANGLE_SOLID_UP}></SvgImg>
-        </div>
-        <div className="fcr-all-videos-tab-controller-info">
-          <span>20</span>
-          <span>/</span>
-          <span>30</span>
-        </div>
-        <div className="fcr-all-videos-tab-controller-next" onClick={next}>
-          <SvgImg type={SvgIconEnum.TRIANGLE_SOLID_DOWN}></SvgImg>
-        </div>
-      </div>
-      <div className="fcr-all-videos-tab-page" onWheel={onWheel}>
-        <Carousel
-          initialSlide={0}
-          dots={false}
-          ref={carouselRef}
-          vertical
-          verticalSwiping
-          infinite={false}
-          lazyLoad="ondemand"
-          afterChange={afterCarouselChange}
-        >
-          <div>
-            <div
-              className={`fcr-all-videos-tab-page-item fcr-all-videos-tab-page-item-${VideosWallLayoutEnum[
-                videosWallLayout
-              ].toLowerCase()}`}
-              style={{ height: containerHeight }}
-            >
-              <StudentCard></StudentCard>
-              <StudentCard></StudentCard>
-              <StudentCard></StudentCard>
-              <StudentCard></StudentCard>
+      {studentListByUserUuidPrefix.size > 0 ? (
+        <>
+          <div className="fcr-all-videos-tab-controller">
+            <div className="fcr-all-videos-tab-controller-prev" onClick={prev}>
+              <SvgImg type={SvgIconEnum.TRIANGLE_SOLID_UP}></SvgImg>
+            </div>
+            <div className="fcr-all-videos-tab-controller-info">
+              <span>20</span>
+              <span>/</span>
+              <span>{studentListByUserUuidPrefix.size}</span>
+            </div>
+            <div className="fcr-all-videos-tab-controller-next" onClick={next}>
+              <SvgImg type={SvgIconEnum.TRIANGLE_SOLID_DOWN}></SvgImg>
             </div>
           </div>
-          <div>
-            <div
-              className={`fcr-all-videos-tab-page-item fcr-all-videos-tab-page-item-${VideosWallLayoutEnum[
-                videosWallLayout
-              ].toLowerCase()}`}
-              style={{ height: containerHeight }}
+          <div className="fcr-all-videos-tab-page" onWheel={onWheel}>
+            <Carousel
+              initialSlide={0}
+              dots={false}
+              ref={carouselRef}
+              vertical
+              verticalSwiping
+              infinite={false}
+              lazyLoad="ondemand"
+              afterChange={afterCarouselChange}
             >
-              <StudentCard></StudentCard>
-              <StudentCard></StudentCard>
-              <StudentCard></StudentCard>
-              <StudentCard></StudentCard>
-              <StudentCard></StudentCard>
-            </div>
+              <div>
+                <div
+                  className={`fcr-all-videos-tab-page-item fcr-all-videos-tab-page-item-${VideosWallLayoutEnum[
+                    videosWallLayout
+                  ].toLowerCase()}`}
+                  style={{ height: containerHeight }}
+                >
+                  <StudentCard></StudentCard>
+                  <StudentCard></StudentCard>
+                  <StudentCard></StudentCard>
+                  <StudentCard></StudentCard>
+                </div>
+              </div>
+              <div>
+                <div
+                  className={`fcr-all-videos-tab-page-item fcr-all-videos-tab-page-item-${VideosWallLayoutEnum[
+                    videosWallLayout
+                  ].toLowerCase()}`}
+                  style={{ height: containerHeight }}
+                >
+                  <StudentCard></StudentCard>
+                  <StudentCard></StudentCard>
+                  <StudentCard></StudentCard>
+                  <StudentCard></StudentCard>
+                  <StudentCard></StudentCard>
+                </div>
+              </div>
+            </Carousel>
           </div>
-        </Carousel>
-      </div>
+        </>
+      ) : (
+        <div className="fcr-all-videos-empty"></div>
+      )}
     </div>
   );
 });
