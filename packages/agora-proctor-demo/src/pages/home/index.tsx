@@ -1,5 +1,5 @@
 import { EduRegion } from "agora-edu-core";
-import { LanguageEnum } from "agora-proctor-sdk";
+import { EnumDeviceType, LanguageEnum } from "agora-proctor-sdk";
 import React, { useEffect, useImperativeHandle, useRef, useState } from "react";
 import { useHistory } from "react-router";
 import { HomeLaunchOption } from "src/stores/home";
@@ -34,7 +34,6 @@ const regionByLang = {
   zh: EduRegion.CN,
   en: EduRegion.NA,
 };
-
 interface inputRoomInfoRef {
   getRoomInfo: () => string;
 }
@@ -82,7 +81,7 @@ export const HomePage = () => {
       const config: HomeLaunchOption = {
         appId,
         sdkDomain: domain,
-        pretest: true,
+        pretest: false, // test for now
         language: language as LanguageEnum,
         userUuid: `${userUuid}`,
         rtmToken: token,
@@ -94,6 +93,7 @@ export const HomePage = () => {
         region: region as EduRegion,
         duration: +30 * 60,
         latencyLevel: 2,
+        deviceType: EnumDeviceType.Main,
       };
 
       config.appId = REACT_APP_AGORA_APP_ID || config.appId;
@@ -133,7 +133,7 @@ const TestRoomInfoArea = React.forwardRef((props, ref) => {
     roomName: `OliverTestRoom${Date.now()}`,
   };
 
-  const userUuid = `${defaultRoomInfo.userName}${defaultRoomInfo.userRole}`;
+  const userUuid = `${defaultRoomInfo.userName}${defaultRoomInfo.userRole}-main`;
   const roomUuid = `${defaultRoomInfo.roomName}${defaultRoomInfo.roomType}`;
 
   const [value, setValue] = useState<string>(
