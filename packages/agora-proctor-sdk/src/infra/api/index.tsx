@@ -11,6 +11,7 @@ import {
   EduRoomTypeEnum,
   Platform,
 } from "agora-edu-core";
+import { FcrWebviewWidget } from "agora-plugin-gallery";
 import { ApiBase } from "agora-rte-sdk";
 import { render, unmountComponentAtNode } from "react-dom";
 import { FcrTheme } from "~ui-kit";
@@ -26,6 +27,7 @@ import {
   uiConfigs,
 } from "../utils/config-loader";
 
+import "antd/dist/antd.css";
 import "./polyfills";
 import { Providers } from "./providers";
 import {
@@ -36,9 +38,7 @@ import {
   LaunchMediaOptions,
   LaunchOption,
   LaunchWindowOption,
-  WindowID,
 } from "./type";
-import 'antd/dist/antd.css';
 
 export * from "./type";
 
@@ -255,7 +255,10 @@ export class AgoraEduSDK {
 
     this._language = option.language;
 
-    this._widgets = { ...option.widgets };
+    this._widgets = {
+      ...option.widgets,
+      [this._getWidgetName(FcrWebviewWidget)]: FcrWebviewWidget,
+    };
 
     const config = new EduClassroomConfig(
       this._appId,

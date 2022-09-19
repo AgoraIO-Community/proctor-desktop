@@ -1,6 +1,6 @@
-### agora-classroom-sdk
+### agora-proctor-sdk
 
-For publishing npm package agora-classroom-sdk (Web & Electron). Get more information from https://docs.agora.io
+For publishing npm package agora-proctor-sdk (Web & Electron). Get more information from https://docs.agora.io
 
 ### Requirements
 
