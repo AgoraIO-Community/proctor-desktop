@@ -1,13 +1,14 @@
-import "./style.css";
 import { EduRegion } from "agora-edu-core";
-import { useEffect } from "react";
-import { useHomeStore } from "../../utils/hooks";
-import { getBrowserLanguage } from "../../utils";
 import { LanguageEnum } from "agora-proctor-sdk";
-import { HomeApi } from "./home-api";
-import { HomeLaunchOption } from "src/stores/home";
-import { v4 as uuidv4 } from "uuid";
+import React, { useEffect, useImperativeHandle, useRef, useState } from "react";
 import { useHistory } from "react-router";
+import { HomeLaunchOption } from "src/stores/home";
+import styled from "styled-components";
+import { v4 as uuidv4 } from "uuid";
+import { getBrowserLanguage } from "../../utils";
+import { useHomeStore } from "../../utils/hooks";
+import { HomeApi } from "./home-api";
+import "./style.css";
 
 // addResource();
 
@@ -33,9 +34,15 @@ const regionByLang = {
   zh: EduRegion.CN,
   en: EduRegion.NA,
 };
+
+interface inputRoomInfoRef {
+  getRoomInfo: () => string;
+}
+
 export const HomePage = () => {
   const homeStore = useHomeStore();
   const history = useHistory();
+  const inputRef = useRef<inputRoomInfoRef>();
 
   useEffect(() => {
     const language =
@@ -51,15 +58,11 @@ export const HomePage = () => {
   const handleSubmit = async () => {
     const language = homeStore.language || getBrowserLanguage();
     const region = homeStore.region || regionByLang[getBrowserLanguage()];
+    const roomInfo = inputRef.current
+      ? JSON.parse(inputRef.current.getRoomInfo())
+      : {};
 
-    const userRole = parseInt("1");
-
-    const roomType = parseInt("4");
-
-    const userUuid = `${"userName"}${userRole}`;
-
-    const roomUuid = `${"roomName"}${roomType}`;
-
+    const { userUuid, roomUuid, userRole, roomType } = roomInfo;
     try {
       const domain = `${REACT_APP_AGORA_APP_SDK_DOMAIN}`;
 
@@ -114,7 +117,53 @@ export const HomePage = () => {
   };
   return (
     <div>
-      <button onClick={handleSubmit}>launch</button>
+      <TestRoomInfoArea ref={inputRef} />
+      <button onClick={handleSubmit} type="submit">
+        launch
+      </button>
     </div>
   );
 };
+
+const TestRoomInfoArea = React.forwardRef((props, ref) => {
+  const defaultRoomInfo = {
+    userRole: 2,
+    roomType: 4,
+    userName: "Oliver",
+    roomName: `OliverTestRoom${Date.now()}`,
+  };
+
+  const userUuid = `${defaultRoomInfo.userName}${defaultRoomInfo.userRole}`;
+  const roomUuid = `${defaultRoomInfo.roomName}${defaultRoomInfo.roomType}`;
+
+  const [value, setValue] = useState<string>(
+    JSON.stringify({ ...defaultRoomInfo, userUuid, roomUuid }, null, 2)
+  );
+
+  const handleChange = (e: any) => {
+    setValue(e.currentTarget.textContent);
+  };
+
+  useImperativeHandle(ref, () => ({
+    getRoomInfo: () => {
+      return value;
+    },
+  }));
+
+  return (
+    <TestInput
+      contentEditable={true}
+      suppressContentEditableWarning={true}
+      onInput={handleChange}
+    >
+      {value}
+    </TestInput>
+  );
+});
+
+const TestInput = styled.div`
+  width: 400px;
+  height: 400px;
+  border: 1px solid #eee;
+  border-radius: 8px;
+`;

@@ -1,50 +1,62 @@
-import { AgoraRteMediaSourceState, bound, Logger } from 'agora-rte-sdk';
-import { action, computed, Lambda, observable } from 'mobx';
-import { EduUIStoreBase } from '../base';
-import { CameraPlaceholderType, DeviceStateChangedReason } from '../type';
-import { v4 as uuidv4 } from 'uuid';
-import { computedFn } from 'mobx-utils';
-import { AgoraEduClassroomEvent, BeautyType, DEVICE_DISABLE, EduEventCenter } from 'agora-edu-core';
-import { transI18n } from '~ui-kit';
+import {
+  AgoraEduClassroomEvent,
+  BeautyType,
+  DEVICE_DISABLE,
+  EduEventCenter,
+} from "agora-edu-core";
+import { AgoraRteMediaSourceState, bound, Logger } from "agora-rte-sdk";
+import { action, computed, Lambda, observable, runInAction } from "mobx";
+import { computedFn } from "mobx-utils";
+import { v4 as uuidv4 } from "uuid";
+import { transI18n } from "~ui-kit";
+import { EduUIStoreBase } from "../base";
+import { CameraPlaceholderType, DeviceStateChangedReason } from "../type";
 
 export type PretestToast = {
   id: string;
-  type: 'video' | 'audio_recording' | 'audio_playback' | 'error';
+  type: "video" | "audio_recording" | "audio_playback" | "error";
   info: string;
 };
 
-type AddToastArgs = Omit<PretestToast, 'id'>;
+type AddToastArgs = Omit<PretestToast, "id">;
+
+export enum EnumStep {
+  one = 0,
+  two,
+  three,
+  finished,
+}
 
 export class PretestUIStore extends EduUIStoreBase {
   private readonly _disposers = new Set<Lambda>();
 
   onInstall() {
     // 处理视频设备变动
-    const videoDisposer = computed(() => this.classroomStore.mediaStore.videoCameraDevices).observe(
-      ({ newValue, oldValue }) => {
-        // 避免初始化阶段触发新设备的弹窗通知
-        if (oldValue && oldValue.length > 1) {
-          if (newValue.length > oldValue.length) {
-            this.addToast({
-              type: 'video',
-              info: DeviceStateChangedReason.newDeviceDetected,
-            });
-          }
-        }
-      },
-    );
-
-    this._disposers.add(videoDisposer);
-
-    // 处理录音设备变动
-    const audioRecordingDisposer = computed(
-      () => this.classroomStore.mediaStore.audioRecordingDevices,
+    const videoDisposer = computed(
+      () => this.classroomStore.mediaStore.videoCameraDevices
     ).observe(({ newValue, oldValue }) => {
       // 避免初始化阶段触发新设备的弹窗通知
       if (oldValue && oldValue.length > 1) {
         if (newValue.length > oldValue.length) {
           this.addToast({
-            type: 'audio_recording',
+            type: "video",
+            info: DeviceStateChangedReason.newDeviceDetected,
+          });
+        }
+      }
+    });
+
+    this._disposers.add(videoDisposer);
+
+    // 处理录音设备变动
+    const audioRecordingDisposer = computed(
+      () => this.classroomStore.mediaStore.audioRecordingDevices
+    ).observe(({ newValue, oldValue }) => {
+      // 避免初始化阶段触发新设备的弹窗通知
+      if (oldValue && oldValue.length > 1) {
+        if (newValue.length > oldValue.length) {
+          this.addToast({
+            type: "audio_recording",
             info: DeviceStateChangedReason.newDeviceDetected,
           });
         }
@@ -55,13 +67,13 @@ export class PretestUIStore extends EduUIStoreBase {
 
     // 处理扬声器设备变动
     const playbackDisposer = computed(
-      () => this.classroomStore.mediaStore.audioPlaybackDevices,
+      () => this.classroomStore.mediaStore.audioPlaybackDevices
     ).observe(({ newValue, oldValue }) => {
       // 避免初始化阶段触发新设备的弹窗通知
       if (oldValue && oldValue.length > 0) {
         if (newValue.length > oldValue.length) {
           this.addToast({
-            type: 'audio_playback',
+            type: "audio_playback",
             info: DeviceStateChangedReason.newDeviceDetected,
           });
         }
@@ -82,19 +94,19 @@ export class PretestUIStore extends EduUIStoreBase {
     switch (type) {
       case AgoraEduClassroomEvent.CurrentCamUnplugged:
         this.addToast({
-          type: 'error',
+          type: "error",
           info: DeviceStateChangedReason.cameraUnplugged,
         });
         break;
       case AgoraEduClassroomEvent.CurrentMicUnplugged:
         this.addToast({
-          type: 'error',
+          type: "error",
           info: DeviceStateChangedReason.micUnplugged,
         });
         break;
       case AgoraEduClassroomEvent.CurrentSpeakerUnplugged:
         this.addToast({
-          type: 'error',
+          type: "error",
           info: DeviceStateChangedReason.playbackUnplugged,
         });
         break;
@@ -120,12 +132,19 @@ export class PretestUIStore extends EduUIStoreBase {
   @observable playbackTesting = false;
 
   /**
+   * 当前步骤
+   */
+  @observable currentStep: number = EnumStep["one"];
+
+  @observable snapshotImage: string = "";
+
+  /**
    * 视频消息 Toast 列表
    * @returns
    */
   @computed
   get videoToastQueue() {
-    return this.toastQueue.filter((t) => t.type === 'video');
+    return this.toastQueue.filter((t) => t.type === "video");
   }
 
   /**
@@ -134,7 +153,7 @@ export class PretestUIStore extends EduUIStoreBase {
    */
   @computed
   get audioPlaybackToastQueue() {
-    return this.toastQueue.filter((t) => t.type === 'audio_playback');
+    return this.toastQueue.filter((t) => t.type === "audio_playback");
   }
 
   /**
@@ -143,7 +162,7 @@ export class PretestUIStore extends EduUIStoreBase {
    */
   @computed
   get audioRecordingToastQueue() {
-    return this.toastQueue.filter((t) => t.type === 'audio_recording');
+    return this.toastQueue.filter((t) => t.type === "audio_recording");
   }
 
   /**
@@ -152,7 +171,7 @@ export class PretestUIStore extends EduUIStoreBase {
    */
   @computed
   get errorToastQueue() {
-    return this.toastQueue.filter((t) => t.type === 'error');
+    return this.toastQueue.filter((t) => t.type === "error");
   }
 
   /**
@@ -161,7 +180,10 @@ export class PretestUIStore extends EduUIStoreBase {
    */
   @computed get cameraDevicesList() {
     return this.classroomStore.mediaStore.videoCameraDevices.map((item) => ({
-      label: item.deviceid === DEVICE_DISABLE ? transI18n('disabled') : item.devicename,
+      label:
+        item.deviceid === DEVICE_DISABLE
+          ? transI18n("disabled")
+          : item.devicename,
       value: item.deviceid,
     }));
   }
@@ -172,7 +194,10 @@ export class PretestUIStore extends EduUIStoreBase {
    */
   @computed get recordingDevicesList() {
     return this.classroomStore.mediaStore.audioRecordingDevices.map((item) => ({
-      label: item.deviceid === DEVICE_DISABLE ? transI18n('disabled') : item.devicename,
+      label:
+        item.deviceid === DEVICE_DISABLE
+          ? transI18n("disabled")
+          : item.devicename,
       value: item.deviceid,
     }));
   }
@@ -182,16 +207,17 @@ export class PretestUIStore extends EduUIStoreBase {
    * @returns
    */
   @computed get playbackDevicesList() {
-    const playbackDevicesList = this.classroomStore.mediaStore.audioPlaybackDevices.map((item) => ({
-      label: item.devicename,
-      value: item.deviceid,
-    }));
+    const playbackDevicesList =
+      this.classroomStore.mediaStore.audioPlaybackDevices.map((item) => ({
+        label: item.devicename,
+        value: item.deviceid,
+      }));
     return playbackDevicesList.length
       ? playbackDevicesList
       : [
           {
             label: transI18n(`media.default`),
-            value: 'default',
+            value: "default",
           },
         ];
   }
@@ -201,7 +227,7 @@ export class PretestUIStore extends EduUIStoreBase {
    * @returns
    */
   @computed get currentCameraDeviceId(): string {
-    return this.classroomStore.mediaStore.cameraDeviceId ?? '';
+    return this.classroomStore.mediaStore.cameraDeviceId ?? "";
   }
 
   /**
@@ -209,7 +235,7 @@ export class PretestUIStore extends EduUIStoreBase {
    * @returns
    */
   @computed get currentRecordingDeviceId(): string {
-    return this.classroomStore.mediaStore.recordingDeviceId ?? '';
+    return this.classroomStore.mediaStore.recordingDeviceId ?? "";
   }
 
   /**
@@ -217,7 +243,7 @@ export class PretestUIStore extends EduUIStoreBase {
    * @returns
    */
   @computed get currentPlaybackDeviceId(): string {
-    return this.classroomStore.mediaStore.playbackDeviceId ?? 'default';
+    return this.classroomStore.mediaStore.playbackDeviceId ?? "default";
   }
 
   /**
@@ -277,7 +303,7 @@ export class PretestUIStore extends EduUIStoreBase {
    * @returns Icon 类型
    */
   @computed get localMicIconType() {
-    return this.localMicOff ? 'microphone-off' : 'microphone-on';
+    return this.localMicOff ? "microphone-off" : "microphone-on";
   }
 
   /**
@@ -334,7 +360,9 @@ export class PretestUIStore extends EduUIStoreBase {
    */
   @computed
   get whiteningValue() {
-    return Math.ceil(this.classroomStore.mediaStore.beautyEffectOptions.lighteningLevel * 100);
+    return Math.ceil(
+      this.classroomStore.mediaStore.beautyEffectOptions.lighteningLevel * 100
+    );
   }
 
   /**
@@ -343,7 +371,9 @@ export class PretestUIStore extends EduUIStoreBase {
    */
   @computed
   get ruddyValue() {
-    return Math.ceil(this.classroomStore.mediaStore.beautyEffectOptions.rednessLevel * 100);
+    return Math.ceil(
+      this.classroomStore.mediaStore.beautyEffectOptions.rednessLevel * 100
+    );
   }
 
   /**
@@ -352,7 +382,9 @@ export class PretestUIStore extends EduUIStoreBase {
    */
   @computed
   get buffingValue() {
-    return Math.ceil(this.classroomStore.mediaStore.beautyEffectOptions.smoothnessLevel * 100);
+    return Math.ceil(
+      this.classroomStore.mediaStore.beautyEffectOptions.smoothnessLevel * 100
+    );
   }
 
   /**
@@ -371,13 +403,88 @@ export class PretestUIStore extends EduUIStoreBase {
     }
   }
 
+  @computed
+  get headerStep() {
+    if (
+      this.currentStep === EnumStep["three"] ||
+      this.currentStep === EnumStep["finished"]
+    ) {
+      return EnumStep["three"];
+    }
+    return this.currentStep;
+  }
+
+  /**
+   * 是否在屏幕分享中
+   */
+  @computed
+  get isScreenSharing() {
+    return (
+      this.classroomStore.mediaStore.localScreenShareTrackState ===
+        AgoraRteMediaSourceState.started ||
+      this.classroomStore.mediaStore.localScreenShareTrackState ===
+        AgoraRteMediaSourceState.starting
+    );
+  }
+
+  /**
+   * 是否选择了多媒体
+   */
+  @computed
+  get isMediaReady() {
+    return (
+      (this.classroomStore.mediaStore.localCameraTrackState ===
+        AgoraRteMediaSourceState.started ||
+        this.classroomStore.mediaStore.localCameraTrackState ===
+          AgoraRteMediaSourceState.starting) &&
+      (this.classroomStore.mediaStore.localMicTrackState ===
+        AgoraRteMediaSourceState.started ||
+        this.classroomStore.mediaStore.localMicTrackState ===
+          AgoraRteMediaSourceState.starting)
+    );
+  }
+
+  @computed
+  get stepupStates() {
+    return [
+      this.classroomStore.mediaStore.localCameraTrackState ===
+        AgoraRteMediaSourceState.started ||
+        this.classroomStore.mediaStore.localCameraTrackState ===
+          AgoraRteMediaSourceState.starting,
+      this.classroomStore.mediaStore.localMicTrackState ===
+        AgoraRteMediaSourceState.started ||
+        this.classroomStore.mediaStore.localMicTrackState ===
+          AgoraRteMediaSourceState.starting,
+      this.snapshotImage,
+      this.isScreenSharing,
+    ];
+  }
+
+  /**
+   * 右下角按钮点击状态
+   */
+  @computed
+  get rightBtnDisable() {
+    if (this.currentStep === 0) return !this.isMediaReady;
+    if (this.currentStep === 1) return !this.snapshotImage;
+    if (this.currentStep === 2) return !this.isScreenSharing;
+    if (this.currentStep === 3) return this.stepupStates.every((item) => !item);
+  }
+
+  @computed
+  get rightBtnText() {
+    if (this.currentStep === 0 || this.currentStep === 1) return "next";
+    if (this.currentStep === 2) return "confirm";
+    if (this.currentStep === 3) return "join exam";
+  }
+
   /**
    * 美颜类型 Icon
    */
   activeBeautyTypeIcon = computedFn((item) =>
     this.activeBeautyType === item.id
-      ? { icon: item.icon, color: '#fff' }
-      : { icon: item.icon, color: 'rgba(255,255,255,.5)' },
+      ? { icon: item.icon, color: "#fff" }
+      : { icon: item.icon, color: "rgba(255,255,255,.5)" }
   );
 
   /**
@@ -557,6 +664,113 @@ export class PretestUIStore extends EduUIStoreBase {
   @bound
   setupLocalVideo(dom: HTMLElement, mirror: boolean) {
     this.classroomStore.mediaStore.setupLocalVideo(dom, mirror);
+  }
+
+  /**
+   * 设置当前的步骤
+   * @param step
+   */
+  @action.bound
+  setCurrentStep(step: number) {
+    this.currentStep = step;
+  }
+
+  /**
+   * 设置上一步
+   */
+  @action.bound
+  setPrevStep() {
+    let currentStep = this.currentStep - 1;
+    this.setCurrentStep(currentStep);
+  }
+
+  @bound
+  private _backToLoginPage() {
+    // back to login page
+    console.log("back to login page");
+  }
+
+  /**
+   * 设置下一步
+   */
+  @action.bound
+  setNextStep(okCallback: () => void) {
+    let currentStep = this.currentStep + 1;
+    if (currentStep > EnumStep["finished"]) {
+      // finish
+      // todo join the exam
+      okCallback();
+      return;
+    }
+    this.setCurrentStep(currentStep);
+  }
+
+  /**
+   *  处理弹窗左下角按钮操作
+   */
+  @action.bound
+  handleLeftBtnAction() {
+    if (this.currentStep <= 0) {
+      this._backToLoginPage();
+    } else {
+      this.setPrevStep();
+    }
+  }
+
+  /**
+   * 截图
+   */
+  @bound
+  async getSnapshot() {
+    let imageData =
+      await this.classroomStore.mediaStore.mediaControl.getCurrentFrameData(
+        "",
+        "",
+        true
+      );
+    const canvas = document.createElement("canvas");
+    canvas.width = imageData.width;
+    canvas.height = imageData.height;
+    const canvasCtx = canvas.getContext("2d") as CanvasRenderingContext2D;
+    canvasCtx.putImageData(imageData, 0, 0);
+    const base64 = canvas.toDataURL("image/jpeg", 1.0);
+    return base64;
+  }
+
+  @bound
+  startLocalScreenShare() {
+    if (!this.classroomStore.mediaStore.hasScreenSharePermission()) {
+      this.shareUIStore.addToast(
+        transI18n("toast2.screen_permission_denied"),
+        "warning"
+      );
+    }
+
+    return this.classroomStore.mediaStore.startScreenShareCapture();
+  }
+
+  /**
+   * 渲染视频渲染
+   * @param dom HTMLElement
+   * @returns
+   */
+  @bound
+  setupLocalScreenShare(dom: HTMLElement) {
+    return this.classroomStore.mediaStore.setupLocalScreenShare(dom);
+  }
+
+  @action.bound
+  async getSnapshotImage() {
+    if (this.snapshotImage) {
+      runInAction(() => {
+        this.snapshotImage = "";
+      });
+    } else {
+      let base64 = await this.getSnapshot();
+      runInAction(() => {
+        this.snapshotImage = base64;
+      });
+    }
   }
 
   @bound

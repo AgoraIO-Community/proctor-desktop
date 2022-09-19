@@ -1,6 +1,9 @@
 > _其他语言版本：[简体中文](README.zh.md)_
 
-## CloudClass Desktop
+## proctor Desktop
+
+![Exam Room](https://badgen.net/badge/ExamRoom/1.0.0/orange)
+![React](https://badgen.net/badge/React/17.0.0/green)
 
 ## Install
 

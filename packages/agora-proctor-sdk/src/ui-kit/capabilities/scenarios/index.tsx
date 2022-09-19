@@ -29,6 +29,7 @@ export const Scenarios: React.FC<ScenariosProps> = observer(({ pretest }) => {
   }, [initialize]);
 
   const [showPretest, setPretest] = useState(pretest);
+
   return initialized ? (
     showPretest ? (
       <PretestContainer onOk={() => setPretest(false)} />
