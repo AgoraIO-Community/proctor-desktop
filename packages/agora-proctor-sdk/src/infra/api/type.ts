@@ -6,45 +6,53 @@ import {
   EduRoomTypeEnum,
   EduRtcConfig,
   Platform,
-} from 'agora-edu-core';
-import { EduVideoEncoderConfiguration, MediaOptions } from 'agora-rte-sdk';
-import { AgoraWidgetBase } from '../stores/common/widget/widget-base';
-import { FcrMultiThemeMode } from '../types/config';
+} from "agora-edu-core";
+import { EduVideoEncoderConfiguration, MediaOptions } from "agora-rte-sdk";
+import { AgoraWidgetBase } from "../stores/common/widget/widget-base";
+import { FcrMultiThemeMode } from "../types/config";
 
 export type AgoraRegion = Uppercase<AgoraRegionString>;
 
 export const regionMap = {
-  AP: 'sg',
-  CN: 'cn-hz',
-  EU: 'gb-lon',
-  NA: 'us-sv',
+  AP: "sg",
+  CN: "cn-hz",
+  EU: "gb-lon",
+  NA: "us-sv",
 } as const;
 
-export type AgoraRegionString = 'cn' | 'ap' | 'na' | 'eu';
+export type AgoraRegionString = "cn" | "ap" | "na" | "eu";
 
-export type ListenerCallback = (evt: AgoraEduClassroomEvent, ...args: any[]) => void;
+export type ListenerCallback = (
+  evt: AgoraEduClassroomEvent,
+  ...args: any[]
+) => void;
 
 export enum WindowID {
-  Main = 'main',
-  RemoteControlBar = 'remote-control-bar',
+  Main = "main",
+  RemoteControlBar = "remote-control-bar",
 }
 
-export type LanguageEnum = 'en' | 'zh';
+export enum EnumDeviceType {
+  Main = "main",
+  Sub = "sub",
+}
+
+export type LanguageEnum = "en" | "zh";
 export type TranslateEnum =
-  | ''
-  | 'auto'
-  | 'zh-CHS'
-  | 'en'
-  | 'ja'
-  | 'ko'
-  | 'fr'
-  | 'es'
-  | 'pt'
-  | 'it'
-  | 'ru'
-  | 'vi'
-  | 'de'
-  | 'ar';
+  | ""
+  | "auto"
+  | "zh-CHS"
+  | "en"
+  | "ja"
+  | "ko"
+  | "fr"
+  | "es"
+  | "pt"
+  | "it"
+  | "ru"
+  | "vi"
+  | "de"
+  | "ar";
 
 export type ConfigParams = {
   appId: string;
@@ -87,6 +95,7 @@ export type LaunchOption = {
   recordRetryTimeout?: number; // 录制重试间隔
   uiMode?: FcrMultiThemeMode;
   shareUrl?: string; // 分享URL
+  deviceType: EnumDeviceType;
 };
 
 /**
@@ -100,17 +109,18 @@ export type LaunchWindowOption = {
   uiMode: FcrMultiThemeMode;
 };
 
-export { AgoraWidgetBase } from '../stores/common/widget/widget-base';
+export {
+  AgoraExtensionRoomEvent,
+  AgoraExtensionWidgetEvent,
+} from "../protocol/events";
+export { AgoraWidgetTrackMode } from "../stores/common/widget/type";
+export { AgoraWidgetBase } from "../stores/common/widget/widget-base";
 export type {
   AgoraMultiInstanceWidget,
   AgoraTrackSyncedWidget,
   AgoraWidgetLifecycle,
   AgoraWidgetRenderable,
-} from '../stores/common/widget/widget-base';
-export { AgoraWidgetTrackMode } from '../stores/common/widget/type';
-
-export { AgoraExtensionRoomEvent, AgoraExtensionWidgetEvent } from '../protocol/events';
-
+} from "../stores/common/widget/widget-base";
 
 export type BoardWindowAnimationOptions = {
   minFPS?: number;

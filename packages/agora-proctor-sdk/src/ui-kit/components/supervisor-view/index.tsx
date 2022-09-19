@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import { SvgIconEnum, SvgImg } from "~ui-kit";
 
 interface IViewProps {
   tag: "PC" | "Phone";
@@ -8,6 +9,11 @@ export const SupervisorView: React.FC<IViewProps> = ({ tag, video }) => {
   return (
     <Container>
       <Tag>
+        <SvgImg
+          type={SvgIconEnum.RECORDING}
+          size={16}
+          colors={{ iconPrimary: "#000" }}
+        />
         <TagText>{tag}</TagText>
       </Tag>
       {video}
@@ -23,6 +29,7 @@ const Container = styled.div`
 const Tag = styled.div`
   width: 49px;
   height: 17px;
+  padding: 0 8px;
   display: flex;
   position: absolute;
   bottom: 6px;
@@ -36,5 +43,6 @@ const Tag = styled.div`
 const TagText = styled.span`
   font-size: 16px;
   transform: scale(0.5);
+  transform-origin: right;
   color: #000;
 `;
