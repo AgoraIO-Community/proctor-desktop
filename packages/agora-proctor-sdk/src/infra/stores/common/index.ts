@@ -12,6 +12,7 @@ import {
   EduClassroomConfig,
   EduClassroomStore,
   LeaveReason,
+  SceneType,
 } from "agora-edu-core";
 import { WidgetUIStore } from "./widget";
 import { GroupUIStore } from "./group-ui";
@@ -135,10 +136,12 @@ export class EduClassroomUIStore {
   /**
    * 加入教室，之后加入 RTC 频道
    */
-  async join() {
+  async joinMainRoom() {
+    const roomUuid = EduClassroomConfig.shared.sessionInfo.roomUuid;
+    const sceneType = SceneType.Main;
     const { joinClassroom, joinRTC } = this.classroomStore.connectionStore;
     try {
-      await joinClassroom();
+      await joinClassroom(roomUuid, sceneType);
     } catch (e) {
       if (
         AGError.isOf(e as AGError, AGServiceErrorCode.SERV_CANNOT_JOIN_ROOM)
@@ -178,7 +181,7 @@ export class EduClassroomUIStore {
     // }
 
     try {
-      await joinRTC();
+      await joinRTC(roomUuid);
     } catch (e) {
       this.shareUIStore.addGenericErrorDialog(e as AGError);
     }
