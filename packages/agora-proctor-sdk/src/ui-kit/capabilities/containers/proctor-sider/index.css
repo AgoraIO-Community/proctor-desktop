@@ -1,0 +1,41 @@
+.fcr_proctor_sider {
+  min-height: 100vh;
+  padding: 28px;
+  flex: 0 0 254px;
+}
+.fcr_proctor_sider_info_title {
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 15px;
+  color: #bdbec6;
+  padding-bottom: 5px;
+}
+.fcr_proctor_sider_info_val {
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 19px;
+  color: #000000;
+}
+.fcr_proctor_sider_info_wrap > div {
+  margin-bottom: 30px;
+}
+.fcr_proctor_sider_info_room_remaining {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  padding-right: 7px;
+}
+.fcr_proctor_sider_info_room_remaining div:last-child {
+  display: flex;
+  align-items: center;
+  font-weight: 400;
+  font-size: 17px;
+  line-height: 21px;
+}
+.fcr_proctor_sider .ant-btn {
+  border-radius: 100px;
+  height: 32px;
+  font-weight: 800;
+  font-size: 12px;
+  line-height: 12px;
+}

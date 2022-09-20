@@ -14,10 +14,12 @@ import { LayoutUIStore } from "./layout";
 import { NavigationBarUIStore } from "./nav-ui";
 import { NotificationUIStore } from "./notification-ui";
 import { PretestUIStore } from "./pretest";
+import { RoomUIStore } from "./room";
 import { EduShareUIStore } from "./share-ui";
 import { StreamUIStore } from "./stream";
 import { StudentViewUIStore } from "./student-view";
 import { SubscriptionUIStore } from "./subscription";
+import { UsersUIStore } from "./users";
 import { WidgetUIStore } from "./widget";
 @Log.attach({ level: AgoraRteLogLevel.INFO })
 export class EduClassroomUIStore {
@@ -33,6 +35,8 @@ export class EduClassroomUIStore {
   protected _groupUIStore: GroupUIStore;
   protected _subscriptionUIStore: SubscriptionUIStore;
   protected _studentViewUIStore: StudentViewUIStore;
+  protected _usersUIStore: UsersUIStore;
+  protected _roomUIStore: RoomUIStore;
   private _installed = false;
 
   constructor(store: EduClassroomStore) {
@@ -60,6 +64,8 @@ export class EduClassroomUIStore {
       this.shareUIStore
     );
     this._studentViewUIStore = new StudentViewUIStore(store, this.shareUIStore);
+    this._usersUIStore = new UsersUIStore(store, this.shareUIStore);
+    this._roomUIStore = new RoomUIStore(store, this.shareUIStore);
   }
 
   /**
@@ -97,6 +103,15 @@ export class EduClassroomUIStore {
     return this._groupUIStore;
   }
 
+  get usersUIStore() {
+    return this._usersUIStore;
+  }
+  get subscriptionUIStore() {
+    return this._subscriptionUIStore;
+  }
+  get roomUIStore() {
+    return this._roomUIStore;
+  }
   /**
    * 初始化所有 UIStore
    * @returns

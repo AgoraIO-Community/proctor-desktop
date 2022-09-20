@@ -1,0 +1,7 @@
+.fcr-track-player {
+  width: 100%;
+  height: 100%;
+}
+.fcr-track-player video {
+  object-fit: contain;
+}

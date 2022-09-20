@@ -28,7 +28,15 @@ export const StudentPretest = observer(() => {
     </Container>
   );
 });
-
+export const TeacherPretest = observer(() => {
+  return (
+    <Container>
+      <PreTestHeader>Exam Prep</PreTestHeader>
+      <ProcessInfo>Please 进行设备检测</ProcessInfo>
+      <DeviceTest />
+    </Container>
+  );
+});
 const Container = styled.div`
   height: 556px;
   box-sizing: border-box;

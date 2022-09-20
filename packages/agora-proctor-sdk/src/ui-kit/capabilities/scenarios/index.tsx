@@ -1,3 +1,5 @@
+import "antd/dist/antd.css"; // or 'antd/dist/antd.less'
+
 import { useStore } from "@/infra/hooks/ui-store";
 import {
   EduClassroomConfig,

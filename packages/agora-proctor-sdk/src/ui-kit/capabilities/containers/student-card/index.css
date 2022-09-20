@@ -1,0 +1,79 @@
+.fcr-student-card {
+  background: #f3f3f3;
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  padding: 4px;
+}
+.fcr-student-card-videos {
+  flex: 1;
+  border-radius: 16px;
+  display: grid;
+
+  overflow: hidden;
+}
+
+.fcr-student-card-videos-loose {
+}
+.fcr-student-card-extra {
+  height: 77px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 14px;
+}
+.fcr-student-card-user {
+  display: flex;
+  align-items: center;
+}
+.fcr-student-card-user-avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: #000;
+  margin-right: 10px;
+}
+.fcr-student-card-actions {
+  display: flex;
+}
+.fcr-student-card-actions > div {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: #000;
+  margin: 0 4px;
+}
+/* 6宫格 */
+.fcr-student-card-videos-compact {
+  grid-template-columns: 3fr 2fr;
+  grid-template-rows: 3fr 2fr;
+  grid-auto-flow: row;
+}
+
+.fcr-student-card-videos-compact .fcr-student-card-videos-screen {
+  background: #fff;
+  grid-column: span 2;
+}
+.fcr-student-card-videos-compact .fcr-student-card-videos-camera {
+  background: red;
+}
+.fcr-student-card-videos-compact .fcr-student-card-videos-mobile {
+  background: blue;
+}
+/* 4宫格 */
+.fcr-student-card-videos-loose {
+  grid-template-columns: 3fr 2fr;
+  grid-template-rows: 3fr 2fr;
+  grid-auto-flow: column;
+}
+
+.fcr-student-card-videos-loose .fcr-student-card-videos-screen {
+  background: #fff;
+}
+.fcr-student-card-videos-loose .fcr-student-card-videos-camera {
+  background: red;
+}
+.fcr-student-card-videos-loose .fcr-student-card-videos-mobile {
+  background: blue;
+  grid-row: span 2;
+}
