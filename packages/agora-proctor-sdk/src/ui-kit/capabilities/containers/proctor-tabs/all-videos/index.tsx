@@ -11,8 +11,11 @@ import { SvgIconEnum, SvgImg } from "~ui-kit";
 
 export const AllVideos = observer(() => {
   const {
-    usersUIStore: { studentListByUserUuidPrefix },
-    layoutUIStore: { videosWallLayout },
+    usersUIStore: {
+      studentListByUserUuidPrefix,
+      videosWallLayout,
+      studentListByPage,
+    },
   } = useStore();
   const containerRef = useRef<HTMLDivElement>(null);
   const carouselRef = useRef<CarouselRef>(null);
@@ -69,33 +72,25 @@ export const AllVideos = observer(() => {
               lazyLoad="ondemand"
               afterChange={afterCarouselChange}
             >
-              <div>
-                <div
-                  className={`fcr-all-videos-tab-page-item fcr-all-videos-tab-page-item-${VideosWallLayoutEnum[
-                    videosWallLayout
-                  ].toLowerCase()}`}
-                  style={{ height: containerHeight }}
-                >
-                  <StudentCard></StudentCard>
-                  <StudentCard></StudentCard>
-                  <StudentCard></StudentCard>
-                  <StudentCard></StudentCard>
-                </div>
-              </div>
-              <div>
-                <div
-                  className={`fcr-all-videos-tab-page-item fcr-all-videos-tab-page-item-${VideosWallLayoutEnum[
-                    videosWallLayout
-                  ].toLowerCase()}`}
-                  style={{ height: containerHeight }}
-                >
-                  <StudentCard></StudentCard>
-                  <StudentCard></StudentCard>
-                  <StudentCard></StudentCard>
-                  <StudentCard></StudentCard>
-                  <StudentCard></StudentCard>
-                </div>
-              </div>
+              {studentListByPage.reduce((prev, cur, index) => {
+                return prev.concat(
+                  <div>
+                    <div
+                      className={`fcr-all-videos-tab-page-item fcr-all-videos-tab-page-item-${VideosWallLayoutEnum[
+                        videosWallLayout
+                      ].toLowerCase()}`}
+                      style={{ height: containerHeight }}
+                    >
+                      {index === currentPage &&
+                        cur.map((userUuid: string) => {
+                          return (
+                            <StudentCard userUuid={userUuid}></StudentCard>
+                          );
+                        })}
+                    </div>
+                  </div>
+                );
+              }, [] as JSX.Element[])}
             </Carousel>
           </div>
         </>

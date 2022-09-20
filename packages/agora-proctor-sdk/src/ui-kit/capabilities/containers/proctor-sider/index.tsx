@@ -1,10 +1,12 @@
 import { useStore } from "@/infra/hooks/ui-store";
+import { ClassroomState, ClassState } from "agora-edu-core";
 import { Button } from "antd";
 import { observer } from "mobx-react";
 import { SvgIconEnum, SvgImg } from "~ui-kit";
 import "./index.css";
 export const ProctorSider = observer(() => {
   const {
+    navigationBarUIStore: { startClass, classStatusText, classState },
     usersUIStore: { studentListByUserUuidPrefix },
   } = useStore();
   return (
@@ -18,7 +20,9 @@ export const ProctorSider = observer(() => {
         <div className={"fcr_proctor_sider_info_room_remaining"}>
           <div>
             <div className={"fcr_proctor_sider_info_title"}>TimeRemaining</div>
-            <div className={"fcr_proctor_sider_info_val"}>00:00:00</div>
+            <div className={"fcr_proctor_sider_info_val"}>
+              {classStatusText}
+            </div>
           </div>
           <div>
             <SvgImg type={SvgIconEnum.PEOPLE}></SvgImg>
@@ -26,9 +30,15 @@ export const ProctorSider = observer(() => {
           </div>
         </div>
         <div>
-          <Button type="primary" block>
-            Start Exam
-          </Button>
+          {classState === ClassState.beforeClass ? (
+            <Button type="primary" block onClick={startClass}>
+              Start Exam
+            </Button>
+          ) : (
+            <Button type="primary" block onClick={startClass}>
+              End Exam
+            </Button>
+          )}
         </div>
       </div>
     </div>

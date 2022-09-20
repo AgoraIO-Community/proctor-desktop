@@ -8,13 +8,9 @@ import { EduUIStoreBase } from "../base";
 import uuidv4 from "uuid";
 import { transI18n } from "~ui-kit";
 import { bound } from "agora-rte-sdk";
-import { VideosWallLayoutEnum } from "../type";
 import { iterateMap } from "agora-edu-core";
 export class LayoutUIStore extends EduUIStoreBase {
   @observable currentTab = "ALL_VIDEOS";
-
-  @observable videosWallLayout: VideosWallLayoutEnum =
-    VideosWallLayoutEnum.Compact;
 
   @observable
   awardAnims: { id: string }[] = [];
@@ -102,10 +98,7 @@ export class LayoutUIStore extends EduUIStoreBase {
   removeAward(id: string) {
     this.awardAnims = this.awardAnims.filter((anim) => anim.id !== id);
   }
-  @action.bound
-  setVideosWallLayout(layout: VideosWallLayoutEnum) {
-    this.videosWallLayout = layout;
-  }
+
   /**
    * 教室加载状态
    */

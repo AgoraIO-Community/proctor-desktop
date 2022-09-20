@@ -1,8 +1,30 @@
 import { EduUserStruct } from "agora-edu-core";
-import { computed } from "mobx";
+import { action, computed, observable } from "mobx";
 import { EduUIStoreBase } from "./base";
+import { VideosWallLayoutEnum } from "./type";
 
 export class UsersUIStore extends EduUIStoreBase {
+  @observable videosWallLayout: VideosWallLayoutEnum =
+    VideosWallLayoutEnum.Compact;
+  @observable currentPageIndex = 0;
+  @computed get totalPage() {
+    return Math.ceil(
+      this.studentListByUserUuidPrefix.size / this.videosWallLayout
+    );
+  }
+  @computed get studentListByPage() {
+    return Array.from(this.studentListByUserUuidPrefix.values()).reduce(
+      (prev, cur, index) => {
+        if (index % this.videosWallLayout === 0) {
+          prev.push([cur]);
+        } else {
+          prev[Math.floor(index / this.videosWallLayout)].push(cur);
+        }
+        return prev;
+      },
+      [] as string[][]
+    );
+  }
   @computed get studentListByUserUuidPrefix() {
     const studentList: Map<string, string> = new Map();
     this.studentWithGroup.forEach((groupUuid, userUuid) => {
@@ -26,6 +48,10 @@ export class UsersUIStore extends EduUIStoreBase {
     });
 
     return studentList;
+  }
+  @action.bound
+  setVideosWallLayout(layout: VideosWallLayoutEnum) {
+    this.videosWallLayout = layout;
   }
   onInstall() {}
   onDestroy() {}

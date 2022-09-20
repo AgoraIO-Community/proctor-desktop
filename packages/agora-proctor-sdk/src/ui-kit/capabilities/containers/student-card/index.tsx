@@ -6,11 +6,16 @@ import { LocalTrackPlayer, RemoteTrackPlayer } from "../stream/track-player";
 import { observer } from "mobx-react";
 import { EduStream, SceneType } from "agora-edu-core";
 import { AgoraRteVideoSourceType } from "agora-rte-sdk";
+import { SvgIconEnum, SvgImg } from "~ui-kit";
 export const StudentCard = observer(({ userUuid }: { userUuid: string }) => {
   const {
-    layoutUIStore: { addStudentTab, videosWallLayout },
+    layoutUIStore: { addStudentTab },
     subscriptionUIStore: { createSceneSubscription },
+    usersUIStore: { videosWallLayout },
     roomUIStore: { joinClassroom, roomSceneByRoomUuid, leaveClassroom },
+    classroomStore: {
+      userStore: { studentList },
+    },
   } = useStore();
   const join = async () => {
     await joinClassroom(userUuid);
@@ -53,6 +58,7 @@ export const StudentCard = observer(({ userUuid }: { userUuid: string }) => {
       scene?.streamController?.streamByStreamUuid.get(streamUuid)
         ?.videoSourceType === AgoraRteVideoSourceType.Camera
   );
+
   return (
     <div
       className="fcr-student-card"
@@ -72,13 +78,23 @@ export const StudentCard = observer(({ userUuid }: { userUuid: string }) => {
       />
       <div className="fcr-student-card-extra">
         <div className="fcr-student-card-user">
-          <div className="fcr-student-card-user-avatar"></div>
-          <div className="fcr-student-card-user-name">aaa</div>
+          <div className="fcr-student-card-user-avatar">
+            <img src={studentList.get(userUuid)?.userProperties.flex.avatar} />
+          </div>
+          <div className="fcr-student-card-user-name">
+            {studentList.get(userUuid)?.userName}
+          </div>
         </div>
         <div className="fcr-student-card-actions">
-          <div className="fcr-student-card-actions-like"></div>
-          <div className="fcr-student-card-actions-chat"></div>
-          <div className="fcr-student-card-actions-warning"></div>
+          <div className="fcr-student-card-actions-like">
+            <SvgImg type={SvgIconEnum.FAV}></SvgImg>
+          </div>
+          <div className="fcr-student-card-actions-chat">
+            <SvgImg type={SvgIconEnum.CHAT}></SvgImg>
+          </div>
+          <div className="fcr-student-card-actions-warning">
+            <SvgImg type={SvgIconEnum.MESSAGE_NORMAL}></SvgImg>
+          </div>
         </div>
       </div>
     </div>

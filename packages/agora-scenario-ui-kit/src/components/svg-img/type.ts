@@ -147,4 +147,7 @@ export enum SvgIconEnum {
   REPLAY = "replay",
   AI = "Ai",
   PEOPLE = "people",
+  FAV = "fav",
+  MESSAGE_NORMAL = "message-normal",
+  MESSAGE_ACTIVE = "message-active",
 }

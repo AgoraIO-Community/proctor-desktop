@@ -10,12 +10,12 @@ import { StudentDetail } from "../proctor-tabs/student-detail";
 export const ProctorContent = observer(() => {
   const {
     layoutUIStore: {
-      setVideosWallLayout,
       studentTabItems,
       currentTab,
       setCurrentTab,
       removeStudentTab,
     },
+    usersUIStore: { setVideosWallLayout },
   } = useStore();
   return (
     <div className="fcr-proctor-content">

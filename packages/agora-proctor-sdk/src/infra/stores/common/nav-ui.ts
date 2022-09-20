@@ -590,20 +590,11 @@ export class NavigationBarUIStore extends EduUIStoreBase {
     }
     switch (this.classState) {
       case ClassState.beforeClass:
-        return `${transI18n("nav.to_start_in")}${this.formatCountDown(
-          duration,
-          TimeFormatType.Timeboard
-        )}`;
+        return `${this.formatCountDown(duration, TimeFormatType.Timeboard)}`;
       case ClassState.ongoing:
-        return `${transI18n("nav.started_elapse")}${this.formatCountDown(
-          duration,
-          TimeFormatType.Timeboard
-        )}`;
+        return `${this.formatCountDown(duration, TimeFormatType.Timeboard)}`;
       case ClassState.afterClass:
-        return `${transI18n("nav.ended_elapse")}${this.formatCountDown(
-          duration,
-          TimeFormatType.Timeboard
-        )}`;
+        return `${this.formatCountDown(duration, TimeFormatType.Timeboard)}`;
       default:
         // return `-- ${transI18n('nav.short.minutes')} -- ${transI18n('nav.short.seconds')}`;
         return `-- : --`;
