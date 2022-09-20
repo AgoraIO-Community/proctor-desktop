@@ -100,7 +100,9 @@ export const AllVideos = observer(() => {
           </div>
         </>
       ) : (
-        <div className="fcr-all-videos-empty"></div>
+        <div className="fcr-all-videos-empty">
+          <img src={require("../../content/waiting.png")} width={256} />
+        </div>
       )}
     </div>
   );

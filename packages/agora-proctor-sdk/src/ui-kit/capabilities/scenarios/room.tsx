@@ -7,11 +7,11 @@ type Props = {
 };
 
 const Room: FC<Props> = observer(({ children }) => {
-  const { initialize, joinMainRoom, destroy } = useStore();
+  const { initialize, join, destroy } = useStore();
 
   useEffect(() => {
     initialize();
-    joinMainRoom();
+    join();
     return destroy;
   }, []);
 

@@ -4,7 +4,10 @@ import { StudentVideos } from "../../student-card";
 import { VideosWallLayoutEnum } from "@/infra/stores/common/type";
 import { SvgIconEnum, SvgImg } from "~ui-kit";
 import { Select } from "antd";
-export const StudentDetail = observer(() => {
+import { useStore } from "@/infra/hooks/ui-store";
+export const StudentDetail = observer(({ userUuid }: { userUuid: string }) => {
+  const {} = useStore();
+
   return (
     <div className="fcr-student-detail-tab">
       <div className="fcr-student-detail-tab-replay">

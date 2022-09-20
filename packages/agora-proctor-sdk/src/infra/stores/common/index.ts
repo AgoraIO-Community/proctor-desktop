@@ -20,6 +20,7 @@ import { NotificationUIStore } from "./notification-ui";
 import { PretestUIStore } from "./pretest";
 import { EduShareUIStore } from "./share-ui";
 import { StreamUIStore } from "./stream";
+import { RoomUIStore } from "./room";
 @Log.attach({ level: AgoraRteLogLevel.INFO })
 export class EduClassroomUIStore {
   protected _classroomStore: EduClassroomStore;
@@ -34,6 +35,7 @@ export class EduClassroomUIStore {
   protected _groupUIStore: GroupUIStore;
   protected _subscriptionUIStore: SubscriptionUIStore;
   protected _usersUIStore: UsersUIStore;
+  protected _roomUIStore: RoomUIStore;
   private _installed = false;
 
   constructor(store: EduClassroomStore) {
@@ -61,6 +63,7 @@ export class EduClassroomUIStore {
       this.shareUIStore
     );
     this._usersUIStore = new UsersUIStore(store, this.shareUIStore);
+    this._roomUIStore = new RoomUIStore(store, this.shareUIStore);
   }
 
   /**
@@ -100,7 +103,12 @@ export class EduClassroomUIStore {
   get usersUIStore() {
     return this._usersUIStore;
   }
-
+  get subscriptionUIStore() {
+    return this._subscriptionUIStore;
+  }
+  get roomUIStore() {
+    return this._roomUIStore;
+  }
   /**
    * 初始化所有 UIStore
    * @returns
@@ -136,12 +144,10 @@ export class EduClassroomUIStore {
   /**
    * 加入教室，之后加入 RTC 频道
    */
-  async joinMainRoom() {
-    const roomUuid = EduClassroomConfig.shared.sessionInfo.roomUuid;
-    const sceneType = SceneType.Main;
+  async join() {
     const { joinClassroom, joinRTC } = this.classroomStore.connectionStore;
     try {
-      await joinClassroom(roomUuid, sceneType);
+      await joinClassroom();
     } catch (e) {
       if (
         AGError.isOf(e as AGError, AGServiceErrorCode.SERV_CANNOT_JOIN_ROOM)
@@ -181,7 +187,7 @@ export class EduClassroomUIStore {
     // }
 
     try {
-      await joinRTC(roomUuid);
+      await joinRTC();
     } catch (e) {
       this.shareUIStore.addGenericErrorDialog(e as AGError);
     }

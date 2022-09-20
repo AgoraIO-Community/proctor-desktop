@@ -40,7 +40,10 @@ export class DeviceSettingUIStore extends EduUIStoreBase {
         () => {
           const { cameraDeviceId, mediaControl } =
             this.classroomStore.mediaStore;
-          if (!this.classroomStore.connectionStore.mainRoomScene) {
+          if (
+            this.classroomStore.connectionStore.classroomState ===
+            ClassroomState.Idle
+          ) {
             // if idle, e.g. pretest
             if (cameraDeviceId && cameraDeviceId !== DEVICE_DISABLE) {
               const track = mediaControl.createCameraVideoTrack();
@@ -51,8 +54,8 @@ export class DeviceSettingUIStore extends EduUIStoreBase {
               this._enableLocalVideo(false);
             }
           } else if (
-            this.classroomStore.connectionStore.mainRoomScene.roomState
-              .state === ClassroomState.Connected
+            this.classroomStore.connectionStore.classroomState ===
+            ClassroomState.Connected
           ) {
             // once connected, should follow stream
             if (!this.classroomStore.streamStore.localCameraStreamUuid) {
@@ -87,7 +90,10 @@ export class DeviceSettingUIStore extends EduUIStoreBase {
         () => {
           const { recordingDeviceId, mediaControl } =
             this.classroomStore.mediaStore;
-          if (!this.classroomStore.connectionStore.mainRoomScene) {
+          if (
+            this.classroomStore.connectionStore.classroomState ===
+            ClassroomState.Idle
+          ) {
             // if idle, e.g. pretest
             if (recordingDeviceId && recordingDeviceId !== DEVICE_DISABLE) {
               const track = mediaControl.createMicrophoneAudioTrack();
@@ -98,8 +104,8 @@ export class DeviceSettingUIStore extends EduUIStoreBase {
               this._enableLocalAudio(false);
             }
           } else if (
-            this.classroomStore.connectionStore.mainRoomScene.roomState
-              .state === ClassroomState.Connected
+            this.classroomStore.connectionStore.classroomState ===
+            ClassroomState.Connected
           ) {
             // once connected, should follow stream
             if (!this.classroomStore.streamStore.localMicStreamUuid) {
@@ -255,7 +261,7 @@ export class DeviceSettingUIStore extends EduUIStoreBase {
    */
   @computed get cameraAccessors() {
     return {
-      classroomState: this.classroomStore.connectionStore.mainRoomScene,
+      classroomState: this.classroomStore.connectionStore.classroomState,
       cameraDeviceId: this.classroomStore.mediaStore.cameraDeviceId,
       localCameraStreamUuid:
         this.classroomStore.streamStore.localCameraStreamUuid,
@@ -270,7 +276,7 @@ export class DeviceSettingUIStore extends EduUIStoreBase {
    */
   @computed get micAccessors() {
     return {
-      classroomState: this.classroomStore.connectionStore.mainRoomScene,
+      classroomState: this.classroomStore.connectionStore.classroomState,
       recordingDeviceId: this.classroomStore.mediaStore.recordingDeviceId,
       localMicStreamUuid: this.classroomStore.streamStore.localMicStreamUuid,
     };
