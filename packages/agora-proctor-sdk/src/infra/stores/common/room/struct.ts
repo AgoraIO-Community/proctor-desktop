@@ -10,7 +10,6 @@ import {
   EduRoleTypeEnum,
   EduStream,
   RteRole2EduRole,
-  SceneType,
 } from "agora-edu-core";
 import {
   AgoraRteConnectionState,
@@ -43,18 +42,23 @@ export class RoomScene {
   @observable scene?: AgoraRteScene;
   @observable rtcState?: Map<AGRtcConnectionType, RtcState>;
   constructor(private classroomStore: EduClassroomStore) {}
+
+  @action.bound
   setClassroomState(state: ClassroomState, reason?: string) {
     if (this.roomState.state !== state) {
-      this.logger.info(`classroom state changed to ${state} ${reason}`);
+      // this.logger.info(`classroom state changed to ${state} ${reason}`);
+      Logger.info(`classroom state changed to ${state} ${reason}`);
       if (state === ClassroomState.Error && reason) {
         this.roomState.roomStateErrorReason = reason;
       }
       this.roomState.state = state;
     }
   }
+  @action.bound
   setCheckInData(checkInData: CheckInData) {
     this.checkInData = checkInData;
   }
+  @action.bound
   setScene(scene: AgoraRteScene) {
     this.scene = scene;
     this.streamController = new StreamController(scene);
@@ -74,7 +78,7 @@ export class RoomScene {
       }
     );
   }
-
+  @action.bound
   setRtcState(state: RtcState, connectionType?: AGRtcConnectionType) {
     let connType = connectionType ? connectionType : AGRtcConnectionType.main;
     if (
@@ -87,7 +91,7 @@ export class RoomScene {
         this.scene?.sceneId
       );
     }
-    this.logger.debug(`${connectionType}] rtc state changed to ${state}`);
+    // this.logger.debug(`${connectionType}] rtc state changed to ${state}`);
     this.rtcState?.set(connType, state);
   }
   private _getClassroomState(state: AgoraRteConnectionState): ClassroomState {

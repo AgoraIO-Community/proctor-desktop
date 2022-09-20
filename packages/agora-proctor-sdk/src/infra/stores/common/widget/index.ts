@@ -5,20 +5,25 @@ import {
   AgoraTrackSyncedWidget,
   AgoraWidgetBase,
   AgoraWidgetLifecycle,
-} from '@/infra/api';
+} from "@/infra/api";
 import {
-  counterEnabled,
-  pollEnabled,
-  popupQuizEnabled,
-  chatEnabled,
-  boardEnabled,
-} from '@/ui-kit/capabilities/containers/visibility/controlled';
-import { WidgetState, AgoraWidgetTrack, AgoraWidgetController } from 'agora-edu-core';
-import { bound, Log } from 'agora-rte-sdk';
-import { action, computed, IReactionDisposer, Lambda, observable, reaction } from 'mobx';
-import { EduUIStoreBase } from '../base';
-import { AgoraWidgetTrackMode } from './type';
-import { AgoraWidgetTrackController } from './widget-track';
+  AgoraWidgetController,
+  AgoraWidgetTrack,
+  WidgetState,
+} from "agora-edu-core";
+import { bound, Log } from "agora-rte-sdk";
+import { cloneDeep } from "lodash";
+import {
+  action,
+  computed,
+  IReactionDisposer,
+  Lambda,
+  observable,
+  reaction,
+} from "mobx";
+import { EduUIStoreBase } from "../base";
+import { AgoraWidgetTrackMode } from "./type";
+import { AgoraWidgetTrackController } from "./widget-track";
 
 @Log.attach({ proxyMethods: false })
 export class WidgetUIStore extends EduUIStoreBase {
@@ -56,13 +61,15 @@ export class WidgetUIStore extends EduUIStoreBase {
   }
 
   get z10Widgets() {
-    return this.widgetInstanceList.filter(({ zContainer }) => zContainer === 10);
+    return this.widgetInstanceList.filter(
+      ({ zContainer }) => zContainer === 10
+    );
   }
 
   @action.bound
   createWidget(
     widgetId: string,
-    defaults?: Record<'properties' | 'userProperties' | 'trackProperties', any>,
+    defaults?: Record<"properties" | "userProperties" | "trackProperties", any>
   ) {
     const [widgetName, instanceId] = this._extractWidgetNameId(widgetId);
 
@@ -86,7 +93,7 @@ export class WidgetUIStore extends EduUIStoreBase {
         this.classroomStore,
         this.shareUIStore,
         AgoraEduSDK.uiConfig,
-        AgoraEduSDK.theme,
+        AgoraEduSDK.theme
       ) as AgoraWidgetBase;
 
       if (instanceId) {
@@ -94,20 +101,26 @@ export class WidgetUIStore extends EduUIStoreBase {
       }
 
       const trackProps =
-        widgetController.getWidgetTrack(widget.widgetId) || (defaults?.trackProperties ?? {});
+        widgetController.getWidgetTrack(widget.widgetId) ||
+        (defaults?.trackProperties ?? {});
 
       const trackMode = this._getWidgetTrackMode(widget);
 
       if (trackMode) {
-        const trackController = new AgoraWidgetTrackController(widget, trackProps, {
-          posOnly: trackMode === AgoraWidgetTrackMode.TrackPositionOnly,
-        });
+        const trackController = new AgoraWidgetTrackController(
+          widget,
+          trackProps,
+          {
+            posOnly: trackMode === AgoraWidgetTrackMode.TrackPositionOnly,
+          }
+        );
 
         widget.setTrackController(trackController);
       }
 
       const props =
-        widgetController?.getWidgetProperties(widget.widgetId) || (defaults?.properties ?? {});
+        widgetController?.getWidgetProperties(widget.widgetId) ||
+        (defaults?.properties ?? {});
 
       const userProps =
         widgetController?.getWidgetUserProperties(widget.widgetId) ||
@@ -117,7 +130,7 @@ export class WidgetUIStore extends EduUIStoreBase {
 
       this._widgetInstances[widgetId] = widget;
     } else {
-      this.logger.info('Widget controller not ready for creating widget');
+      this.logger.info("Widget controller not ready for creating widget");
     }
   }
 
@@ -134,7 +147,7 @@ export class WidgetUIStore extends EduUIStoreBase {
   }
 
   private _extractWidgetNameId(widgetId: string) {
-    const [widgetName, instanceId] = widgetId.split('-');
+    const [widgetName, instanceId] = widgetId.split("-");
     return [widgetName, instanceId];
   }
 
@@ -172,13 +185,20 @@ export class WidgetUIStore extends EduUIStoreBase {
     }
   }
 
-  private _callWidgetCreate(widget: AgoraWidgetBase, props: unknown, userProps: unknown) {
+  private _callWidgetCreate(
+    widget: AgoraWidgetBase,
+    props: unknown,
+    userProps: unknown
+  ) {
     if ((widget as unknown as AgoraWidgetLifecycle).onCreate) {
       (widget as unknown as AgoraWidgetLifecycle).onCreate(props, userProps);
     }
   }
 
-  private _callWidgetSetInstanceId(widget: AgoraWidgetBase, instanceId: string) {
+  private _callWidgetSetInstanceId(
+    widget: AgoraWidgetBase,
+    instanceId: string
+  ) {
     if ((widget as unknown as AgoraMultiInstanceWidget).setInstanceId) {
       (widget as unknown as AgoraMultiInstanceWidget).setInstanceId(instanceId);
     }
@@ -189,9 +209,14 @@ export class WidgetUIStore extends EduUIStoreBase {
       (widget as unknown as AgoraWidgetLifecycle).onPropertiesUpdate(props);
     }
   }
-  private _callWidgetUserPropertiesUpdate(widget: AgoraWidgetBase, userProps: unknown) {
+  private _callWidgetUserPropertiesUpdate(
+    widget: AgoraWidgetBase,
+    userProps: unknown
+  ) {
     if ((widget as unknown as AgoraWidgetLifecycle).onUserPropertiesUpdate) {
-      (widget as unknown as AgoraWidgetLifecycle).onUserPropertiesUpdate(userProps);
+      (widget as unknown as AgoraWidgetLifecycle).onUserPropertiesUpdate(
+        userProps
+      );
     }
   }
 
@@ -203,9 +228,11 @@ export class WidgetUIStore extends EduUIStoreBase {
 
   private _callWidgetUpdateTrack(widget: AgoraWidgetBase, trackProps: unknown) {
     if ((widget as unknown as AgoraTrackSyncedWidget).updateToLocal) {
-      (widget as unknown as AgoraTrackSyncedWidget).updateToLocal(trackProps as AgoraWidgetTrack);
+      (widget as unknown as AgoraTrackSyncedWidget).updateToLocal(
+        trackProps as AgoraWidgetTrack
+      );
       (widget as unknown as AgoraTrackSyncedWidget).updateZIndexToLocal(
-        (trackProps as AgoraWidgetTrack).zIndex ?? 0,
+        (trackProps as AgoraWidgetTrack).zIndex ?? 0
       );
     }
   }
@@ -214,13 +241,19 @@ export class WidgetUIStore extends EduUIStoreBase {
     return (widget as unknown as AgoraTrackSyncedWidget).trackMode;
   }
 
-  private _callWidgetInstall(widget: AgoraWidgetBase, controller: AgoraWidgetController) {
+  private _callWidgetInstall(
+    widget: AgoraWidgetBase,
+    controller: AgoraWidgetController
+  ) {
     if ((widget as unknown as AgoraWidgetLifecycle).onInstall) {
       (widget as unknown as AgoraWidgetLifecycle).onInstall(controller);
     }
   }
 
-  private _callWidgetUninstall(widget: AgoraWidgetBase, controller: AgoraWidgetController) {
+  private _callWidgetUninstall(
+    widget: AgoraWidgetBase,
+    controller: AgoraWidgetController
+  ) {
     if ((widget as unknown as AgoraWidgetLifecycle).onUninstall) {
       (widget as unknown as AgoraWidgetLifecycle).onUninstall(controller);
     }
@@ -259,32 +292,7 @@ export class WidgetUIStore extends EduUIStoreBase {
   }
 
   private _getEnabledWidgets() {
-    const widgets = Object.entries(AgoraEduSDK.widgets).reduce((prev, [key, value]) => {
-      if (!popupQuizEnabled(AgoraEduSDK.uiConfig) && key === 'popupQuiz') {
-        return prev;
-      }
-
-      if (!counterEnabled(AgoraEduSDK.uiConfig) && key === 'countdownTimer') {
-        return prev;
-      }
-
-      if (!pollEnabled(AgoraEduSDK.uiConfig) && key === 'poll') {
-        return prev;
-      }
-
-      if (!chatEnabled(AgoraEduSDK.uiConfig) && key === 'easemobIM') {
-        return prev;
-      }
-
-      if (!boardEnabled(AgoraEduSDK.uiConfig) && key === 'netlessBoard') {
-        return prev;
-      }
-      prev[key] = value;
-
-      return prev;
-    }, {});
-
-    return widgets;
+    return cloneDeep(AgoraEduSDK.widgets);
   }
 
   onInstall() {
@@ -308,8 +316,8 @@ export class WidgetUIStore extends EduUIStoreBase {
               }
             });
           }
-        },
-      ),
+        }
+      )
     );
 
     this._disposers.push(
@@ -349,13 +357,15 @@ export class WidgetUIStore extends EduUIStoreBase {
               onMessage: this._handleBecomeInactive,
             });
           }
-        },
-      ),
+        }
+      )
     );
   }
 
   onDestroy() {
-    this.classroomStore.widgetStore.removeWidgetStateListener(this._stateListener);
+    this.classroomStore.widgetStore.removeWidgetStateListener(
+      this._stateListener
+    );
     this._disposers.forEach((d) => d());
     this._disposers = [];
   }

@@ -1,16 +1,8 @@
 import { AgoraButton } from "@/ui-kit/components/button";
 import { AgoraBaseTextColor } from "@/ui-kit/components/common";
+import { observer } from "mobx-react";
+import { useCallback } from "react";
 import styled from "styled-components";
-
-export const RoomOperation = () => {
-  return (
-    <OperationContainer>
-      <RoomTimer />
-      <ExistBtn />
-      <ExistClose />
-    </OperationContainer>
-  );
-};
 
 const RoomTimer = () => {
   return (
@@ -21,17 +13,36 @@ const RoomTimer = () => {
   );
 };
 
-const ExistBtn = () => {
+const ExistBtn = observer(() => {
+  const handleExistRoom = useCallback(() => {}, []);
+
   return (
-    <AgoraButton type="primary" subType="red" shape="round">
+    <AgoraButton
+      type="primary"
+      subType="red"
+      shape="round"
+      onClick={handleExistRoom}
+    >
       exist
     </AgoraButton>
   );
-};
+});
 
 const ExistClose = () => {
   return <CloseBtn>x</CloseBtn>;
 };
+
+export const RoomOperation = observer(() => {
+  const Items = [RoomTimer, ExistBtn];
+
+  return (
+    <OperationContainer>
+      {Items.map((Item, index) => (
+        <Item key={index} />
+      ))}
+    </OperationContainer>
+  );
+});
 
 const OperationContainer = styled.div`
   display: flex;

@@ -81,7 +81,7 @@ export const HomePage = () => {
       const config: HomeLaunchOption = {
         appId,
         sdkDomain: domain,
-        pretest: false, // test for now
+        pretest: true, // test for now
         language: language as LanguageEnum,
         userUuid: `${userUuid}`,
         rtmToken: token,
@@ -128,7 +128,7 @@ export const HomePage = () => {
 const TestRoomInfoArea = React.forwardRef((props, ref) => {
   const defaultRoomInfo = {
     userRole: 2,
-    roomType: 4,
+    roomType: 6,
     userName: "Oliver",
     roomName: `OliverTestRoom${Date.now()}`,
   };

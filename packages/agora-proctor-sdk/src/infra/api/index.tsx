@@ -195,6 +195,7 @@ export class AgoraEduSDK {
         EduRoomTypeEnum.Room1v1Class,
         EduRoomTypeEnum.RoomBigClass,
         EduRoomTypeEnum.RoomSmallClass,
+        EduRoomTypeEnum.RoomProctor,
       ].includes(option.roomType)
     ) {
       throw new Error("AgoraEduSDK: Invalid roomType!");
@@ -360,7 +361,7 @@ export class AgoraEduSDK {
     roomType: EduRoomTypeEnum
   ) {
     const themeMode = uiMode ?? FcrMultiThemeMode.light;
-    this._uiConfig = uiConfigs[roomType];
+    // this._uiConfig = uiConfigs[roomType];
     this._theme = themes["default"][themeMode];
   }
 

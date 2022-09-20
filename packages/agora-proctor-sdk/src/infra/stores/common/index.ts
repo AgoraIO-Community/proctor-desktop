@@ -1,26 +1,25 @@
+import { ConvertMediaOptionsConfig } from "@/infra/api";
 import {
   AGServiceErrorCode,
   EduClassroomConfig,
   EduClassroomStore,
   LeaveReason,
-  SceneType,
 } from "agora-edu-core";
-import { WidgetUIStore } from "./widget";
-import { GroupUIStore } from "./group-ui";
-import { ConvertMediaOptionsConfig } from "@/infra/api";
-import { SubscriptionUIStore } from "./subscription";
-import { transI18n } from "~ui-kit";
-import { UsersUIStore } from "./users";
 import { AGError, AgoraRteLogLevel, Log } from "agora-rte-sdk";
+import { transI18n } from "~ui-kit";
 import { EduUIStoreBase } from "./base";
 import { DeviceSettingUIStore } from "./device-setting/index";
 import { LayoutUIStore } from "./layout";
 import { NavigationBarUIStore } from "./nav-ui";
 import { NotificationUIStore } from "./notification-ui";
 import { PretestUIStore } from "./pretest";
+import { RoomUIStore } from "./room";
 import { EduShareUIStore } from "./share-ui";
 import { StreamUIStore } from "./stream";
-import { RoomUIStore } from "./room";
+import { StudentViewUIStore } from "./student-view";
+import { SubscriptionUIStore } from "./subscription";
+import { UsersUIStore } from "./users";
+import { WidgetUIStore } from "./widget";
 @Log.attach({ level: AgoraRteLogLevel.INFO })
 export class EduClassroomUIStore {
   protected _classroomStore: EduClassroomStore;
@@ -32,8 +31,9 @@ export class EduClassroomUIStore {
   protected _notificationUIStore: NotificationUIStore;
   protected _pretestUIStore: PretestUIStore;
   protected _widgetUIStore: WidgetUIStore;
-  protected _groupUIStore: GroupUIStore;
+  // protected _groupUIStore: GroupUIStore;
   protected _subscriptionUIStore: SubscriptionUIStore;
+  protected _studentViewUIStore: StudentViewUIStore;
   protected _usersUIStore: UsersUIStore;
   protected _roomUIStore: RoomUIStore;
   private _installed = false;
@@ -57,11 +57,12 @@ export class EduClassroomUIStore {
       this.shareUIStore
     );
     this._widgetUIStore = new WidgetUIStore(store, this.shareUIStore);
-    this._groupUIStore = new GroupUIStore(store, this.shareUIStore);
+    // this._groupUIStore = new GroupUIStore(store, this.shareUIStore);
     this._subscriptionUIStore = new SubscriptionUIStore(
       store,
       this.shareUIStore
     );
+    this._studentViewUIStore = new StudentViewUIStore(store, this.shareUIStore);
     this._usersUIStore = new UsersUIStore(store, this.shareUIStore);
     this._roomUIStore = new RoomUIStore(store, this.shareUIStore);
   }
@@ -97,9 +98,10 @@ export class EduClassroomUIStore {
   get widgetUIStore() {
     return this._widgetUIStore;
   }
-  get groupUIStore() {
-    return this._groupUIStore;
-  }
+  // get groupUIStore() {
+  //   return this._groupUIStore;
+  // }
+
   get usersUIStore() {
     return this._usersUIStore;
   }
