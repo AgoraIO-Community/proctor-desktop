@@ -151,7 +151,8 @@
     "workbox-webpack-plugin": "6.3.0",
     "zlib": "1.0.5",
     "antd": "4.23.0",
-    "cz-customizable": "6.9.1"
+    "cz-customizable": "6.9.1",
+    "tinycolor2": "1.4.2"
   },
   "config": {
     "commitizen": {

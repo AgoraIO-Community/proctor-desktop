@@ -9,8 +9,11 @@ export const Content = () => {
       </ScenarioHeader>
       <FlexContainer flex={1}>
         <InitialPanel>
-          <img src={require("./waiting.png")} width={256} />
-          Please Wait Until the Proctor Starts the Exam.
+          <>
+            <img src={require("./waiting.png")} width={256} />
+            Please Wait Until the Proctor Starts the Exam.
+          </>
+          {/* <Counter /> */}
         </InitialPanel>
       </FlexContainer>
     </FlexContainer>

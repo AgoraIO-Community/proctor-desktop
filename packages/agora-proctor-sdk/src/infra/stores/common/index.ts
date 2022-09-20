@@ -16,6 +16,7 @@ import { NotificationUIStore } from "./notification-ui";
 import { PretestUIStore } from "./pretest";
 import { EduShareUIStore } from "./share-ui";
 import { StreamUIStore } from "./stream";
+import { StudentViewUIStore } from "./student-view";
 import { SubscriptionUIStore } from "./subscription";
 import { WidgetUIStore } from "./widget";
 @Log.attach({ level: AgoraRteLogLevel.INFO })
@@ -31,6 +32,7 @@ export class EduClassroomUIStore {
   protected _widgetUIStore: WidgetUIStore;
   protected _groupUIStore: GroupUIStore;
   protected _subscriptionUIStore: SubscriptionUIStore;
+  protected _studentViewUIStore: StudentViewUIStore;
   private _installed = false;
 
   constructor(store: EduClassroomStore) {
@@ -57,6 +59,7 @@ export class EduClassroomUIStore {
       store,
       this.shareUIStore
     );
+    this._studentViewUIStore = new StudentViewUIStore(store, this.shareUIStore);
   }
 
   /**

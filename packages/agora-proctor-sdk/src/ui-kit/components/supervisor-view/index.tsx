@@ -2,7 +2,7 @@ import styled from "styled-components";
 import { SvgIconEnum, SvgImg } from "~ui-kit";
 
 interface IViewProps {
-  tag: "PC" | "Phone";
+  tag: "Phone" | "PC";
   video: React.ReactNode;
 }
 export const SupervisorView: React.FC<IViewProps> = ({ tag, video }) => {
@@ -13,6 +13,7 @@ export const SupervisorView: React.FC<IViewProps> = ({ tag, video }) => {
           type={SvgIconEnum.RECORDING}
           size={16}
           colors={{ iconPrimary: "#000" }}
+          style={{ flex: "1 0 16px" }}
         />
         <TagText>{tag}</TagText>
       </Tag>
@@ -27,9 +28,9 @@ const Container = styled.div`
   height: 100%;
 `;
 const Tag = styled.div`
-  width: 49px;
+  width: 54px;
   height: 17px;
-  padding: 0 8px;
+  padding: 0 4px;
   display: flex;
   position: absolute;
   bottom: 6px;
@@ -38,11 +39,12 @@ const Tag = styled.div`
   background: rgba(217, 217, 217, 0.9);
   align-items: center;
   justify-content: space-between;
+  gap: 6px;
 `;
 
 const TagText = styled.span`
   font-size: 16px;
   transform: scale(0.5);
-  transform-origin: right;
+  transform-origin: left;
   color: #000;
 `;
