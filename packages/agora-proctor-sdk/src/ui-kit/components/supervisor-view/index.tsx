@@ -40,6 +40,7 @@ const Tag = styled.div`
   align-items: center;
   justify-content: space-between;
   gap: 6px;
+  z-index: 9;
 `;
 
 const TagText = styled.span`

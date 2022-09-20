@@ -12,6 +12,7 @@ interface ICardProps {
 export const AgoraCard = styled.div<ICardProps>`
   ${AgoraMidBorderRadius};
   background: ${(props) => (props.background ? props.background : "#fff")};
+  overflow: hidden;
   ${(props) =>
     props.borderTopLeftRadius &&
     css`

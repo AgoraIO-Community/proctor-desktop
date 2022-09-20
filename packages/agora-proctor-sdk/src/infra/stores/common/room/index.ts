@@ -1,53 +1,66 @@
 import {
   AGEduErrorCode,
+  AgoraEduClassroomEvent,
   ClassroomState,
   EduClassroomConfig,
   EduErrorCenter,
   EduEventCenter,
   EduRole2RteRole,
-  EduRoomSubtypeEnum,
+  EduRoomTypeEnum,
+  EduSessionInfo,
+  GroupDetail,
 } from "agora-edu-core";
-import { EduSessionInfo } from "agora-edu-core/src/type";
-import {
-  AgoraRteConnectionState,
-  AgoraRteEventType,
-  AgoraRteSceneJoinRTCOptions,
-  bound,
-  retryAttempt,
-} from "agora-rte-sdk";
+import { AgoraRteMediaPublishState, bound, retryAttempt } from "agora-rte-sdk";
 import to from "await-to-js";
-import { observable } from "mobx";
+import {
+  action,
+  computed,
+  IReactionDisposer,
+  Lambda,
+  observable,
+  runInAction,
+} from "mobx";
 import { computedFn } from "mobx-utils";
 import { EduUIStoreBase } from "../base";
 import { RoomScene } from "./struct";
 
 export class RoomUIStore extends EduUIStoreBase {
+  private _disposers: (IReactionDisposer | Lambda)[] = [];
   @observable roomScenes: Map<string, RoomScene> = new Map();
   roomSceneByRoomUuid = computedFn((roomUuid: string) => {
     return this.roomScenes.get(roomUuid);
   });
   @bound
-  async joinClassroom(roomUuid: string) {
+  async joinClassroom(roomUuid: string, roomType?: EduRoomTypeEnum) {
     const roomScene = new RoomScene(this.classroomStore);
     let engine = this.classroomStore.connectionStore.getEngine();
 
     let [error] = await to(
       retryAttempt(async () => {
-        roomScene.setClassroomState(ClassroomState.Connecting);
-        const { sessionInfo } = EduClassroomConfig.shared;
-        await this.checkIn(sessionInfo, roomScene);
+        try {
+          roomScene.setClassroomState(ClassroomState.Connecting);
+          let { sessionInfo } = EduClassroomConfig.shared;
+          sessionInfo = {
+            ...sessionInfo,
+            roomUuid,
+            roomType: roomType ? roomType : sessionInfo.roomType,
+          };
+          await this.checkIn(sessionInfo, roomScene);
+          const scene = engine.createAgoraRteScene(roomUuid);
 
-        await engine.login(sessionInfo.token, sessionInfo.userUuid);
-        const scene = engine.createAgoraRteScene(roomUuid);
-
-        roomScene.setScene(scene);
-        // streamId defaults to 0 means server allocate streamId for you
-        await scene.joinScene({
-          userName: sessionInfo.userName,
-          userRole: EduRole2RteRole(sessionInfo.roomType, sessionInfo.role),
-          streamId: "0",
-        });
-        this.roomScenes.set(roomUuid, roomScene);
+          roomScene.setScene(scene);
+          // streamId defaults to 0 means server allocate streamId for you
+          await scene.joinScene({
+            userName: sessionInfo.userName,
+            userRole: EduRole2RteRole(sessionInfo.roomType, sessionInfo.role),
+            streamId: "0",
+          });
+          runInAction(() => {
+            this.roomScenes.set(roomUuid, roomScene);
+          });
+        } catch (e) {
+          console.log(e);
+        }
       }, [])
         .fail(({ error }: { error: Error }) => {
           this.logger.error(error.message);
@@ -98,6 +111,85 @@ export class RoomUIStore extends EduUIStoreBase {
     await this.roomSceneByRoomUuid(roomUuid)?.leave();
     this.roomScenes.delete(roomUuid);
   }
-  onDestroy() {}
-  onInstall() {}
+
+  generateGroupUuid = () => {
+    const userUuid = EduClassroomConfig.shared.sessionInfo.userUuid;
+    const tagIndex = userUuid.indexOf("-main");
+    const groupUuid = userUuid.slice(0, tagIndex);
+    return groupUuid;
+  };
+
+  /**
+   * 新增组
+   */
+  @action.bound
+  addGroup() {
+    const userUuid = EduClassroomConfig.shared.sessionInfo.userUuid;
+    const groupUuid = this.generateGroupUuid();
+    const newGroup = { groupUuid, groupName: groupUuid };
+    const newUsers = { userUuid };
+    this.classroomStore.groupStore.addGroups(
+      [
+        {
+          groupUuid: newGroup.groupUuid,
+          groupName: newGroup.groupName,
+          users: [newUsers],
+        },
+      ],
+      false
+    );
+  }
+
+  private _checkUserRoomState = (groupDetails: Map<string, GroupDetail>) => {
+    const currentGroupUuid = this.generateGroupUuid();
+    let visibleGroup = false;
+    for (let [groupUuid] of groupDetails) {
+      if (groupUuid === currentGroupUuid) {
+        visibleGroup = true;
+        return;
+      }
+    }
+    if (!visibleGroup) {
+      console.log("add group");
+      this.addGroup();
+    }
+  };
+  @bound
+  private _addGroupDetailsChange(groupDetails: Map<string, GroupDetail>) {
+    this._checkUserRoomState(groupDetails);
+  }
+  @bound
+  private async _handleClassroomEvent(type: AgoraEduClassroomEvent, args: any) {
+    if (type === AgoraEduClassroomEvent.JoinSubRoom) {
+      const currentGroupUuid = this.generateGroupUuid();
+      await this.joinClassroom(currentGroupUuid, EduRoomTypeEnum.RoomGroup);
+      await this.roomSceneByRoomUuid(currentGroupUuid)?.scene?.joinRTC();
+      this.classroomStore.streamStore.updateLocalPublishState(
+        {
+          videoState: AgoraRteMediaPublishState.Published,
+          audioState: AgoraRteMediaPublishState.Published,
+        },
+        this.roomSceneByRoomUuid(currentGroupUuid)?.scene
+      );
+    }
+  }
+  /** Hooks */
+  onInstall() {
+    this._disposers.push(
+      computed(() => this.classroomStore.groupStore.groupDetails).observe(
+        ({ newValue, oldValue }) => {
+          if (!oldValue?.size) {
+            this._addGroupDetailsChange(newValue);
+          }
+        }
+      )
+    );
+
+    EduEventCenter.shared.onClassroomEvents(this._handleClassroomEvent);
+  }
+
+  onDestroy() {
+    this._disposers.forEach((d) => d());
+    this._disposers = [];
+  }
 }

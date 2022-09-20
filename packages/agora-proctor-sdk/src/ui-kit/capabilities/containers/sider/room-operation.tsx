@@ -37,8 +37,8 @@ export const RoomOperation = observer(() => {
 
   return (
     <OperationContainer>
-      {Items.map((Item) => (
-        <Item />
+      {Items.map((Item, index) => (
+        <Item key={index} />
       ))}
     </OperationContainer>
   );

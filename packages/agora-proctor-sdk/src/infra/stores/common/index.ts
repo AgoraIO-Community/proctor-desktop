@@ -9,7 +9,6 @@ import { AGError, AgoraRteLogLevel, Log } from "agora-rte-sdk";
 import { transI18n } from "~ui-kit";
 import { EduUIStoreBase } from "./base";
 import { DeviceSettingUIStore } from "./device-setting/index";
-import { GroupUIStore } from "./group-ui";
 import { LayoutUIStore } from "./layout";
 import { NavigationBarUIStore } from "./nav-ui";
 import { NotificationUIStore } from "./notification-ui";
@@ -32,7 +31,7 @@ export class EduClassroomUIStore {
   protected _notificationUIStore: NotificationUIStore;
   protected _pretestUIStore: PretestUIStore;
   protected _widgetUIStore: WidgetUIStore;
-  protected _groupUIStore: GroupUIStore;
+  // protected _groupUIStore: GroupUIStore;
   protected _subscriptionUIStore: SubscriptionUIStore;
   protected _studentViewUIStore: StudentViewUIStore;
   protected _usersUIStore: UsersUIStore;
@@ -58,7 +57,7 @@ export class EduClassroomUIStore {
       this.shareUIStore
     );
     this._widgetUIStore = new WidgetUIStore(store, this.shareUIStore);
-    this._groupUIStore = new GroupUIStore(store, this.shareUIStore);
+    // this._groupUIStore = new GroupUIStore(store, this.shareUIStore);
     this._subscriptionUIStore = new SubscriptionUIStore(
       store,
       this.shareUIStore
@@ -99,9 +98,9 @@ export class EduClassroomUIStore {
   get widgetUIStore() {
     return this._widgetUIStore;
   }
-  get groupUIStore() {
-    return this._groupUIStore;
-  }
+  // get groupUIStore() {
+  //   return this._groupUIStore;
+  // }
 
   get usersUIStore() {
     return this._usersUIStore;
