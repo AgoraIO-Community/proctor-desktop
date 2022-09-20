@@ -6,6 +6,7 @@ import {
   EduErrorCenter,
   EduEventCenter,
   EduRole2RteRole,
+  EduRoleTypeEnum,
   EduRoomTypeEnum,
   EduSessionInfo,
   GroupDetail,
@@ -156,7 +157,8 @@ export class RoomUIStore extends EduUIStoreBase {
   };
   @bound
   private _addGroupDetailsChange(groupDetails: Map<string, GroupDetail>) {
-    this._checkUserRoomState(groupDetails);
+    EduClassroomConfig.shared.sessionInfo.role === EduRoleTypeEnum.student &&
+      this._checkUserRoomState(groupDetails);
   }
   @bound
   private async _handleClassroomEvent(type: AgoraEduClassroomEvent, args: any) {
