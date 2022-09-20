@@ -1,4 +1,4 @@
-import { EduRegion } from "agora-edu-core";
+import { EduRegion, EduRoleTypeEnum } from "agora-edu-core";
 import { EnumDeviceType, LanguageEnum } from "agora-proctor-sdk";
 import React, { useEffect, useImperativeHandle, useRef, useState } from "react";
 import { useHistory } from "react-router";
@@ -129,11 +129,15 @@ const TestRoomInfoArea = React.forwardRef((props, ref) => {
   const defaultRoomInfo = {
     userRole: 2,
     roomType: 6,
-    userName: "Oliver",
+    userName: `Oliver${Date.now()}`,
     roomName: `OliverTestRoom${Date.now()}`,
   };
 
-  const userUuid = `${defaultRoomInfo.userName}${defaultRoomInfo.userRole}-main`;
+  const userUuid = `${defaultRoomInfo.userName}${
+    defaultRoomInfo.userRole === EduRoleTypeEnum.student
+      ? `${defaultRoomInfo.userRole}-main`
+      : defaultRoomInfo.userRole
+  }`;
   const roomUuid = `${defaultRoomInfo.roomName}${defaultRoomInfo.roomType}`;
 
   const [value, setValue] = useState<string>(
@@ -150,20 +154,13 @@ const TestRoomInfoArea = React.forwardRef((props, ref) => {
     },
   }));
 
-  return (
-    <TestInput
-      contentEditable={true}
-      suppressContentEditableWarning={true}
-      onInput={handleChange}
-    >
-      {value}
-    </TestInput>
-  );
+  return <TestArea onChange={handleChange}>{value}</TestArea>;
 });
 
-const TestInput = styled.div`
+const TestArea = styled.textarea`
   width: 400px;
   height: 400px;
   border: 1px solid #eee;
   border-radius: 8px;
+  padding: 10px;
 `;
