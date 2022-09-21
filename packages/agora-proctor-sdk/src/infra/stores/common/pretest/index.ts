@@ -1,16 +1,28 @@
 import {
+  AGEduErrorCode,
   AgoraEduClassroomEvent,
   BeautyType,
+  ClassroomState,
+  CloudDriveResourceUploadStatus,
   DEVICE_DISABLE,
+  EduClassroomConfig,
+  EduErrorCenter,
   EduEventCenter,
 } from "agora-edu-core";
-import { AgoraRteMediaSourceState, bound, Logger } from "agora-rte-sdk";
+import {
+  AGError,
+  AGErrorWrapper,
+  AgoraRteMediaSourceState,
+  bound,
+  Logger,
+} from "agora-rte-sdk";
 import { action, computed, Lambda, observable, runInAction } from "mobx";
 import { computedFn } from "mobx-utils";
 import { v4 as uuidv4 } from "uuid";
 import { transI18n } from "~ui-kit";
 import { EduUIStoreBase } from "../base";
 import { CameraPlaceholderType, DeviceStateChangedReason } from "../type";
+import { extractFileExt, fileExt2ContentType, supportedTypes } from "./help";
 
 export type PretestToast = {
   id: string;
@@ -79,8 +91,22 @@ export class PretestUIStore extends EduUIStoreBase {
         }
       }
     });
-
-    this._disposers.add(playbackDisposer);
+    this._disposers.add(
+      computed(
+        () => this.classroomStore.connectionStore.classroomState
+      ).observe(({ oldValue, newValue }) => {
+        if (
+          oldValue === ClassroomState.Connecting &&
+          newValue === ClassroomState.Connected
+        ) {
+          Logger.info(`newvalue ${newValue}, oldvalue ${oldValue}`);
+          const userUuid = EduClassroomConfig.shared.sessionInfo.userUuid;
+          this.classroomStore.userStore.updateUserProperties([
+            { userUuid, properties: { avatar: this.avatarUrl } },
+          ]);
+        }
+      })
+    );
 
     EduEventCenter.shared.onClassroomEvents(this._handleInteractionEvents);
   }
@@ -137,6 +163,11 @@ export class PretestUIStore extends EduUIStoreBase {
   @observable currentStep: number = EnumStep["one"];
 
   @observable snapshotImage: string = "";
+
+  @observable _snapshotImageFile?: File;
+
+  /** 快照 */
+  @observable avatarUrl: string = "";
 
   /**
    * 视频消息 Toast 列表
@@ -690,19 +721,91 @@ export class PretestUIStore extends EduUIStoreBase {
     console.log("back to login page");
   }
 
+  @action
+  handlePersonalAvatar = async () => {
+    if (!this._snapshotImageFile) {
+      return Promise.reject("has not image file");
+    }
+    let fileData = await this.uploadPersonalResource(this._snapshotImageFile);
+    if (!fileData?.url) {
+      return Promise.reject("upload image error");
+    }
+    runInAction(() => {
+      this.avatarUrl = fileData?.url as string;
+    });
+  };
+
   /**
    * 设置下一步
    */
   @action.bound
-  setNextStep(okCallback: () => void) {
-    let currentStep = this.currentStep + 1;
-    if (currentStep > EnumStep["finished"]) {
-      // finish
-      // todo join the exam
-      okCallback();
-      return;
+  async setNextStep(okCallback: () => void) {
+    try {
+      if (this.currentStep === EnumStep["two"] && this._snapshotImageFile) {
+        // upload image
+        await this.handlePersonalAvatar();
+      }
+      let currentStep = this.currentStep + 1;
+      if (currentStep > EnumStep["finished"]) {
+        // finish
+        okCallback();
+        return;
+      }
+      this.setCurrentStep(currentStep);
+    } catch (e) {
+      Logger.warn(e);
     }
-    this.setCurrentStep(currentStep);
+  }
+
+  /**
+   * 上传文件
+   * @param file
+   * @returns
+   */
+  @bound
+  async uploadPersonalResource(file: File) {
+    try {
+      let ext = extractFileExt(file.name);
+      if (!ext) {
+        return this.shareUIStore.addGenericErrorDialog(
+          AGErrorWrapper(
+            AGEduErrorCode.EDU_ERR_UPLOAD_FAILED_NO_FILE_EXT,
+            new Error(`no file ext`)
+          )
+        );
+      }
+
+      ext = ext.toLowerCase();
+
+      const resourceUuid =
+        await this.classroomStore.cloudDriveStore.calcResourceUuid(file);
+
+      if (!supportedTypes.includes(ext)) {
+        this.classroomStore.cloudDriveStore.updateProgress(
+          resourceUuid,
+          undefined,
+          CloudDriveResourceUploadStatus.Failed
+        );
+        return EduErrorCenter.shared.handleNonThrowableError(
+          AGEduErrorCode.EDU_ERR_INVALID_CLOUD_RESOURCE,
+          new Error(`unsupported file type ${ext}`)
+        );
+      }
+      const contentType = fileExt2ContentType(ext);
+
+      const data =
+        await this.classroomStore.cloudDriveStore.uploadPersonalResource(
+          file,
+          resourceUuid,
+          ext,
+          contentType,
+          false
+        );
+
+      return data;
+    } catch (e) {
+      this.shareUIStore.addGenericErrorDialog(e as AGError);
+    }
   }
 
   /**
@@ -722,8 +825,9 @@ export class PretestUIStore extends EduUIStoreBase {
    */
   @bound
   async getSnapshot() {
+    const { userUuid, roomUuid } = EduClassroomConfig.shared.sessionInfo;
     let imageData =
-      await this.classroomStore.mediaStore.mediaControl.getCurrentFrameData(
+      this.classroomStore.mediaStore.mediaControl.getCurrentFrameData(
         "",
         "",
         true
@@ -734,6 +838,20 @@ export class PretestUIStore extends EduUIStoreBase {
     const canvasCtx = canvas.getContext("2d") as CanvasRenderingContext2D;
     canvasCtx.putImageData(imageData, 0, 0);
     const base64 = canvas.toDataURL("image/jpeg", 1.0);
+    const imageBlob = await new Promise((res, rej) => {
+      canvas.toBlob((blob) => {
+        res(blob);
+      });
+    });
+    if (imageBlob) {
+      runInAction(() => {
+        this._snapshotImageFile = new File(
+          [imageBlob as BlobPart],
+          `${userUuid}${roomUuid}.jpeg`
+        );
+      });
+    }
+
     return base64;
   }
 
@@ -761,16 +879,10 @@ export class PretestUIStore extends EduUIStoreBase {
 
   @action.bound
   async getSnapshotImage() {
-    if (this.snapshotImage) {
-      runInAction(() => {
-        this.snapshotImage = "";
-      });
-    } else {
-      let base64 = await this.getSnapshot();
-      runInAction(() => {
-        this.snapshotImage = base64;
-      });
-    }
+    let base64 = await this.getSnapshot();
+    runInAction(() => {
+      this.snapshotImage = base64;
+    });
   }
 
   @bound

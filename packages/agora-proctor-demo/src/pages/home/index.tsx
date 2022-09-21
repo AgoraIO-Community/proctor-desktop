@@ -145,7 +145,7 @@ const TestRoomInfoArea = React.forwardRef((props, ref) => {
   );
 
   const handleChange = (e: any) => {
-    setValue(e.currentTarget.textContent);
+    setValue(e.currentTarget.value);
   };
 
   useImperativeHandle(ref, () => ({
@@ -154,7 +154,7 @@ const TestRoomInfoArea = React.forwardRef((props, ref) => {
     },
   }));
 
-  return <TestArea onChange={handleChange}>{value}</TestArea>;
+  return <TestArea onChange={handleChange} value={value} />;
 });
 
 const TestArea = styled.textarea`

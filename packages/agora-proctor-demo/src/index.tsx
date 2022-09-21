@@ -1,14 +1,15 @@
-import { routesMap } from "./router";
-import { HomeStore } from "./stores/home";
-import { GlobalStorage } from "./utils";
 import { Provider } from "mobx-react";
 import ReactDOM from "react-dom";
 import { HashRouter, Route, Switch } from "react-router-dom";
+import { routesMap } from "./router";
 import { BizPageRouter } from "./router/type";
+import { HomeStore } from "./stores/home";
+import { GlobalStorage } from "./utils";
 
 const routes: BizPageRouter[] = [
   BizPageRouter.HomePage,
   BizPageRouter.LaunchPage,
+  BizPageRouter.ColorPage,
 ];
 
 const RouteContainer = () => {
