@@ -11,7 +11,12 @@ import {
   EduSessionInfo,
   GroupDetail,
 } from "agora-edu-core";
-import { AgoraRteMediaPublishState, bound, retryAttempt } from "agora-rte-sdk";
+import {
+  AgoraRteMediaPublishState,
+  AgoraRteScene,
+  bound,
+  retryAttempt,
+} from "agora-rte-sdk";
 import to from "await-to-js";
 import {
   action,
@@ -23,16 +28,38 @@ import {
 } from "mobx";
 import { computedFn } from "mobx-utils";
 import { EduUIStoreBase } from "../base";
+import { SceneSubscription, SubscriptionFactory } from "../subscription/room";
 import { RoomScene } from "./struct";
 
 export class RoomUIStore extends EduUIStoreBase {
+  private _sceneSubscriptions: Map<string, SceneSubscription> = new Map<
+    string,
+    SceneSubscription
+  >();
   private _disposers: (IReactionDisposer | Lambda)[] = [];
   @observable roomScenes: Map<string, RoomScene> = new Map();
   roomSceneByRoomUuid = computedFn((roomUuid: string) => {
     return this.roomScenes.get(roomUuid);
   });
+  createSceneSubscription(scene: AgoraRteScene) {
+    if (!this._sceneSubscriptions.has(scene.sceneId)) {
+      const sub = SubscriptionFactory.createSubscription(scene);
+
+      sub && this._sceneSubscriptions.set(scene.sceneId, sub);
+    }
+    return this._sceneSubscriptions.get(scene.sceneId);
+  }
   @bound
   async joinClassroom(roomUuid: string, roomType?: EduRoomTypeEnum) {
+    if (this.roomSceneByRoomUuid(roomUuid)) {
+      if (
+        this.roomSceneByRoomUuid(roomUuid)?.roomState.state !==
+        ClassroomState.Connected
+      ) {
+        return;
+      }
+    }
+
     const roomScene = new RoomScene(this.classroomStore);
     let engine = this.classroomStore.connectionStore.getEngine();
 
@@ -165,6 +192,10 @@ export class RoomUIStore extends EduUIStoreBase {
     if (type === AgoraEduClassroomEvent.JoinSubRoom) {
       const currentGroupUuid = this.generateGroupUuid();
       await this.joinClassroom(currentGroupUuid, EduRoomTypeEnum.RoomGroup);
+      const sceneSubscribtion = this.createSceneSubscription(
+        this.roomSceneByRoomUuid(currentGroupUuid)?.scene!
+      );
+      sceneSubscribtion?.setActive(true);
       await this.roomSceneByRoomUuid(currentGroupUuid)?.scene?.joinRTC();
       this.classroomStore.streamStore.updateLocalPublishState(
         {

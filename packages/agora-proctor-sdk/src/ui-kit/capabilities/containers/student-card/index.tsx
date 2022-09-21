@@ -4,24 +4,28 @@ import { VideosWallLayoutEnum } from "@/infra/stores/common/type";
 import { useStore } from "@/infra/hooks/ui-store";
 import { LocalTrackPlayer, RemoteTrackPlayer } from "../stream/track-player";
 import { observer } from "mobx-react";
-import { EduStream, SceneType } from "agora-edu-core";
-import { AgoraRteVideoSourceType } from "agora-rte-sdk";
+import {
+  EduClassroomConfig,
+  EduRoomTypeEnum,
+  EduStream,
+  SceneType,
+} from "agora-edu-core";
+import { AgoraRteScene, AgoraRteVideoSourceType } from "agora-rte-sdk";
 import { SvgIconEnum, SvgImg } from "~ui-kit";
 export const StudentCard = observer(({ userUuid }: { userUuid: string }) => {
   const {
     layoutUIStore: { addStudentTab },
     subscriptionUIStore: { createSceneSubscription },
-    usersUIStore: { videosWallLayout },
+    usersUIStore: { videosWallLayout, focusUser },
     roomUIStore: { joinClassroom, roomSceneByRoomUuid, leaveClassroom },
     classroomStore: {
       userStore: { studentList },
     },
   } = useStore();
   const join = async () => {
-    await joinClassroom(userUuid);
+    await joinClassroom(userUuid, EduRoomTypeEnum.RoomGroup);
 
     if (scene?.scene) {
-      createSceneSubscription(scene.scene);
       await scene.scene.joinRTC();
     }
   };
@@ -33,10 +37,7 @@ export const StudentCard = observer(({ userUuid }: { userUuid: string }) => {
   }, []);
   const mainDeviceUserUuid = useMemo(() => userUuid + "-main", []);
   const subDeviceUserUuid = useMemo(() => userUuid + "-sub", []);
-  const scene = useMemo(
-    () => roomSceneByRoomUuid(userUuid),
-    [roomSceneByRoomUuid, userUuid]
-  );
+  const scene = roomSceneByRoomUuid(userUuid);
   const screenShareStream = Array.from(
     scene?.streamController?.streamByUserUuid.get(mainDeviceUserUuid) || []
   ).find(
@@ -58,13 +59,27 @@ export const StudentCard = observer(({ userUuid }: { userUuid: string }) => {
       scene?.streamController?.streamByStreamUuid.get(streamUuid)
         ?.videoSourceType === AgoraRteVideoSourceType.Camera
   );
+  const mainDeviceStudent = studentList.get(mainDeviceUserUuid);
 
+  const focus = async (e: MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    await focusUser(
+      EduClassroomConfig.shared.sessionInfo.roomUuid,
+      mainDeviceUserUuid,
+      {
+        focus:
+          mainDeviceStudent?.userProperties?.get("tags")?.focus === 1 ? 0 : 1,
+      }
+    );
+  };
   return (
     <div
       className="fcr-student-card"
       onClick={() => addStudentTab("test", "test")}
     >
       <StudentVideos
+        fromScene={scene?.scene}
         screenShareStream={scene?.streamController?.streamByStreamUuid?.get(
           screenShareStream || ""
         )}
@@ -79,15 +94,23 @@ export const StudentCard = observer(({ userUuid }: { userUuid: string }) => {
       <div className="fcr-student-card-extra">
         <div className="fcr-student-card-user">
           <div className="fcr-student-card-user-avatar">
-            <img src={studentList.get(userUuid)?.userProperties.flex.avatar} />
+            <img src={mainDeviceStudent?.userProperties?.flex?.avatar} />
           </div>
           <div className="fcr-student-card-user-name">
-            {studentList.get(userUuid)?.userName}
+            {mainDeviceStudent?.userName}
           </div>
         </div>
         <div className="fcr-student-card-actions">
-          <div className="fcr-student-card-actions-like">
-            <SvgImg type={SvgIconEnum.FAV}></SvgImg>
+          <div className="fcr-student-card-actions-like" onClick={focus}>
+            <SvgImg
+              type={SvgIconEnum.FAV}
+              colors={{
+                iconPrimary:
+                  mainDeviceStudent?.userProperties?.get("tags")?.focus === 1
+                    ? "#FF5474"
+                    : "#63626F",
+              }}
+            ></SvgImg>
           </div>
           <div className="fcr-student-card-actions-chat">
             <SvgImg type={SvgIconEnum.CHAT}></SvgImg>
@@ -107,11 +130,13 @@ export const StudentVideos = observer(
     screenShareStream,
     cameraStream,
     mobileStream,
+    fromScene,
   }: {
     layout: VideosWallLayoutEnum;
     screenShareStream?: EduStream;
     cameraStream?: EduStream;
     mobileStream?: EduStream;
+    fromScene?: AgoraRteScene;
   }) => {
     return (
       <div
@@ -123,17 +148,26 @@ export const StudentVideos = observer(
       >
         <div className="fcr-student-card-videos-screen">
           {screenShareStream && (
-            <RemoteTrackPlayer stream={screenShareStream}></RemoteTrackPlayer>
+            <RemoteTrackPlayer
+              fromScene={fromScene}
+              stream={screenShareStream}
+            ></RemoteTrackPlayer>
           )}
         </div>
         <div className="fcr-student-card-videos-camera">
           {cameraStream && (
-            <RemoteTrackPlayer stream={cameraStream}></RemoteTrackPlayer>
+            <RemoteTrackPlayer
+              fromScene={fromScene}
+              stream={cameraStream}
+            ></RemoteTrackPlayer>
           )}
         </div>
         <div className="fcr-student-card-videos-mobile">
           {mobileStream && (
-            <RemoteTrackPlayer stream={mobileStream}></RemoteTrackPlayer>
+            <RemoteTrackPlayer
+              fromScene={fromScene}
+              stream={mobileStream}
+            ></RemoteTrackPlayer>
           )}
         </div>
       </div>

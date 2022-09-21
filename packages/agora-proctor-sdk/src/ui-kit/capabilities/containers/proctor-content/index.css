@@ -6,6 +6,7 @@
 }
 .fcr-proctor-content .ant-tabs {
   flex: 1;
+  overflow: hidden;
 }
 .fcr-proctor-content-tabs .ant-tabs-nav .ant-tabs-nav-list .ant-tabs-tab {
   border-radius: 16px 16px 0 0;

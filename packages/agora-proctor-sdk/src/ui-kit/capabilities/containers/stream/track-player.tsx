@@ -1,6 +1,6 @@
 import { useStore } from "@/infra/hooks/ui-store";
 import { EduStream } from "agora-edu-core";
-import { AGRenderMode } from "agora-rte-sdk";
+import { AgoraRteScene, AGRenderMode } from "agora-rte-sdk";
 import { observer } from "mobx-react";
 import { useRef, FC, useEffect, CSSProperties } from "react";
 import "./index.css";
@@ -9,6 +9,7 @@ type RemoteTrackPlayerProps = {
   style?: CSSProperties;
   className?: string;
   mirrorMode?: boolean;
+  fromScene?: AgoraRteScene;
 };
 
 type LocalTrackPlayerProps = Omit<RemoteTrackPlayerProps, "stream">;
@@ -35,15 +36,22 @@ export const LocalTrackPlayer: FC<LocalTrackPlayerProps> = observer(
   }
 );
 export const RemoteTrackPlayer: FC<RemoteTrackPlayerProps> = observer(
-  ({ style, className, stream, mirrorMode = false }) => {
+  ({ style, className, stream, mirrorMode = false, fromScene }) => {
     const {
-      streamUIStore: { setupRemoteVideo },
+      classroomStore: {
+        streamStore: { setupRemoteVideo },
+      },
     } = useStore();
     const ref = useRef<HTMLDivElement | null>(null);
-
     useEffect(() => {
       if (ref.current) {
-        setupRemoteVideo(stream, ref.current, mirrorMode, AGRenderMode.fit);
+        setupRemoteVideo(
+          stream,
+          ref.current,
+          mirrorMode,
+          AGRenderMode.fit,
+          fromScene
+        );
       }
     }, [mirrorMode, setupRemoteVideo]);
 

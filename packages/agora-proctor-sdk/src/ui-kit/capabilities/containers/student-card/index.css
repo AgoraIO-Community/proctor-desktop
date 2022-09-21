@@ -40,8 +40,11 @@
   width: 32px;
   height: 32px;
   border-radius: 8px;
-  background: #000;
   margin: 0 4px;
+  background-color: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 /* 6宫格 */
 .fcr-student-card-videos-compact {

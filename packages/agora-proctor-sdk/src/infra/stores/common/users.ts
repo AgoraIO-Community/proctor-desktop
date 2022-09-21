@@ -1,4 +1,5 @@
 import { EduUserStruct } from "agora-edu-core";
+import { bound } from "agora-rte-sdk";
 import { action, computed, observable } from "mobx";
 import { EduUIStoreBase } from "./base";
 import { VideosWallLayoutEnum } from "./type";
@@ -53,6 +54,11 @@ export class UsersUIStore extends EduUIStoreBase {
   setVideosWallLayout(layout: VideosWallLayoutEnum) {
     this.videosWallLayout = layout;
   }
+  @bound
+  async focusUser(roomUuid: string, userUuid: string, tags: Record<any, any>) {
+    return this.classroomStore.api.updateUserTags({ roomUuid, userUuid, tags });
+  }
+
   onInstall() {}
   onDestroy() {}
 }
