@@ -11,7 +11,12 @@ import {
   EduSessionInfo,
   GroupDetail,
 } from "agora-edu-core";
-import { AgoraRteMediaPublishState, bound, retryAttempt } from "agora-rte-sdk";
+import {
+  AgoraRteMediaPublishState,
+  bound,
+  Logger,
+  retryAttempt,
+} from "agora-rte-sdk";
 import to from "await-to-js";
 import {
   action,
@@ -125,15 +130,14 @@ export class RoomUIStore extends EduUIStoreBase {
    */
   @action.bound
   addGroup() {
-    const userUuid = EduClassroomConfig.shared.sessionInfo.userUuid;
+    const { userUuid, roomUuid } = EduClassroomConfig.shared.sessionInfo;
     const groupUuid = this.generateGroupUuid();
-    const newGroup = { groupUuid, groupName: groupUuid };
     const newUsers = { userUuid };
     this.classroomStore.groupStore.addGroups(
       [
         {
-          groupUuid: newGroup.groupUuid,
-          groupName: newGroup.groupName,
+          groupUuid: `${groupUuid}${roomUuid}`,
+          groupName: groupUuid,
           users: [newUsers],
         },
       ],
@@ -151,7 +155,7 @@ export class RoomUIStore extends EduUIStoreBase {
       }
     }
     if (!visibleGroup) {
-      console.log("add group");
+      Logger.info(`${currentGroupUuid} join in`);
       this.addGroup();
     }
   };

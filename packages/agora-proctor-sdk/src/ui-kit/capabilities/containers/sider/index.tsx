@@ -2,13 +2,14 @@ import { AgoraCard } from "@/ui-kit/components/card";
 import { AgoraBaseTextColor } from "@/ui-kit/components/common";
 import { FlexContainer } from "@/ui-kit/components/container";
 import { Space } from "antd";
+import { observer } from "mobx-react";
 import styled from "styled-components";
 import { InteractiveVideo } from "./interactive-video";
 import { MainCameraView } from "./main-camera-view";
 import { RoomOperation } from "./room-operation";
 import { SubCameraView } from "./sub-camera-view";
 
-export const Sider = () => {
+export const Sider = observer(() => {
   return (
     <FlexContainer
       width={247}
@@ -27,7 +28,7 @@ export const Sider = () => {
       <SubCameraView />
     </FlexContainer>
   );
-};
+});
 
 const SiderSpace = styled(Space)`
   padding: 16px;

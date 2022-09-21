@@ -1,7 +1,7 @@
+import { useStore } from "@/infra/hooks/ui-store";
 import { AgoraButton } from "@/ui-kit/components/button";
 import { AgoraBaseTextColor } from "@/ui-kit/components/common";
 import { observer } from "mobx-react";
-import { useCallback } from "react";
 import styled from "styled-components";
 
 const RoomTimer = () => {
@@ -14,8 +14,9 @@ const RoomTimer = () => {
 };
 
 const ExistBtn = observer(() => {
-  const handleExistRoom = useCallback(() => {}, []);
-
+  const {
+    studentViewUIStore: { handleExistRoom, exitProcessing },
+  } = useStore();
   return (
     <AgoraButton
       type="primary"
@@ -23,23 +24,36 @@ const ExistBtn = observer(() => {
       shape="round"
       onClick={handleExistRoom}
     >
-      exist
+      {exitProcessing ? "Leave room" : "exit"}
     </AgoraButton>
   );
 });
 
-const ExistClose = () => {
-  return <CloseBtn>x</CloseBtn>;
-};
+const ExistClose = observer(() => {
+  const {
+    studentViewUIStore: { toggleExistState },
+  } = useStore();
+  return (
+    <CloseBtn
+      onClick={(_) => {
+        toggleExistState(false);
+      }}
+    >
+      x
+    </CloseBtn>
+  );
+});
 
 export const RoomOperation = observer(() => {
-  const Items = [RoomTimer, ExistBtn];
+  const {
+    studentViewUIStore: { exitProcessing },
+  } = useStore();
 
   return (
     <OperationContainer>
-      {Items.map((Item, index) => (
-        <Item key={index} />
-      ))}
+      {!exitProcessing && <RoomTimer />}
+      <ExistBtn />
+      {exitProcessing && <ExistClose />}
     </OperationContainer>
   );
 });

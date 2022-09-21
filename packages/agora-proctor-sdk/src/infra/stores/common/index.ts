@@ -111,6 +111,9 @@ export class EduClassroomUIStore {
   get roomUIStore() {
     return this._roomUIStore;
   }
+  get studentViewUIStore() {
+    return this._studentViewUIStore;
+  }
   /**
    * 初始化所有 UIStore
    * @returns
