@@ -142,11 +142,14 @@ export class RoomUIStore extends EduUIStoreBase {
     this.roomScenes.delete(roomUuid);
   }
 
-  generateGroupUuid = () => {
+  /**
+   * for student only
+   */
+  get currentGroupUuid() {
     const { userUuid, roomUuid } = EduClassroomConfig.shared.sessionInfo;
     const userUuidPrefix = userUuid.split("-")[0];
     return `${userUuidPrefix}-${roomUuid}`;
-  };
+  }
 
   /**
    * 新增组
@@ -154,7 +157,7 @@ export class RoomUIStore extends EduUIStoreBase {
   @action.bound
   addGroup() {
     const { userUuid } = EduClassroomConfig.shared.sessionInfo;
-    const groupUuid = this.generateGroupUuid();
+    const groupUuid = this.currentGroupUuid;
     const newUsers = { userUuid };
     this.classroomStore.groupStore.addGroups(
       [
@@ -169,7 +172,7 @@ export class RoomUIStore extends EduUIStoreBase {
   }
 
   private _checkUserRoomState = (groupDetails: Map<string, GroupDetail>) => {
-    const currentGroupUuid = this.generateGroupUuid();
+    const currentGroupUuid = this.currentGroupUuid;
     let visibleGroup = false;
     for (let [groupUuid] of groupDetails) {
       if (groupUuid === currentGroupUuid) {
@@ -190,7 +193,7 @@ export class RoomUIStore extends EduUIStoreBase {
   @bound
   private async _handleClassroomEvent(type: AgoraEduClassroomEvent, args: any) {
     if (type === AgoraEduClassroomEvent.JoinSubRoom) {
-      const currentGroupUuid = this.generateGroupUuid();
+      const currentGroupUuid = this.currentGroupUuid;
       await this.joinClassroom(currentGroupUuid, EduRoomTypeEnum.RoomGroup);
       if (this.roomSceneByRoomUuid(currentGroupUuid)!.scene) {
         await this.roomSceneByRoomUuid(currentGroupUuid)?.scene?.joinRTC();
@@ -204,6 +207,7 @@ export class RoomUIStore extends EduUIStoreBase {
       }
     }
   }
+
   /** Hooks */
   onInstall() {
     this._disposers.push(
