@@ -76,7 +76,7 @@ export class RoomUIStore extends EduUIStoreBase {
           };
           await this.checkIn(sessionInfo, roomScene);
           const scene = engine.createAgoraRteScene(roomUuid);
-
+          this.createSceneSubscription(scene);
           roomScene.setScene(scene);
           // streamId defaults to 0 means server allocate streamId for you
           await scene.joinScene({
@@ -108,6 +108,7 @@ export class RoomUIStore extends EduUIStoreBase {
     }
 
     roomScene.setClassroomState(ClassroomState.Connected);
+    return roomScene;
   }
   async checkIn(sessionInfo: EduSessionInfo, roomScene: RoomScene) {
     const { data, ts } = await this.classroomStore.api.checkIn(sessionInfo);
@@ -142,10 +143,10 @@ export class RoomUIStore extends EduUIStoreBase {
   }
 
   generateGroupUuid = () => {
-    const userUuid = EduClassroomConfig.shared.sessionInfo.userUuid;
+    const { userUuid, roomUuid } = EduClassroomConfig.shared.sessionInfo;
     const tagIndex = userUuid.indexOf("-main");
     const groupUuid = userUuid.slice(0, tagIndex);
-    return groupUuid;
+    return groupUuid + "-" + roomUuid;
   };
 
   /**
@@ -159,7 +160,7 @@ export class RoomUIStore extends EduUIStoreBase {
     this.classroomStore.groupStore.addGroups(
       [
         {
-          groupUuid: `${groupUuid}${roomUuid}`,
+          groupUuid: `${groupUuid}-${roomUuid}`,
           groupName: groupUuid,
           users: [newUsers],
         },
@@ -192,18 +193,16 @@ export class RoomUIStore extends EduUIStoreBase {
     if (type === AgoraEduClassroomEvent.JoinSubRoom) {
       const currentGroupUuid = this.generateGroupUuid();
       await this.joinClassroom(currentGroupUuid, EduRoomTypeEnum.RoomGroup);
-      const sceneSubscribtion = this.createSceneSubscription(
-        this.roomSceneByRoomUuid(currentGroupUuid)?.scene!
-      );
-      sceneSubscribtion?.setActive(true);
-      await this.roomSceneByRoomUuid(currentGroupUuid)?.scene?.joinRTC();
-      this.classroomStore.streamStore.updateLocalPublishState(
-        {
-          videoState: AgoraRteMediaPublishState.Published,
-          audioState: AgoraRteMediaPublishState.Published,
-        },
-        this.roomSceneByRoomUuid(currentGroupUuid)?.scene
-      );
+      if (this.roomSceneByRoomUuid(currentGroupUuid)!.scene) {
+        await this.roomSceneByRoomUuid(currentGroupUuid)?.scene?.joinRTC();
+        this.classroomStore.streamStore.updateLocalPublishState(
+          {
+            videoState: AgoraRteMediaPublishState.Published,
+            audioState: AgoraRteMediaPublishState.Published,
+          },
+          this.roomSceneByRoomUuid(currentGroupUuid)?.scene
+        );
+      }
     }
   }
   /** Hooks */

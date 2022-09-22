@@ -1,5 +1,5 @@
 import "./index.css";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { VideosWallLayoutEnum } from "@/infra/stores/common/type";
 import { useStore } from "@/infra/hooks/ui-store";
 import { LocalTrackPlayer, RemoteTrackPlayer } from "../stream/track-player";
@@ -22,11 +22,14 @@ export const StudentCard = observer(({ userUuid }: { userUuid: string }) => {
       userStore: { studentList },
     },
   } = useStore();
-  const join = async () => {
-    await joinClassroom(userUuid, EduRoomTypeEnum.RoomGroup);
+  const [joinSuccess, setJoinSuccess] = useState(false);
+  const scene = roomSceneByRoomUuid(userUuid);
 
-    if (scene?.scene) {
-      await scene.scene.joinRTC();
+  const join = async () => {
+    const roomScene = await joinClassroom(userUuid, EduRoomTypeEnum.RoomGroup);
+    if (roomScene?.scene) {
+      await roomScene.scene.joinRTC();
+      setJoinSuccess(true);
     }
   };
   useEffect(() => {
@@ -35,9 +38,11 @@ export const StudentCard = observer(({ userUuid }: { userUuid: string }) => {
       leaveClassroom(userUuid);
     };
   }, []);
-  const mainDeviceUserUuid = useMemo(() => userUuid + "-main", []);
-  const subDeviceUserUuid = useMemo(() => userUuid + "-sub", []);
-  const scene = roomSceneByRoomUuid(userUuid);
+  const mainDeviceUserUuid = useMemo(
+    () => userUuid.split("-")[0] + "-main",
+    []
+  );
+  const subDeviceUserUuid = useMemo(() => userUuid.split("-")[0] + "-sub", []);
   const screenShareStream = Array.from(
     scene?.streamController?.streamByUserUuid.get(mainDeviceUserUuid) || []
   ).find(
@@ -78,19 +83,21 @@ export const StudentCard = observer(({ userUuid }: { userUuid: string }) => {
       className="fcr-student-card"
       onClick={() => addStudentTab("test", "test")}
     >
-      <StudentVideos
-        fromScene={scene?.scene}
-        screenShareStream={scene?.streamController?.streamByStreamUuid?.get(
-          screenShareStream || ""
-        )}
-        mobileStream={scene?.streamController?.streamByStreamUuid?.get(
-          mobileStream || ""
-        )}
-        cameraStream={scene?.streamController?.streamByStreamUuid?.get(
-          cameraStream || ""
-        )}
-        layout={videosWallLayout}
-      />
+      {joinSuccess && (
+        <StudentVideos
+          fromScene={scene?.scene}
+          screenShareStream={scene?.streamController?.streamByStreamUuid?.get(
+            screenShareStream || ""
+          )}
+          mobileStream={scene?.streamController?.streamByStreamUuid?.get(
+            mobileStream || ""
+          )}
+          cameraStream={scene?.streamController?.streamByStreamUuid?.get(
+            cameraStream || ""
+          )}
+          layout={videosWallLayout}
+        />
+      )}
       <div className="fcr-student-card-extra">
         <div className="fcr-student-card-user">
           <div className="fcr-student-card-user-avatar">

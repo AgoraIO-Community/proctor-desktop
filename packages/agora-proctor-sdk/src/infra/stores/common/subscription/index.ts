@@ -1,7 +1,7 @@
-import { AgoraRteScene, Log } from 'agora-rte-sdk';
-import { computed, IReactionDisposer, Lambda, reaction } from 'mobx';
-import { SceneSubscription, SubscriptionFactory } from './room';
-import { EduUIStoreBase } from '../base';
+import { AgoraRteScene, Log } from "agora-rte-sdk";
+import { computed, IReactionDisposer, Lambda, reaction } from "mobx";
+import { SceneSubscription, SubscriptionFactory } from "./room";
+import { EduUIStoreBase } from "../base";
 
 @Log.attach({ proxyMethods: false })
 export class SubscriptionUIStore extends EduUIStoreBase {
@@ -40,31 +40,20 @@ export class SubscriptionUIStore extends EduUIStoreBase {
   }
 
   onInstall(): void {
-    this._disposers.push(
-      reaction(
-        () => this.classroomStore.connectionStore.scene,
-        (scene) => {
-          if (scene) {
-            this.createSceneSubscription(scene);
-            this.setActive(scene.sceneId);
-          }
-        },
-      ),
-    );
-    this._disposers.push(
-      computed(() => this.classroomStore.connectionStore.subRoomScene).observe(({ oldValue }) => {
-        if (oldValue) {
-          SubscriptionUIStore._sceneSubscriptions.delete(oldValue.sceneId);
-        }
-      }),
-    );
+    // this._disposers.push(
+    //   computed(() => this.classroomStore.connectionStore.subRoomScene).observe(({ oldValue }) => {
+    //     if (oldValue) {
+    //       SubscriptionUIStore._sceneSubscriptions.delete(oldValue.sceneId);
+    //     }
+    //   }),
+    // );
     this._disposers.push(
       reaction(
         () => this.classroomStore.roomStore.isCDNMode,
         (isCDNMode) => {
           this.setCDNMode(isCDNMode);
-        },
-      ),
+        }
+      )
     );
   }
 

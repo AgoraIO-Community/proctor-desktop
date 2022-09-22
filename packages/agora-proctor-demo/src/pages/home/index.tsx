@@ -61,10 +61,12 @@ export const HomePage = () => {
       ? JSON.parse(inputRef.current.getRoomInfo())
       : {};
 
-    const { userUuid, roomUuid, userRole, roomType } = roomInfo;
+    let { userRole, roomType, userName, roomName } = roomInfo;
+    const userUuid =
+      userRole == "1" ? userName + userRole : userName + userRole + "-main";
+    const roomUuid = roomName + roomType;
     try {
       const domain = `${REACT_APP_AGORA_APP_SDK_DOMAIN}`;
-
       HomeApi.shared.setDomainRegion(region);
 
       const { token, appId } = await HomeApi.shared.loginV3(
@@ -87,8 +89,8 @@ export const HomePage = () => {
         rtmToken: token,
         roomUuid: `${roomUuid}`,
         roomType: roomType,
-        roomName: `${"roomName"}`,
-        userName: "userName",
+        roomName,
+        userName,
         roleType: userRole,
         region: region as EduRegion,
         duration: +30 * 60,
@@ -127,25 +129,18 @@ export const HomePage = () => {
 
 const TestRoomInfoArea = React.forwardRef((props, ref) => {
   const defaultRoomInfo = {
-    userRole: 2,
-    roomType: 6,
-    userName: `Oliver${Date.now()}`,
-    roomName: `OliverTestRoom${Date.now()}`,
+    userRole: 1,
+    roomType: 4,
+    userName: `zhanheng11`,
+    roomName: `zhanhengTestRoom11`,
   };
 
-  const userUuid = `${defaultRoomInfo.userName}${
-    defaultRoomInfo.userRole === EduRoleTypeEnum.student
-      ? `${defaultRoomInfo.userRole}-main`
-      : defaultRoomInfo.userRole
-  }`;
-  const roomUuid = `${defaultRoomInfo.roomName}${defaultRoomInfo.roomType}`;
-
   const [value, setValue] = useState<string>(
-    JSON.stringify({ ...defaultRoomInfo, userUuid, roomUuid }, null, 2)
+    JSON.stringify({ ...defaultRoomInfo }, null, 2)
   );
 
-  const handleChange = (e: any) => {
-    setValue(e.currentTarget.value);
+  const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setValue(e.target.value);
   };
 
   useImperativeHandle(ref, () => ({
@@ -154,7 +149,7 @@ const TestRoomInfoArea = React.forwardRef((props, ref) => {
     },
   }));
 
-  return <TestArea onChange={handleChange} value={value} />;
+  return <TestArea onChange={handleChange} value={value}></TestArea>;
 });
 
 const TestArea = styled.textarea`
