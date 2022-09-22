@@ -1,6 +1,7 @@
 import {
   AGEduErrorCode,
   AgoraEduClassroomEvent,
+  AGServiceErrorCode,
   CheckInData,
   ClassroomState,
   EduClassroomConfig,
@@ -12,20 +13,27 @@ import {
   RteRole2EduRole,
 } from "agora-edu-core";
 import {
+  AGError,
   AgoraRteConnectionState,
   AgoraRteEventType,
   AgoraRteMediaPublishState,
+  AgoraRteMediaSourceState,
   AgoraRteOperator,
   AgoraRteScene,
   AgoraRteSceneJoinRTCOptions,
+  AgoraRteThread,
   AgoraStream,
   AGRtcConnectionType,
+  bound,
   Injectable,
+  Log,
   Logger,
   RtcState,
 } from "agora-rte-sdk";
 import to from "await-to-js";
-import { action, computed, observable } from "mobx";
+import { string } from "joi";
+import { get } from "lodash";
+import { action, computed, observable, reaction, runInAction } from "mobx";
 
 export class RoomScene {
   protected logger!: Injectable.Logger;
@@ -40,7 +48,9 @@ export class RoomScene {
     roomStateErrorReason: "",
   };
   @observable scene?: AgoraRteScene;
-  @observable rtcState?: Map<AGRtcConnectionType, RtcState>;
+  @observable rtcState?: Map<AGRtcConnectionType, RtcState> = new Map()
+    .set(AGRtcConnectionType.main, RtcState.Idle)
+    .set(AGRtcConnectionType.sub, RtcState.Idle);
   constructor(private classroomStore: EduClassroomStore) {}
 
   @action.bound
@@ -61,7 +71,11 @@ export class RoomScene {
   @action.bound
   setScene(scene: AgoraRteScene) {
     this.scene = scene;
-    this.streamController = new StreamController(scene);
+    this.streamController = new StreamController(
+      scene,
+      this.classroomStore,
+      this
+    );
     //listen to rte state change
     scene.on(
       AgoraRteEventType.RteConnectionStateChanged,
@@ -130,16 +144,46 @@ export class RoomScene {
 
 class StreamController {
   @observable dataStore: {
+    stateKeeper?: ShareStreamStateKeeper;
     streamByStreamUuid: Map<string, EduStream>;
     streamByUserUuid: Map<string, Set<string>>;
     userStreamRegistry: Map<string, boolean>;
     streamVolumes: Map<string, number>;
+    shareStreamTokens: Map<string, string>;
+    screenShareStreamUuid: string;
   } = {
+    stateKeeper: undefined,
     streamByStreamUuid: new Map(),
     streamByUserUuid: new Map(),
     userStreamRegistry: new Map(),
     streamVolumes: new Map(),
+    shareStreamTokens: new Map(),
+    screenShareStreamUuid: "",
   };
+  @computed
+  get screenShareStateAccessor() {
+    return {
+      trackState: this._classroomStore.mediaStore.localScreenShareTrackState,
+      classroomState: this._roomScene.roomState.state,
+    };
+  }
+
+  @computed
+  get screenShareTokenAccessor() {
+    return {
+      streamUuid: this.dataStore.screenShareStreamUuid,
+      shareStreamToken: this.shareStreamToken,
+    };
+  }
+  @computed get shareStreamToken() {
+    let streamUuid = this.dataStore.screenShareStreamUuid;
+
+    if (!streamUuid) {
+      return undefined;
+    }
+
+    return this.dataStore.shareStreamTokens.get(streamUuid);
+  }
   @computed get streamByStreamUuid() {
     return this.dataStore.streamByStreamUuid;
   }
@@ -155,7 +199,11 @@ class StreamController {
         err
       );
   }
-  constructor(private _scene: AgoraRteScene) {
+  constructor(
+    private _scene: AgoraRteScene,
+    private _classroomStore: EduClassroomStore,
+    private _roomScene: RoomScene
+  ) {
     this._scene.on(AgoraRteEventType.AudioVolumes, this._updateStreamVolumes);
     this._scene.on(AgoraRteEventType.LocalStreamAdded, this._addLocalStream);
     this._scene.on(
@@ -175,6 +223,123 @@ class StreamController {
       AgoraRteEventType.RemoteStreamUpdate,
       this._updateRemoteStream
     );
+    this._scene.on(
+      AgoraRteEventType.RoomPropertyUpdated,
+      this._handleRoomPropertiesChange
+    );
+
+    reaction(
+      () => this.screenShareStateAccessor,
+      (value) => {
+        const { trackState, classroomState } = value;
+        if (classroomState === ClassroomState.Connected) {
+          //only set state when classroom is connected, the state will also be refreshed when classroom state become connected
+          this.dataStore.stateKeeper?.setShareScreenState(trackState);
+        }
+      }
+    );
+    reaction(
+      () => this.screenShareTokenAccessor,
+      (value) => {
+        const { streamUuid, shareStreamToken } = value;
+
+        if (streamUuid && shareStreamToken) {
+          if (
+            this._roomScene.rtcState?.get(AGRtcConnectionType.sub) ===
+            RtcState.Idle
+          ) {
+            this._scene.joinRTC({
+              connectionType: AGRtcConnectionType.sub,
+              streamUuid,
+              token: shareStreamToken,
+            });
+          }
+        } else {
+          // leave rtc if share StreamUuid is no longer in the room
+          if (
+            this._roomScene.rtcState?.get(AGRtcConnectionType.sub) !==
+            RtcState.Idle
+          ) {
+            this._scene.leaveRTC(AGRtcConnectionType.sub);
+          }
+        }
+      }
+    );
+    this.dataStore.stateKeeper = new ShareStreamStateKeeper(
+      async (targetState: AgoraRteMediaSourceState) => {
+        if (targetState === AgoraRteMediaSourceState.started) {
+          const {
+            rtcToken,
+            streamUuid,
+          }: { rtcToken: string; streamUuid: string } =
+            await this.publishScreenShare();
+          runInAction(() => {
+            this.dataStore.shareStreamTokens.set(streamUuid, rtcToken);
+          });
+        } else if (
+          targetState === AgoraRteMediaSourceState.stopped ||
+          targetState === AgoraRteMediaSourceState.error
+        ) {
+          await this.unpublishScreenShare();
+          runInAction(() => {
+            this.dataStore.shareStreamTokens.clear();
+          });
+        }
+      }
+    );
+  }
+  @action.bound
+  private _handleRoomPropertiesChange(
+    changedRoomProperties: string[],
+    roomProperties: any,
+    operator: any,
+    cause: any
+  ) {
+    changedRoomProperties.forEach((key) => {
+      if (key === "screen") {
+        const screenData = get(roomProperties, "screen");
+        if (screenData.state === 1) {
+          this.dataStore.screenShareStreamUuid = screenData.streamUuid;
+        }
+      }
+    });
+  }
+
+  @bound
+  async publishScreenShare() {
+    const sessionInfo = EduClassroomConfig.shared.sessionInfo;
+    try {
+      let res = await this._classroomStore.api.startShareScreen(
+        this._scene.sceneId,
+        sessionInfo.userUuid
+      );
+      return res;
+    } catch (e) {
+      EduErrorCenter.shared.handleThrowableError(
+        AGEduErrorCode.EDU_ERR_MEDIA_START_SCREENSHARE_FAIL,
+        e as Error
+      );
+    }
+  }
+  @bound
+  async unpublishScreenShare() {
+    const sessionInfo = EduClassroomConfig.shared.sessionInfo;
+    try {
+      let res = await this._classroomStore.api.stopShareScreen(
+        this._scene.sceneId,
+        sessionInfo.userUuid
+      );
+      return res;
+    } catch (e) {
+      if (
+        !AGError.isOf(e as AGError, AGServiceErrorCode.SERV_SCREEN_NOT_SHARED)
+      ) {
+        EduErrorCenter.shared.handleThrowableError(
+          AGEduErrorCode.EDU_ERR_MEDIA_STOP_SCREENSHARE_FAIL,
+          e as Error
+        );
+      }
+    }
   }
   private _addStream2UserSet(stream: EduStream, userUuid: string) {
     let streamUuidSet = this.dataStore.streamByUserUuid.get(userUuid);
@@ -307,5 +472,108 @@ class StreamController {
       this._addStream2UserSet(eduStream, stream.fromUser.userUuid);
       this.dataStore.userStreamRegistry.set(stream.fromUser.userUuid, true);
     });
+  }
+}
+@Log.attach({ proxyMethods: false })
+export class ShareStreamStateKeeper extends AgoraRteThread {
+  private _timer?: any;
+  private _cancelTimer?: () => void;
+  private _timeout = 500;
+  private _currentState: AgoraRteMediaSourceState =
+    AgoraRteMediaSourceState.stopped;
+  private _targetState: AgoraRteMediaSourceState =
+    AgoraRteMediaSourceState.stopped;
+
+  syncTo: (targetState: AgoraRteMediaSourceState) => Promise<void>;
+
+  constructor(
+    syncTo: (targetState: AgoraRteMediaSourceState) => Promise<void>
+  ) {
+    super();
+    this.syncTo = syncTo;
+  }
+
+  async onExecution() {
+    do {
+      this.logger.debug(`thread notify start...`);
+
+      if (this._currentState === this._targetState) {
+        this.logger.info(`state synced.`);
+        break;
+      }
+
+      if (!this.syncTo) {
+        this.logger.warn(
+          `no syncTo handler found, screen share state sync will not be possible`
+        );
+        break;
+      }
+
+      try {
+        await this.syncTo(this._targetState);
+        this._currentState = this._targetState;
+        this.logger.info(`sync state to ${this._targetState} done`);
+        break;
+      } catch (e) {
+        this.logger.error(`sync state failed: ${(e as Error).message}`);
+        this._increaseTimeout();
+      }
+
+      await this._wait(this._timeout);
+    } while (this.running);
+    this.logger.debug(`thread sleep...`);
+  }
+
+  setShareScreenState(state: AgoraRteMediaSourceState) {
+    if (state === AgoraRteMediaSourceState.starting) {
+      //ignore starting state
+      return;
+    }
+    this._targetState = state;
+    //run immediately
+    this._runImmediately();
+  }
+
+  run() {
+    //reset timeout when run is called
+    this._timeout = 500;
+    super.run();
+  }
+
+  stop() {
+    super.stop();
+    this._cancelWait();
+  }
+
+  private _increaseTimeout() {
+    if (this._timeout >= 10 * 1000) {
+      //if current timeout is more than 10 seconds, don't increase
+      return;
+    }
+    // otherwise increase timeout exponentially
+    this._timeout = this._timeout * 2;
+  }
+
+  private _runImmediately() {
+    this._cancelWait();
+    this.run();
+  }
+
+  private async _wait(timeout: number) {
+    this.logger.info(`wait for ${timeout}ms to retry`);
+    await new Promise<void>((resolve) => {
+      clearTimeout(this._timer);
+      this._timer = setTimeout(resolve, timeout);
+      this._cancelTimer = () => {
+        this.logger.info(`cancel wait`);
+        resolve();
+      };
+    });
+  }
+
+  private _cancelWait() {
+    clearTimeout(this._timer);
+    this._timer = undefined;
+    this._cancelTimer && this._cancelTimer();
   }
 }
