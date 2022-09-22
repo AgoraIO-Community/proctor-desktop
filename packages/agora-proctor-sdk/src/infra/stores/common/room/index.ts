@@ -144,9 +144,8 @@ export class RoomUIStore extends EduUIStoreBase {
 
   generateGroupUuid = () => {
     const { userUuid, roomUuid } = EduClassroomConfig.shared.sessionInfo;
-    const tagIndex = userUuid.indexOf("-main");
-    const groupUuid = userUuid.slice(0, tagIndex);
-    return groupUuid + "-" + roomUuid;
+    const userUuidPrefix = userUuid.split("-")[0];
+    return `${userUuidPrefix}-${roomUuid}`;
   };
 
   /**
@@ -154,13 +153,13 @@ export class RoomUIStore extends EduUIStoreBase {
    */
   @action.bound
   addGroup() {
-    const { userUuid, roomUuid } = EduClassroomConfig.shared.sessionInfo;
+    const { userUuid } = EduClassroomConfig.shared.sessionInfo;
     const groupUuid = this.generateGroupUuid();
     const newUsers = { userUuid };
     this.classroomStore.groupStore.addGroups(
       [
         {
-          groupUuid: `${groupUuid}-${roomUuid}`,
+          groupUuid: `${groupUuid}`,
           groupName: groupUuid,
           users: [newUsers],
         },
