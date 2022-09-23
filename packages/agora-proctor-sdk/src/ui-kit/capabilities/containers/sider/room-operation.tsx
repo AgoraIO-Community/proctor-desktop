@@ -5,14 +5,17 @@ import { observer } from "mobx-react";
 import { useCallback } from "react";
 import styled from "styled-components";
 
-const RoomTimer = () => {
+const RoomTimer = observer(() => {
+  const {
+    roomUIStore: { classStatusText },
+  } = useStore();
   return (
     <div>
       <TimerTip>Start Time</TimerTip>
-      <Timer>08: 30</Timer>
+      <Timer>{classStatusText}</Timer>
     </div>
   );
-};
+});
 
 const ExistBtn = observer(() => {
   const {

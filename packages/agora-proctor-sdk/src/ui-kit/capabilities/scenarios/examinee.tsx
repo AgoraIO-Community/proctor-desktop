@@ -12,6 +12,7 @@ import { useCallback } from "react";
 import styled from "styled-components";
 import { Content } from "../containers/content";
 import { Sider } from "../containers/sider";
+import { ToastContainer } from "../containers/toast";
 import Room from "./room";
 
 export const ExamineeScenario = observer(() => {
@@ -22,6 +23,7 @@ export const ExamineeScenario = observer(() => {
         <Sider />
       </FlexContainer>
       <RoomCloseModal />
+      <ToastContainer />
     </Room>
   );
 });
@@ -30,7 +32,7 @@ const RoomCloseModal = observer(() => {
   const {
     studentViewUIStore: { roomClose, userAvatar },
   } = useStore();
-  return true ? (
+  return roomClose ? (
     <AgoraModal
       centered
       open={true}
@@ -61,7 +63,7 @@ const RoomCloseModal = observer(() => {
 
 const LeaveRoomFooter = observer(() => {
   const handleLeaveRoom = useCallback(() => {
-    //leave room
+    // leave room
     EduEventCenter.shared.emitClasroomEvents(
       AgoraEduClassroomEvent.Destroyed,
       LeaveReason.leave

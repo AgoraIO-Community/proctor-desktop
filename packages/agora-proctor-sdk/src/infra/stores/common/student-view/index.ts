@@ -27,6 +27,14 @@ export class StudentViewUIStore extends EduUIStoreBase {
       : this.classroomStore.userStore.localUserProperties.get("avatar");
   }
 
+  @computed
+  get userWarning() {
+    return typeof this.classroomStore.userStore.localUserProperties ===
+      "undefined"
+      ? {}
+      : this.classroomStore.userStore.localUserProperties.get("warning");
+  }
+
   @action.bound
   toggleExistState(state?: boolean) {
     this.exitProcessing = state ? state : !this.exitProcessing;
@@ -53,10 +61,23 @@ export class StudentViewUIStore extends EduUIStoreBase {
     await this.classroomStore.connectionStore.leaveClassroom(LeaveReason.leave);
   }
 
-  @computed
-  get teacherStream() {
-    return "";
-  }
+  openWebview = () => {
+    this.extensionApi.openWebview({
+      resourceUuid: "openwebview",
+      url: "https://www.agora.io",
+      title: "baidu",
+    });
+  };
+  testToast = () => {
+    // update user message
+    const { userUuid } = EduClassroomConfig.shared.sessionInfo;
+    this.classroomStore.userStore.updateUserProperties([
+      {
+        userUuid,
+        properties: { warning: { message: "你小心点", time: Date.now() } },
+      },
+    ]);
+  };
 
   onInstall() {
     this._disposers.push(
@@ -69,6 +90,13 @@ export class StudentViewUIStore extends EduUIStoreBase {
           }
         }
       )
+    );
+    this._disposers.push(
+      computed(() => this.userWarning).observe(({ newValue }) => {
+        if (newValue?.message) {
+          this.shareUIStore.addToast(newValue.message, "error");
+        }
+      })
     );
   }
 

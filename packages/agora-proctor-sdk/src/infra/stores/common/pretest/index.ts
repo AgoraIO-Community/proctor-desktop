@@ -164,6 +164,8 @@ export class PretestUIStore extends EduUIStoreBase {
 
   @observable snapshotImage: string = "";
 
+  @observable snapshotImageProcess: boolean = false; // 默认头像没有进度
+
   @observable _snapshotImageFile?: File;
 
   /** 快照 */
@@ -497,7 +499,8 @@ export class PretestUIStore extends EduUIStoreBase {
   @computed
   get rightBtnDisable() {
     if (this.currentStep === 0) return !this.isMediaReady;
-    if (this.currentStep === 1) return !this.snapshotImage;
+    if (this.currentStep === 1)
+      return !this.snapshotImage && !this.snapshotImageProcess;
     if (this.currentStep === 2) return !this.isScreenSharing;
     if (this.currentStep === 3) return this.stepupStates.every((item) => !item);
   }
@@ -742,8 +745,14 @@ export class PretestUIStore extends EduUIStoreBase {
   async setNextStep(okCallback: () => void) {
     try {
       if (this.currentStep === EnumStep["two"] && this._snapshotImageFile) {
+        runInAction(() => {
+          this.snapshotImageProcess = true;
+        });
         // upload image
         await this.handlePersonalAvatar();
+        runInAction(() => {
+          this.snapshotImageProcess = false;
+        });
       }
       let currentStep = this.currentStep + 1;
       if (currentStep > EnumStep["finished"]) {
