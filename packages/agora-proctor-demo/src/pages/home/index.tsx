@@ -1,4 +1,4 @@
-import { EduRegion, EduRoleTypeEnum } from "agora-edu-core";
+import { EduRegion } from "agora-edu-core";
 import { EnumDeviceType, LanguageEnum } from "agora-proctor-sdk";
 import React, { useEffect, useImperativeHandle, useRef, useState } from "react";
 import { useHistory } from "react-router";
@@ -129,10 +129,10 @@ export const HomePage = () => {
 
 const TestRoomInfoArea = React.forwardRef((props, ref) => {
   const defaultRoomInfo = {
-    userRole: 1,
+    userRole: 2,
     roomType: 4,
-    userName: `zhanheng11`,
-    roomName: `zhanhengTestRoom11`,
+    userName: `agora${Date.now()}`,
+    roomName: `agoraTestRoom${Date.now()}`,
   };
 
   const [value, setValue] = useState<string>(
