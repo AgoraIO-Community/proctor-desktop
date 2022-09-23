@@ -11,7 +11,10 @@ export const StudentDetail = observer(({ userUuid }: { userUuid: string }) => {
   return (
     <div className="fcr-student-detail-tab">
       <div className="fcr-student-detail-tab-replay">
-        <StudentVideos layout={VideosWallLayoutEnum.Compact} />
+        <StudentVideos
+          userUuid={userUuid}
+          layout={VideosWallLayoutEnum.Compact}
+        />
         <div className="fcr-student-detail-tab-replay-bottom">
           <div className="fcr-student-detail-tab-replay-bottom-title">
             <Alarm></Alarm>
@@ -41,7 +44,10 @@ export const StudentDetail = observer(({ userUuid }: { userUuid: string }) => {
         </div>
       </div>
       <div className="fcr-student-detail-tab-live">
-        <StudentVideos layout={VideosWallLayoutEnum.Compact} />
+        <StudentVideos
+          userUuid={userUuid}
+          layout={VideosWallLayoutEnum.Compact}
+        />
         <div className="fcr-student-detail-tab-live-bottom">
           <div className="fcr-student-detail-tab-live-bottom-title">
             Real Time Monitor

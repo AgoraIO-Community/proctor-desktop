@@ -150,4 +150,5 @@ export enum SvgIconEnum {
   FAV = "fav",
   MESSAGE_NORMAL = "message-normal",
   MESSAGE_ACTIVE = "message-active",
+  VIDEO_FULLSCREEN = "video-fullscreen",
 }
