@@ -1,10 +1,10 @@
-import "./index.css";
-import { observer } from "mobx-react";
-import { StudentVideos } from "../../student-card";
-import { VideosWallLayoutEnum } from "@/infra/stores/common/type";
-import { SvgIconEnum, SvgImg } from "~ui-kit";
-import { Select } from "antd";
 import { useStore } from "@/infra/hooks/ui-store";
+import { VideosWallLayoutEnum } from "@/infra/stores/common/type";
+import { Select } from "antd";
+import { observer } from "mobx-react";
+import { SvgIconEnum, SvgImg, transI18n } from "~ui-kit";
+import { StudentVideos } from "../../student-card";
+import "./index.css";
 export const StudentDetail = observer(({ userUuid }: { userUuid: string }) => {
   const {} = useStore();
 
@@ -50,11 +50,11 @@ export const StudentDetail = observer(({ userUuid }: { userUuid: string }) => {
         />
         <div className="fcr-student-detail-tab-live-bottom">
           <div className="fcr-student-detail-tab-live-bottom-title">
-            Real Time Monitor
+            {transI18n("fcr_sub_room_label_monitor")}
           </div>
           <div className="fcr-student-detail-tab-live-bottom-suspicious">
             <div className="fcr-student-detail-tab-live-bottom-suspicious-title">
-              Report a suspicious behavior
+              {transI18n("fcr_sub_room_label_report_behavior")}
             </div>
             <Select></Select>
           </div>

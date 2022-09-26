@@ -1,6 +1,7 @@
 import { AgoraMidBorderRadius } from "@/ui-kit/components/common";
 import { Col, Row, Space } from "antd";
 import styled from "styled-components";
+import { transI18n } from "~ui-kit";
 import {
   PreTestCamera,
   PreTestMicrophone,
@@ -12,7 +13,7 @@ export const DeviceTest = () => {
   return (
     <HeaderRow gutter={22}>
       <Col span={12}>
-        <ItemTitle>Camera</ItemTitle>
+        <ItemTitle>{transI18n("fcr_exam_prep_label_camera")}</ItemTitle>
         <Card>
           <PreTestCamera />
           <PureVideo />
@@ -21,13 +22,15 @@ export const DeviceTest = () => {
       <Col span={12}>
         <Space size={44} direction="vertical" style={{ width: "100%" }}>
           <div>
-            <ItemTitle>Microphone</ItemTitle>
+            <ItemTitle>{transI18n("fcr_exam_prep_label_microphone")}</ItemTitle>
             <Card>
               <PreTestMicrophone />
             </Card>
           </div>
           <div>
-            <ItemTitle marginTop="20px">Speaker</ItemTitle>
+            <ItemTitle marginTop="20px">
+              {transI18n("fcr_exam_prep_label_speaker")}
+            </ItemTitle>
             <Card>
               <PreTestSpeaker />
             </Card>

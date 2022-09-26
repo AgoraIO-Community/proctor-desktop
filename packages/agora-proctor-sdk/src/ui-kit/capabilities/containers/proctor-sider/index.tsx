@@ -1,9 +1,9 @@
 import { useStore } from "@/infra/hooks/ui-store";
-import { ClassroomState, ClassState, EduClassroomConfig } from "agora-edu-core";
+import { ClassState, EduClassroomConfig } from "agora-edu-core";
 import { Button } from "antd";
 import md5 from "js-md5";
 import { observer } from "mobx-react";
-import { SvgIconEnum, SvgImg } from "~ui-kit";
+import { SvgIconEnum, SvgImg, transI18n } from "~ui-kit";
 import "./index.css";
 export const ProctorSider = observer(() => {
   const {
@@ -25,17 +25,23 @@ export const ProctorSider = observer(() => {
   };
   return (
     <div className={"fcr_proctor_sider"}>
-      <div className={"fcr_proctor_sider_logo"}>灵动课堂</div>
+      <div className={"fcr_proctor_sider_logo"}>
+        {transI18n("fcr_home_page_scene_option_online_proctoring")}
+      </div>
       <div className={"fcr_proctor_sider_info_wrap"}>
         <div className={"fcr_proctor_sider_info_room_number"}>
-          <div className={"fcr_proctor_sider_info_title"}>RoomNumber</div>
+          <div className={"fcr_proctor_sider_info_title"}>
+            {transI18n("fcr_room_label_room_number")}
+          </div>
           <div className={"fcr_proctor_sider_info_val"}>
             {EduClassroomConfig.shared.sessionInfo.roomName}
           </div>
         </div>
         <div className={"fcr_proctor_sider_info_room_remaining"}>
           <div>
-            <div className={"fcr_proctor_sider_info_title"}>TimeRemaining</div>
+            <div className={"fcr_proctor_sider_info_title"}>
+              {transI18n("fcr_room_label_time_remaining")}
+            </div>
             <div className={"fcr_proctor_sider_info_val"}>
               {classStatusText}
             </div>
@@ -48,11 +54,11 @@ export const ProctorSider = observer(() => {
         <div>
           {classState === ClassState.beforeClass ? (
             <Button type="primary" block onClick={startExam}>
-              Start Exam
+              {transI18n("fcr_room_button_exam_start")}
             </Button>
           ) : (
             <Button type="primary" block onClick={startClass}>
-              End Exam
+              {transI18n("fcr_room_button_exam_end")}
             </Button>
           )}
         </div>

@@ -5,6 +5,7 @@ import { EduClassroomConfig, EduRoleTypeEnum } from "agora-edu-core";
 import { observer } from "mobx-react";
 import { FC } from "react";
 import styled from "styled-components";
+import { transI18n } from "~ui-kit";
 import { StudentPretest, TeacherPretest } from "./student-pretest";
 
 interface pretestProps {
@@ -66,7 +67,9 @@ const StudentPretestFooter: FC<pretestProps> = observer(({ onOk }) => {
         subType="original"
         onClick={handleLeftBtnAction}
       >
-        {currentStep <= 0 ? "cancel" : "prev"}
+        {currentStep <= 0
+          ? transI18n("fcr_exam_prep_button_cancel")
+          : transI18n("fcr_exam_prep_button_previous")}
       </AgoraButton>
       <AgoraButton
         size="large"

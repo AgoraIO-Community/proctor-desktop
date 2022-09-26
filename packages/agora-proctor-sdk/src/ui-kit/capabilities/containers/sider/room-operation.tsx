@@ -4,6 +4,7 @@ import { AgoraBaseTextColor } from "@/ui-kit/components/common";
 import { observer } from "mobx-react";
 import { useCallback } from "react";
 import styled from "styled-components";
+import { transI18n } from "~ui-kit";
 
 const RoomTimer = observer(() => {
   const {
@@ -11,7 +12,7 @@ const RoomTimer = observer(() => {
   } = useStore();
   return (
     <div>
-      <TimerTip>Start Time</TimerTip>
+      <TimerTip>{transI18n("fcr_room_label_start_time")}</TimerTip>
       <Timer>{classStatusText}</Timer>
     </div>
   );
@@ -36,7 +37,9 @@ const ExistBtn = observer(() => {
       shape="round"
       onClick={handleExitRoom}
     >
-      {exitProcessing ? "Leave room" : "exit"}
+      {exitProcessing
+        ? transI18n("fcr_room_button_leave")
+        : transI18n("fcr_room_button_leave")}
     </AgoraButton>
   );
 });
