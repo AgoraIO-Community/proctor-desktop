@@ -8,7 +8,7 @@ import "./index.css";
 export const ProctorSider = observer(() => {
   const {
     navigationBarUIStore: { startClass, classStatusText, classState },
-    usersUIStore: { studentListByUserUuidPrefix },
+    usersUIStore: { studentListByUserUuidPrefix, filterTag },
     classroomStore: {
       widgetStore: { setActive },
     },
@@ -42,7 +42,7 @@ export const ProctorSider = observer(() => {
           </div>
           <div>
             <SvgImg type={SvgIconEnum.PEOPLE}></SvgImg>
-            <span>{studentListByUserUuidPrefix.size}</span>
+            <span>{studentListByUserUuidPrefix(filterTag).size}</span>
           </div>
         </div>
         <div>

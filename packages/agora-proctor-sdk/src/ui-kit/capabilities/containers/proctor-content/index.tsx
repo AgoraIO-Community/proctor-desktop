@@ -4,7 +4,10 @@ import { AllVideos } from "../proctor-tabs/all-videos";
 import { SvgIconEnum, SvgImg } from "~ui-kit";
 import { useStore } from "@/infra/hooks/ui-store";
 import { observer } from "mobx-react";
-import { VideosWallLayoutEnum } from "@/infra/stores/common/type";
+import {
+  StudentFilterTag,
+  VideosWallLayoutEnum,
+} from "@/infra/stores/common/type";
 import { useState } from "react";
 import { StudentDetail } from "../proctor-tabs/student-detail";
 export const ProctorContent = observer(() => {
@@ -15,7 +18,11 @@ export const ProctorContent = observer(() => {
       setCurrentTab,
       removeStudentTab,
     },
-    usersUIStore: { setVideosWallLayout },
+    usersUIStore: {
+      setVideosWallLayout,
+      studentListByUserUuidPrefix,
+      setFilterTag,
+    },
   } = useStore();
   return (
     <div className="fcr-proctor-content">
@@ -91,7 +98,38 @@ export const ProctorContent = observer(() => {
         <div className="fcr-proctor-content-footer-segmented">
           <Segmented
             className="fcr-proctor-content-tag-segmented"
-            options={["All", "Abnormal", "Focus"]}
+            onChange={(val) => setFilterTag(val as StudentFilterTag)}
+            options={[
+              {
+                label: (
+                  <span>
+                    All·{studentListByUserUuidPrefix(StudentFilterTag.All).size}
+                  </span>
+                ),
+                value: StudentFilterTag.All,
+              },
+              {
+                label: (
+                  <span>
+                    Abnormal·
+                    {
+                      studentListByUserUuidPrefix(StudentFilterTag.Abnormal)
+                        .size
+                    }
+                  </span>
+                ),
+                value: StudentFilterTag.Abnormal,
+              },
+              {
+                label: (
+                  <span>
+                    Focus·
+                    {studentListByUserUuidPrefix(StudentFilterTag.Focus).size}
+                  </span>
+                ),
+                value: StudentFilterTag.Focus,
+              },
+            ]}
           ></Segmented>
         </div>
         <div className="fcr-proctor-content-footer-leave">

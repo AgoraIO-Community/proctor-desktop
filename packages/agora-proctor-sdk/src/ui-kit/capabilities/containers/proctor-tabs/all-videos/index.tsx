@@ -13,8 +13,10 @@ export const AllVideos = observer(() => {
   const {
     usersUIStore: {
       studentListByUserUuidPrefix,
+      filterTag,
       videosWallLayout,
       studentListByPage,
+      currentUserCount,
     },
   } = useStore();
   const containerRef = useRef<HTMLDivElement>(null);
@@ -46,16 +48,16 @@ export const AllVideos = observer(() => {
   };
   return (
     <div className="fcr-all-videos-tab" ref={containerRef}>
-      {studentListByUserUuidPrefix.size > 0 ? (
+      {studentListByUserUuidPrefix(filterTag).size > 0 ? (
         <>
           <div className="fcr-all-videos-tab-controller">
             <div className="fcr-all-videos-tab-controller-prev" onClick={prev}>
               <SvgImg type={SvgIconEnum.TRIANGLE_SOLID_UP}></SvgImg>
             </div>
             <div className="fcr-all-videos-tab-controller-info">
-              <span>20</span>
+              <span>{currentUserCount}</span>
               <span>/</span>
-              <span>{studentListByUserUuidPrefix.size}</span>
+              <span>{studentListByUserUuidPrefix(filterTag).size}</span>
             </div>
             <div className="fcr-all-videos-tab-controller-next" onClick={next}>
               <SvgImg type={SvgIconEnum.TRIANGLE_SOLID_DOWN}></SvgImg>
@@ -81,12 +83,14 @@ export const AllVideos = observer(() => {
                       ].toLowerCase()}`}
                       style={{ height: containerHeight }}
                     >
-                      {index === currentPage &&
-                        cur.map((userUuid: string) => {
-                          return (
-                            <StudentCard userUuid={userUuid}></StudentCard>
-                          );
-                        })}
+                      {cur.map((userUuid: string) => {
+                        return (
+                          <StudentCard
+                            renderVideos={index === currentPage}
+                            userUuid={userUuid}
+                          ></StudentCard>
+                        );
+                      })}
                     </div>
                   </div>
                 );

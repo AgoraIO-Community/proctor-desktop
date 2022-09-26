@@ -16,75 +16,79 @@ import {
 } from "agora-edu-core";
 import { AgoraRteScene, AgoraRteVideoSourceType } from "agora-rte-sdk";
 import { SvgIconEnum, SvgImg } from "~ui-kit";
-export const StudentCard = observer(({ userUuid }: { userUuid: string }) => {
-  const {
-    layoutUIStore: { addStudentTab },
-    usersUIStore: { videosWallLayout, focusUser },
-    classroomStore: {
-      userStore: { studentList },
-    },
-  } = useStore();
+export const StudentCard = observer(
+  ({ userUuid, renderVideos }: { userUuid: string; renderVideos: boolean }) => {
+    const {
+      layoutUIStore: { addStudentTab },
+      usersUIStore: { videosWallLayout, focusUser },
+      classroomStore: {
+        userStore: { studentList },
+      },
+    } = useStore();
 
-  const mainDeviceUserUuid = useMemo(
-    () => userUuid.split("-")[0] + "-main",
-    []
-  );
-
-  const mainDeviceStudent = studentList.get(mainDeviceUserUuid);
-
-  const focus: React.MouseEventHandler = async (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    await focusUser(
-      EduClassroomConfig.shared.sessionInfo.roomUuid,
-      mainDeviceUserUuid,
-      {
-        focus:
-          mainDeviceStudent?.userProperties?.get("tags")?.focus === 1 ? 0 : 1,
-      }
+    const mainDeviceUserUuid = useMemo(
+      () => userUuid.split("-")[0] + "-main",
+      []
     );
-  };
-  return (
-    <div
-      className="fcr-student-card"
-      onClick={() =>
-        addStudentTab(userUuid, mainDeviceStudent?.userName || "student")
-      }
-    >
-      <StudentVideos userUuid={userUuid} layout={videosWallLayout} />
 
-      <div className="fcr-student-card-extra">
-        <div className="fcr-student-card-user">
-          <div className="fcr-student-card-user-avatar">
-            <img src={mainDeviceStudent?.userProperties?.flex?.avatar} />
+    const mainDeviceStudent = studentList.get(mainDeviceUserUuid);
+
+    const focus: React.MouseEventHandler = async (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      await focusUser(
+        EduClassroomConfig.shared.sessionInfo.roomUuid,
+        mainDeviceUserUuid,
+        {
+          focus:
+            mainDeviceStudent?.userProperties?.get("tags")?.focus === 1 ? 0 : 1,
+        }
+      );
+    };
+    return (
+      <div
+        className="fcr-student-card"
+        onClick={() =>
+          addStudentTab(userUuid, mainDeviceStudent?.userName || "student")
+        }
+      >
+        {renderVideos && (
+          <StudentVideos userUuid={userUuid} layout={videosWallLayout} />
+        )}
+
+        <div className="fcr-student-card-extra">
+          <div className="fcr-student-card-user">
+            <div className="fcr-student-card-user-avatar">
+              <img src={mainDeviceStudent?.userProperties?.flex?.avatar} />
+            </div>
+            <div className="fcr-student-card-user-name">
+              {mainDeviceStudent?.userName}
+            </div>
           </div>
-          <div className="fcr-student-card-user-name">
-            {mainDeviceStudent?.userName}
-          </div>
-        </div>
-        <div className="fcr-student-card-actions">
-          <div className="fcr-student-card-actions-like" onClick={focus}>
-            <SvgImg
-              type={SvgIconEnum.FAV}
-              colors={{
-                iconPrimary:
-                  mainDeviceStudent?.userProperties?.get("tags")?.focus === 1
-                    ? "#FF5474"
-                    : "#63626F",
-              }}
-            ></SvgImg>
-          </div>
-          <div className="fcr-student-card-actions-chat">
-            <SvgImg type={SvgIconEnum.CHAT}></SvgImg>
-          </div>
-          <div className="fcr-student-card-actions-warning">
-            <SvgImg type={SvgIconEnum.MESSAGE_NORMAL}></SvgImg>
+          <div className="fcr-student-card-actions">
+            <div className="fcr-student-card-actions-like" onClick={focus}>
+              <SvgImg
+                type={SvgIconEnum.FAV}
+                colors={{
+                  iconPrimary:
+                    mainDeviceStudent?.userProperties?.get("tags")?.focus === 1
+                      ? "#FF5474"
+                      : "#63626F",
+                }}
+              ></SvgImg>
+            </div>
+            <div className="fcr-student-card-actions-chat">
+              <SvgImg type={SvgIconEnum.CHAT}></SvgImg>
+            </div>
+            <div className="fcr-student-card-actions-warning">
+              <SvgImg type={SvgIconEnum.MESSAGE_NORMAL}></SvgImg>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-  );
-});
+    );
+  }
+);
 
 export const StudentVideos = observer(
   ({

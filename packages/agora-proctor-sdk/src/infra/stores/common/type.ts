@@ -138,3 +138,9 @@ export enum VideosWallLayoutEnum {
   Loose = 4,
   Compact = 6,
 }
+
+export enum StudentFilterTag {
+  All = "all",
+  Focus = "focus",
+  Abnormal = "abnormal",
+}
