@@ -1,82 +1,93 @@
-import { getRegion } from "../stores/home";
-import { GlobalStorage } from "../utils";
-import { request, Response } from "./request";
 import { AgoraRegion } from "agora-rte-sdk";
 import axios from "axios";
-let tokenDomain = "";
-let tokenDomainCollection: Record<string, string> = {};
+import { getRegion } from "../stores/home";
+import { GlobalStorage } from "../utils";
+import { getTokenDomain } from "../utils/env";
+import { indexURL } from "../utils/url";
+import { request, Response } from "./request";
 
-try {
-  tokenDomainCollection = JSON.parse(
-    `${process.env.REACT_APP_AGORA_APP_TOKEN_DOMAIN}`
-  );
-} catch (e) {
-  tokenDomain = `${process.env.REACT_APP_AGORA_APP_TOKEN_DOMAIN}`;
-}
-export const getTokenDomain = (region: AgoraRegion) => {
-  let domain = tokenDomain;
-  if (!domain && tokenDomainCollection) {
-    switch (region) {
-      case AgoraRegion.CN:
-        domain = tokenDomainCollection["prod_cn"];
-        break;
-      case AgoraRegion.AP:
-        domain = tokenDomainCollection["prod_ap"];
-        break;
-      case AgoraRegion.NA:
-        domain = tokenDomainCollection["prod_na"];
-        break;
-      case AgoraRegion.EU:
-        domain = tokenDomainCollection["prod_eu"];
-        break;
-    }
-  }
-  return domain;
-};
-interface RefreshTokenResponse {
+type RefreshTokenResponse = {
   accessToken: string;
   refreshToken: string;
-}
+};
 
-interface GetUserInfoResponse {
+type GetUserInfoResponse = {
   companyId: string; // 客户信息
   companyName: string; // 客户名称
   userId: string; // 账户类型
   language: string; //偏好语言
-}
+};
 
-interface GetAuthorizedURLRequest {
+type GetAuthorizedURLRequest = {
   redirectUrl: string;
   toRegion?: string;
-}
+};
 
 type GetAuthorizedURLResponse = string;
 
-const access_token_key = "access_token";
-const refresh_token_key = "refresh_token";
+const LOGOUT_SSO_URL = "https://sso2.agora.io/api/v0/logout";
+const ACCESS_TOKEN_KEY = "access_token";
+const REFRESH_TOKEN_KEY = "refresh_token";
+const USER_INFO_KEY = "user_info";
+const NICK_NAME_KEY = "nick_name";
 
 export class UserApi {
   static shared = new UserApi();
 
-  static get access_token() {
-    return GlobalStorage.read(access_token_key);
-  }
-  static get refresh_token() {
-    return GlobalStorage.read(refresh_token_key);
+  static get accessToken() {
+    return localStorage.getItem(ACCESS_TOKEN_KEY) as string;
   }
 
-  get domain() {
+  static set accessToken(value: string) {
+    localStorage.setItem(ACCESS_TOKEN_KEY, value);
+  }
+
+  static get refreshToken() {
+    return localStorage.getItem(REFRESH_TOKEN_KEY) as string;
+  }
+
+  static set refreshToken(value: string) {
+    localStorage.setItem(REFRESH_TOKEN_KEY, value);
+  }
+
+  get userInfo(): GetUserInfoResponse {
+    return GlobalStorage.read(USER_INFO_KEY);
+  }
+
+  private set userInfo(value: GetUserInfoResponse) {
+    GlobalStorage.save(USER_INFO_KEY, value);
+  }
+
+  get nickName() {
+    return GlobalStorage.read(NICK_NAME_KEY) || this.userInfo.companyName;
+  }
+
+  set nickName(name: string) {
+    GlobalStorage.save(NICK_NAME_KEY, name);
+  }
+
+  get redirectUrl() {
+    const redirectUrl = GlobalStorage.read("redirectUrl");
+    const expireTime = Number(GlobalStorage.read("redirectUrl_expire"));
+    const nowTime = Math.ceil(Date.now() / 1000);
+    if (redirectUrl && expireTime > nowTime) {
+      GlobalStorage.clear("redirectUrl");
+      return redirectUrl;
+    }
+    return "";
+  }
+
+  set redirectUrl(val: string) {
+    const nowTime = Math.ceil(Date.now() / 1000);
+    GlobalStorage.save("redirectUrl_expire", nowTime + 10);
+    GlobalStorage.save("redirectUrl", val);
+  }
+
+  private get domain() {
     return getTokenDomain(getRegion());
   }
 
-  static saveAccessToken(value: string) {
-    GlobalStorage.save(access_token_key, value);
-  }
-  static saveRefreshToken(value: string) {
-    GlobalStorage.save(refresh_token_key, value);
-  }
-
-  async getAuthorizedURL(params: GetAuthorizedURLRequest) {
+  private async getAuthorizedURL(params: GetAuthorizedURLRequest) {
     const url = `${this.domain}/sso/v2/users/oauth/redirectUrl`;
     const { data } = await axios.post<Response<GetAuthorizedURLResponse>>(
       url,
@@ -85,41 +96,104 @@ export class UserApi {
     return data.data;
   }
 
-  async redirectLogin() {
+  private redirect_url = indexURL;
+
+  /**
+   * 获取sso鉴权登录地址
+   * @returns
+   *
+   **/
+  /** @en
+   * Get authentication login address
+   * @returns
+   */
+  async login() {
     return this.getAuthorizedURL({
-      redirectUrl: `${location.href.split("?")[0]}`,
+      redirectUrl: this.redirect_url,
       toRegion: getRegion() === AgoraRegion.CN ? "cn" : "en",
-    }).then((data) => {
-      location.href = data;
+    }).then((redirect_url) => {
+      window.location.href = redirect_url;
     });
   }
 
-  async logout() {
-    GlobalStorage.clear(access_token_key);
-    GlobalStorage.clear(refresh_token_key);
-    this.redirectLogin();
-  }
-
+  /**
+   * 获取用户信息
+   * @returns
+   *
+   **/
+  /** @en
+   * Get user's info
+   * @returns
+   */
   async getUserInfo() {
     const url = `${this.domain}/sso/v2/users/info`;
-    const { data } = await request.get<Response<GetUserInfoResponse>>(url, {
-      headers: {
-        Authorization: `Bearer ${UserApi.access_token}`,
-      },
-    });
+    const { data } = await request.get<Response<GetUserInfoResponse>>(url);
+    this.userInfo = data.data;
     return data.data;
   }
 
+  /**
+   * 刷新token
+   * @returns
+   *
+   **/
+  /** @en
+   * Refresh token
+   * @returns
+   */
   async refreshToken() {
-    const url = `${this.domain}/sso/v2/users/refresh/refreshToken/${UserApi.refresh_token}`;
-    return request
-      .post<Response<RefreshTokenResponse>>(url, {})
-      .then((resp) => {
-        if (resp.data) {
-          UserApi.saveAccessToken(resp.data.data.accessToken);
-          UserApi.saveRefreshToken(resp.data.data.refreshToken);
-        }
-        return resp.data;
-      });
+    const url = `${this.domain}/sso/v2/users/refresh/refreshToken/${UserApi.refreshToken}`;
+    return request.post<Response<RefreshTokenResponse>>(url).then((resp) => {
+      if (resp.data) {
+        UserApi.accessToken = resp.data.data.accessToken;
+        UserApi.refreshToken = resp.data.data.refreshToken;
+      }
+      return resp.data;
+    });
+  }
+
+  /**
+   * 清除用户信息，一般登出的时候使用
+   * @returns
+   *
+   **/
+  /** @en
+   * Clear user's info
+   * @returns
+   */
+  clearUserInfo() {
+    GlobalStorage.clear(ACCESS_TOKEN_KEY);
+    GlobalStorage.clear(REFRESH_TOKEN_KEY);
+    GlobalStorage.clear(USER_INFO_KEY);
+  }
+
+  /**
+   * 登出
+   * @returns
+   *
+   **/
+  /** @en
+   * Logout
+   * @returns
+   */
+  async logout() {
+    this.clearUserInfo();
+    const redirect_url = decodeURI(this.redirect_url);
+    location.href = `${LOGOUT_SSO_URL}?redirect_uri=${redirect_url}`;
+    return;
+  }
+
+  /**
+   * 注销账户
+   * @returns
+   *
+   **/
+  /** @en
+   * Close Account
+   * @returns
+   */
+  async closeAccount() {
+    const url = `${this.domain}/sso/v2/users/auth`;
+    return request.delete<Response<RefreshTokenResponse>>(url);
   }
 }

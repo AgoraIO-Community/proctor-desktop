@@ -1,9 +1,10 @@
-import React, { FC, useState, useEffect, useContext } from 'react';
 import classnames from 'classnames';
-import { BaseProps } from '~ui-kit/components/util/type';
-import './index.css';
-import { SvgIconEnum, SvgImg } from '../svg-img';
+import React, { FC, useContext, useEffect, useState } from 'react';
 import { themeContext } from '~ui-kit';
+import { BaseProps } from '~ui-kit/components/util/type';
+import { OverlayWrap } from '../overlay-wrap';
+import { SvgIconEnum, SvgImg } from '../svg-img';
+import './index.css';
 export interface ModalProps extends BaseProps {
   /** 标题 */
   title?: string | React.ReactNode;
@@ -173,5 +174,9 @@ export const Modal: ModalType = ({
     </div>
   );
 
-  return hasMask ? <div className="modal-mask">{modalJsx}</div> : modalJsx;
+  const resultJsx = animate ? <OverlayWrap opened={opened}>{modalJsx}</OverlayWrap> : modalJsx;
+
+  return hasMask ? <div className="modal-mask">{resultJsx}</div> : resultJsx;
 };
+
+export * from './amodal';

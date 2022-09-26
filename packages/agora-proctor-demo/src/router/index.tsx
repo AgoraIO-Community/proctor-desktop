@@ -1,30 +1,53 @@
-import React from "react";
-import { ColorPage } from "../pages/color";
-import { HomePage } from "../pages/home";
-import { LaunchPage } from "../pages/launch";
-import { ManipulatePanel } from "../pages/panel";
-import { BizPageRouter } from "./type";
+import { useEffect, useMemo } from "react";
+import { Route, Switch } from "react-router";
+import { HashRouter } from "react-router-dom";
+import { addResource } from "../components/i18n";
+import { AuthLayout } from "../layout/auth-layout";
+import { BrowserCheckLayout } from "../layout/browser-check-layout";
+import { routesMap } from "./maps";
+import { PageRouter } from "./type";
 
-export type AppRouteComponent = {
-  path: string;
-  component: React.FC;
-};
+const routes: PageRouter[] = [
+  PageRouter.PretestPage,
+  PageRouter.Launch,
+  PageRouter.Window,
+  PageRouter.Index,
+];
+export const RouteContainer = () => {
+  const browserCheckIncludes = useMemo(() => {
+    const list = [PageRouter.Index, PageRouter.Welcome, PageRouter.JoinRoom];
+    return list.map((v) => routesMap[v].path);
+  }, []);
 
-export const routesMap: Record<string, AppRouteComponent> = {
-  [BizPageRouter.HomePage]: {
-    path: "/",
-    component: () => <HomePage />,
-  },
-  [BizPageRouter.LaunchPage]: {
-    path: "/launch",
-    component: () => <LaunchPage />,
-  },
-  [BizPageRouter.ColorPage]: {
-    path: "/color",
-    component: () => <ColorPage />,
-  },
-  [BizPageRouter.ManipulatePage]: {
-    path: "/manipulate",
-    component: () => <ManipulatePanel />,
-  },
+  const authIncludes = useMemo(() => {
+    const list = [PageRouter.JoinRoom];
+    return list.map((v) => routesMap[v].path);
+  }, []);
+
+  useEffect(() => {
+    addResource();
+  }, []);
+
+  return (
+    <HashRouter>
+      <AuthLayout includes={authIncludes}>
+        <BrowserCheckLayout includes={browserCheckIncludes}>
+          <Switch>
+            {routes.map((item, index) => {
+              const route = routesMap[item];
+              if (!route) return null;
+              return (
+                <Route
+                  key={item + index}
+                  exact={!!route.exact}
+                  path={route.path}
+                  component={route.component}
+                />
+              );
+            })}
+          </Switch>
+        </BrowserCheckLayout>
+      </AuthLayout>
+    </HashRouter>
+  );
 };

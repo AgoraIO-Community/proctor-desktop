@@ -1,20 +1,36 @@
-import { LanguageEnum, LaunchOption } from "agora-proctor-sdk";
-import { getBrowserLanguage, GlobalStorage } from "../utils";
+// import { ToastType } from "@/infra/stores/common/share-ui";
+// import { FcrMultiThemeMode } from "@/infra/types/config";
+// import { getBrowserLanguage, GlobalStorage } from "@/infra/utils";
 import { EduRegion } from "agora-edu-core";
+import { LanguageEnum, LaunchOption } from "agora-proctor-sdk";
+import { ToastType } from "agora-proctor-sdk/src/infra/stores/common/share-ui";
+import { AgoraRegion } from "agora-rte-sdk";
 import { action, autorun, observable, toJS } from "mobx";
 import { changeLanguage } from "~ui-kit";
-import { ToastType } from "agora-proctor-sdk/lib/agora-proctor-sdk/src/infra/stores/common/share-ui";
-
+import { getBrowserLanguage, GlobalStorage } from "../utils";
 export type HomeLaunchOption = Omit<LaunchOption, "listener"> & {
   appId: string;
   sdkDomain: string;
   region: EduRegion;
-  curService?: string;
   scenes?: any;
+  themes?: any;
 };
 const regionKey = `home_store_demo_launch_region`;
 const launchKey = `home_store_demo_launch_options`;
 const languageKey = `home_store_demo_launch_language`;
+const themeKey = `home_store_demo_launch_theme`;
+
+export const regionByLang = {
+  zh: EduRegion.CN,
+  en: EduRegion.NA,
+};
+
+const regionList = [
+  AgoraRegion.AP,
+  AgoraRegion.CN,
+  AgoraRegion.EU,
+  AgoraRegion.NA,
+];
 
 export const getRegion = (): EduRegion => {
   return (
@@ -27,16 +43,16 @@ export const getRegion = (): EduRegion => {
 export const getLanguage = (): LanguageEnum => {
   return GlobalStorage.read(languageKey) || getBrowserLanguage() || "en";
 };
-
-const regionByLang = {
-  zh: EduRegion.CN,
-  en: EduRegion.NA,
+// 暂时设置为 'light'
+export const getTheme = () => {
+  return "light";
 };
 
 export const clearHomeOption = () => {
   GlobalStorage.clear(launchKey);
   GlobalStorage.clear(regionKey);
   GlobalStorage.clear(languageKey);
+  GlobalStorage.clear(themeKey);
 };
 
 export class HomeStore {
@@ -49,7 +65,13 @@ export class HomeStore {
   language: LanguageEnum = "en";
 
   @observable
+  theme: string = getTheme();
+
+  @observable
   toastList: ToastType[] = [];
+
+  @observable
+  roomListToast: ToastType[] = [];
 
   constructor() {
     this.launchOption = GlobalStorage.read(launchKey) || {};
@@ -66,6 +88,11 @@ export class HomeStore {
       } else {
         GlobalStorage.clear(languageKey);
       }
+      if (this.theme) {
+        GlobalStorage.save(themeKey, this.theme);
+      } else {
+        GlobalStorage.clear(themeKey);
+      }
     });
   }
 
@@ -79,9 +106,25 @@ export class HomeStore {
     this.toastList = this.toastList.filter((it) => it.id != id);
   }
 
+  @action.bound
+  addRoomListToast(toast: ToastType) {
+    this.roomListToast.push(toast);
+  }
+
+  @action.bound
+  removeRoomListToast(id: string) {
+    this.roomListToast = this.roomListToast.filter((it) => it.id != id);
+  }
   @action
   setRegion = (region: EduRegion) => {
-    this.region = region;
+    if (regionList.includes(region)) {
+      this.region = region;
+    }
+  };
+
+  @action
+  setTheme = (theme: string) => {
+    this.theme = theme;
   };
 
   @action
@@ -114,4 +157,20 @@ export class HomeStore {
     this.language = getLanguage();
     this.launchOption = GlobalStorage.read(launchKey) || {};
   }
+
+  @observable
+  loading = false;
+
+  @action
+  setLoading = (loading: boolean) => {
+    this.loading = loading;
+  };
+
+  @observable
+  isLogin = false;
+
+  @action
+  setLogin = (isLogin: boolean) => {
+    this.isLogin = isLogin;
+  };
 }
