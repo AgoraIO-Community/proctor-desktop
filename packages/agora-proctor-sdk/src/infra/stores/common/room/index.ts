@@ -2,6 +2,7 @@ import {
   AGEduErrorCode,
   AgoraEduClassroomEvent,
   ClassroomState,
+  ClassState,
   EduClassroomConfig,
   EduErrorCenter,
   EduEventCenter,
@@ -19,6 +20,7 @@ import {
   retryAttempt,
 } from "agora-rte-sdk";
 import to from "await-to-js";
+import dayjs from "dayjs";
 import {
   action,
   computed,
@@ -28,6 +30,7 @@ import {
   runInAction,
 } from "mobx";
 import { computedFn } from "mobx-utils";
+import { transI18n } from "~ui-kit";
 import { EduUIStoreBase } from "../base";
 import { SceneSubscription, SubscriptionFactory } from "../subscription/room";
 import { RoomScene } from "./struct";
@@ -142,11 +145,14 @@ export class RoomUIStore extends EduUIStoreBase {
     this.roomScenes.delete(roomUuid);
   }
 
-  generateGroupUuid = () => {
+  /**
+   * for student only
+   */
+  get currentGroupUuid() {
     const { userUuid, roomUuid } = EduClassroomConfig.shared.sessionInfo;
     const userUuidPrefix = userUuid.split("-")[0];
     return `${userUuidPrefix}-${roomUuid}`;
-  };
+  }
 
   /**
    * 新增组
@@ -154,7 +160,7 @@ export class RoomUIStore extends EduUIStoreBase {
   @action.bound
   addGroup() {
     const { userUuid } = EduClassroomConfig.shared.sessionInfo;
-    const groupUuid = this.generateGroupUuid();
+    const groupUuid = this.currentGroupUuid;
     const newUsers = { userUuid };
     this.classroomStore.groupStore.addGroups(
       [
@@ -169,7 +175,7 @@ export class RoomUIStore extends EduUIStoreBase {
   }
 
   private _checkUserRoomState = (groupDetails: Map<string, GroupDetail>) => {
-    const currentGroupUuid = this.generateGroupUuid();
+    const currentGroupUuid = this.currentGroupUuid;
     let visibleGroup = false;
     for (let [groupUuid] of groupDetails) {
       if (groupUuid === currentGroupUuid) {
@@ -190,7 +196,7 @@ export class RoomUIStore extends EduUIStoreBase {
   @bound
   private async _handleClassroomEvent(type: AgoraEduClassroomEvent, args: any) {
     if (type === AgoraEduClassroomEvent.JoinSubRoom) {
-      const currentGroupUuid = this.generateGroupUuid();
+      const currentGroupUuid = this.currentGroupUuid;
       await this.joinClassroom(currentGroupUuid, EduRoomTypeEnum.RoomGroup);
       if (this.roomSceneByRoomUuid(currentGroupUuid)!.scene) {
         await this.roomSceneByRoomUuid(currentGroupUuid)?.scene?.joinRTC();
@@ -202,6 +208,106 @@ export class RoomUIStore extends EduUIStoreBase {
           this.roomSceneByRoomUuid(currentGroupUuid)?.scene
         );
       }
+    }
+  }
+  /**
+   * 教室时间信息
+   * @returns
+   */
+  @computed
+  get classroomSchedule() {
+    return this.classroomStore.roomStore.classroomSchedule;
+  }
+  /**
+   * 教室状态
+   * @returns
+   */
+  @computed
+  get classState() {
+    return this.classroomSchedule.state;
+  }
+
+  /**
+   * 服务器时间
+   * @returns
+   */
+  @computed
+  get calibratedTime() {
+    const { clockTime, clientServerTimeShift } = this.classroomStore.roomStore;
+    return clockTime + clientServerTimeShift;
+  }
+
+  /**
+   * 教室倒计时
+   * @returns
+   */
+  @computed
+  get classTimeDuration(): number {
+    let duration = -1;
+    if (this.classroomSchedule) {
+      switch (this.classState) {
+        case ClassState.beforeClass:
+          if (this.classroomSchedule.startTime !== undefined) {
+            duration = 0;
+          }
+          break;
+        case ClassState.ongoing:
+          if (this.classroomSchedule.startTime !== undefined) {
+            duration = Math.max(
+              this.classroomSchedule.duration
+                ? this.classroomSchedule.duration -
+                    this.calibratedTime +
+                    this.classroomSchedule.startTime
+                : this.calibratedTime - this.classroomSchedule.startTime,
+              0
+            );
+          }
+          break;
+        case ClassState.afterClass:
+          if (
+            this.classroomSchedule.startTime !== undefined &&
+            this.classroomSchedule.duration !== undefined
+          ) {
+            duration = Math.max(
+              this.calibratedTime - this.classroomSchedule.startTime,
+              0
+            );
+          }
+          break;
+      }
+    }
+    return duration;
+  }
+
+  formatCountDown = (time: number) => {
+    const classDuration = dayjs.duration({ milliseconds: time });
+    return classDuration.format("mm:ss");
+  };
+  /**
+   * 教室状态文字
+   * @returns
+   */
+  @computed
+  get classStatusText() {
+    const duration = this.classTimeDuration || 0;
+
+    if (duration < 0) {
+      // return `-- ${transI18n('nav.short.minutes')} -- ${transI18n('nav.short.seconds')}`;
+      return `-- : --`;
+    }
+    switch (this.classState) {
+      case ClassState.beforeClass:
+        return `-- : --`;
+      case ClassState.ongoing:
+        return `${transI18n("nav.started_elapse")}${this.formatCountDown(
+          duration
+        )}`;
+      case ClassState.afterClass:
+        return `${transI18n("nav.ended_elapse")}${this.formatCountDown(
+          duration
+        )}`;
+      default:
+        return `-- : --`;
     }
   }
   /** Hooks */

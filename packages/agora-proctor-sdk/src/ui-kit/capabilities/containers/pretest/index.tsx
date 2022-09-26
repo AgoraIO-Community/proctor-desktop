@@ -54,6 +54,7 @@ const StudentPretestFooter: FC<pretestProps> = observer(({ onOk }) => {
       handleLeftBtnAction,
       rightBtnDisable,
       rightBtnText,
+      snapshotImageProcess,
     },
   } = useStore();
 
@@ -73,6 +74,7 @@ const StudentPretestFooter: FC<pretestProps> = observer(({ onOk }) => {
         onClick={() => setNextStep(onOk)}
         disabled={rightBtnDisable}
         width="200px"
+        loading={snapshotImageProcess}
       >
         {rightBtnText}
       </AgoraButton>

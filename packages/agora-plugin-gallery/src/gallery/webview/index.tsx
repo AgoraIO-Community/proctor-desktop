@@ -9,10 +9,10 @@ import ReactDOM from "react-dom";
 import { AgoraEduToolWidget } from "../../common/edu-tool-widget";
 import { App } from "./app";
 
-const defaultPos = { xaxis: 0.5, yaxis: 0.5 };
+const defaultPos = { xaxis: 0, yaxis: 0 };
 const defaultSize = {
-  width: 0.54,
-  height: 0.71,
+  width: 1,
+  height: 1,
 };
 
 export class FcrWebviewWidget extends AgoraEduToolWidget {

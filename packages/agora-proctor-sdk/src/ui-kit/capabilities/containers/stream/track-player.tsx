@@ -3,12 +3,12 @@ import { EduStream } from "agora-edu-core";
 import { AgoraRteScene, AGRenderMode } from "agora-rte-sdk";
 import { observer } from "mobx-react";
 import {
-  useRef,
-  FC,
-  useEffect,
   CSSProperties,
+  FC,
   forwardRef,
+  useEffect,
   useImperativeHandle,
+  useRef,
 } from "react";
 import { SvgIconEnum, SvgImg } from "~ui-kit";
 import "./index.css";

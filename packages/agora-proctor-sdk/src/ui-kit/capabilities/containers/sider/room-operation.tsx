@@ -2,27 +2,39 @@ import { useStore } from "@/infra/hooks/ui-store";
 import { AgoraButton } from "@/ui-kit/components/button";
 import { AgoraBaseTextColor } from "@/ui-kit/components/common";
 import { observer } from "mobx-react";
+import { useCallback } from "react";
 import styled from "styled-components";
 
-const RoomTimer = () => {
+const RoomTimer = observer(() => {
+  const {
+    roomUIStore: { classStatusText },
+  } = useStore();
   return (
     <div>
       <TimerTip>Start Time</TimerTip>
-      <Timer>08: 30</Timer>
+      <Timer>{classStatusText}</Timer>
     </div>
   );
-};
+});
 
 const ExistBtn = observer(() => {
   const {
-    studentViewUIStore: { handleExistRoom, exitProcessing },
+    studentViewUIStore: { exitRoom, exitProcessing, leaveMainClassroom },
+    roomUIStore: { leaveClassroom, currentGroupUuid },
   } = useStore();
+
+  const handleExitRoom = useCallback(async () => {
+    if (exitRoom()) {
+      await leaveClassroom(currentGroupUuid);
+      await leaveMainClassroom();
+    }
+  }, []);
   return (
     <AgoraButton
       type="primary"
       subType="red"
       shape="round"
-      onClick={handleExistRoom}
+      onClick={handleExitRoom}
     >
       {exitProcessing ? "Leave room" : "exit"}
     </AgoraButton>

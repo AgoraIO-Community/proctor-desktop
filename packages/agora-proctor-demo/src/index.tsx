@@ -10,6 +10,7 @@ const routes: BizPageRouter[] = [
   BizPageRouter.HomePage,
   BizPageRouter.LaunchPage,
   BizPageRouter.ColorPage,
+  BizPageRouter.ManipulatePage,
 ];
 
 const RouteContainer = () => {

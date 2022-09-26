@@ -1,7 +1,7 @@
-import { useCallback, useEffect } from "react";
 import { AgoraEduSDK, LaunchOption } from "agora-proctor-sdk";
 import { isEmpty } from "lodash";
 import { observer } from "mobx-react";
+import { useCallback, useEffect } from "react";
 import { useHistory } from "react-router-dom";
 import { useHomeStore } from "../../utils/hooks";
 
@@ -36,6 +36,13 @@ export const LaunchPage = observer(() => {
       // const recordUrl = `https://solutions-apaas.agora.io/apaas/record/dev/${CLASSROOM_SDK_VERSION}/record_page.html`;
       AgoraEduSDK.launch(dom, {
         ...launchOption,
+        listener: (evt: any, type: any) => {
+          console.log("launch#listener ", evt);
+
+          if (evt === 2) {
+            history.push(`/?reason=${type}`);
+          }
+        },
         // TODO:  Here you need to pass in the address of the recording page posted by the developer himself
       } as unknown as LaunchOption);
     }

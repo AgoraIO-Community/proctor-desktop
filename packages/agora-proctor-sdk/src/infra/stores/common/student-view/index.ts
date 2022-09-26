@@ -1,20 +1,38 @@
-import { LeaveReason } from "agora-edu-core";
-import { Log, Logger } from "agora-rte-sdk";
-import { action, computed, observable } from "mobx";
+import { ClassState, EduClassroomConfig, LeaveReason } from "agora-edu-core";
+import { bound, Log } from "agora-rte-sdk";
+import {
+  action,
+  computed,
+  IReactionDisposer,
+  Lambda,
+  observable,
+  runInAction,
+} from "mobx";
 import { EduUIStoreBase } from "../base";
 
 @Log.attach({ proxyMethods: false })
 export class StudentViewUIStore extends EduUIStoreBase {
+  private _disposers: (IReactionDisposer | Lambda)[] = [];
   @observable
   exitProcessing = false;
 
+  @observable
+  roomClose = false; // 房间是否关闭
+
   @computed
   get userAvatar() {
-    const localUserProperties =
-      this.classroomStore.userStore.localUserProperties;
-    return typeof localUserProperties === "undefined"
+    return typeof this.classroomStore.userStore.localUserProperties ===
+      "undefined"
       ? ""
-      : localUserProperties.get("avatar");
+      : this.classroomStore.userStore.localUserProperties.get("avatar");
+  }
+
+  @computed
+  get userWarning() {
+    return typeof this.classroomStore.userStore.localUserProperties ===
+      "undefined"
+      ? {}
+      : this.classroomStore.userStore.localUserProperties.get("warning");
   }
 
   @action.bound
@@ -22,28 +40,65 @@ export class StudentViewUIStore extends EduUIStoreBase {
     this.exitProcessing = state ? state : !this.exitProcessing;
   }
 
+  generateGroupUuid = () => {
+    const { userUuid, roomUuid } = EduClassroomConfig.shared.sessionInfo;
+    const userUuidPrefix = userUuid.split("-")[0];
+    return `${userUuidPrefix}-${roomUuid}`;
+  };
+
   @action.bound
-  async handleExistRoom() {
+  exitRoom() {
     // leave room
     if (!this.exitProcessing) {
       this.toggleExistState();
-      return;
+      return false;
     }
-    //
+    return true;
+  }
 
-    // leave group room
-    await Promise.resolve("leave user own room");
-    // leave main room
+  @bound
+  async leaveMainClassroom() {
     await this.classroomStore.connectionStore.leaveClassroom(LeaveReason.leave);
-    Logger.info("leave room ");
   }
 
-  @computed
-  get teacherStream() {
-    return "";
-  }
+  openWebview = () => {
+    this.extensionApi.openWebview({
+      resourceUuid: "openwebview",
+      url: "https://www.agora.io",
+      title: "baidu",
+    });
+  };
+  testToast = () => {
+    // update user message
+    const { userUuid } = EduClassroomConfig.shared.sessionInfo;
+    this.classroomStore.userStore.updateUserProperties([
+      {
+        userUuid,
+        properties: { warning: { message: "你小心点", time: Date.now() } },
+      },
+    ]);
+  };
 
-  onInstall() {}
+  onInstall() {
+    this._disposers.push(
+      computed(() => this.classroomStore.roomStore.classroomSchedule).observe(
+        ({ newValue }) => {
+          if (newValue.state === ClassState.close) {
+            runInAction(() => {
+              this.roomClose = true;
+            });
+          }
+        }
+      )
+    );
+    this._disposers.push(
+      computed(() => this.userWarning).observe(({ newValue }) => {
+        if (newValue?.message) {
+          this.shareUIStore.addToast(newValue.message, "error");
+        }
+      })
+    );
+  }
 
   onDestroy() {}
 }
