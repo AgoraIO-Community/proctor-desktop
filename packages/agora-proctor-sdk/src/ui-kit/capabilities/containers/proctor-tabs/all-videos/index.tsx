@@ -76,18 +76,19 @@ export const AllVideos = observer(() => {
             >
               {studentListByPage.reduce((prev, cur, index) => {
                 return prev.concat(
-                  <div>
+                  <div key={index}>
                     <div
                       className={`fcr-all-videos-tab-page-item fcr-all-videos-tab-page-item-${VideosWallLayoutEnum[
                         videosWallLayout
                       ].toLowerCase()}`}
                       style={{ height: containerHeight }}
                     >
-                      {cur.map((userUuid: string) => {
+                      {cur.map((userUuidPrefix) => {
                         return (
                           <StudentCard
+                            key={userUuidPrefix}
                             renderVideos={index === currentPage}
-                            userUuid={userUuid}
+                            userUuidPrefix={userUuidPrefix}
                           ></StudentCard>
                         );
                       })}

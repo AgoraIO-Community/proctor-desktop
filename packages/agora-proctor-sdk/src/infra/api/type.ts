@@ -32,7 +32,7 @@ export enum WindowID {
   RemoteControlBar = "remote-control-bar",
 }
 
-export enum EnumDeviceType {
+export enum DeviceTypeEnum {
   Main = "main",
   Sub = "sub",
 }
@@ -95,7 +95,7 @@ export type LaunchOption = {
   recordRetryTimeout?: number; // 录制重试间隔
   uiMode?: FcrMultiThemeMode;
   shareUrl?: string; // 分享URL
-  deviceType: EnumDeviceType;
+  deviceType: DeviceTypeEnum;
 };
 
 /**

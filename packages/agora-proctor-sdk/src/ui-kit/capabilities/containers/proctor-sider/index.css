@@ -39,3 +39,20 @@
   font-size: 12px;
   line-height: 12px;
 }
+
+.fcr_proctor_sider_info_proctor-actions {
+  width: 214px;
+  height: 354px;
+
+  background: linear-gradient(180deg, #fafafa 0%, #f3f3f3 100%);
+  border-radius: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.fcr_proctor_sider_info_proctor-actions-video {
+  width: 178px;
+  height: 111px;
+  border-radius: 16px;
+  overflow: hidden;
+}

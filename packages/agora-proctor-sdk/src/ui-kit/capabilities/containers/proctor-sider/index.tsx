@@ -1,9 +1,11 @@
 import { useStore } from "@/infra/hooks/ui-store";
 import { ClassroomState, ClassState, EduClassroomConfig } from "agora-edu-core";
+import { AgoraRteMediaSourceState } from "agora-rte-sdk";
 import { Button } from "antd";
 import md5 from "js-md5";
 import { observer } from "mobx-react";
 import { SvgIconEnum, SvgImg } from "~ui-kit";
+import { LocalTrackPlayer } from "../stream/track-player";
 import "./index.css";
 export const ProctorSider = observer(() => {
   const {
@@ -11,6 +13,7 @@ export const ProctorSider = observer(() => {
     usersUIStore: { studentListByUserUuidPrefix, filterTag },
     classroomStore: {
       widgetStore: { setActive },
+      mediaStore: { localCameraTrackState, enableLocalVideo, mediaControl },
     },
   } = useStore();
 
@@ -22,6 +25,12 @@ export const ProctorSider = observer(() => {
       },
     });
     await startClass();
+  };
+  const startSpeak = () => {
+    enableLocalVideo(true);
+  };
+  const stopSpeak = () => {
+    enableLocalVideo(false);
   };
   return (
     <div className={"fcr_proctor_sider"}>
@@ -53,6 +62,25 @@ export const ProctorSider = observer(() => {
           ) : (
             <Button type="primary" block onClick={startClass}>
               End Exam
+            </Button>
+          )}
+        </div>
+      </div>
+      <div className="fcr_proctor_sider_info_proctor-actions">
+        <div className="fcr_proctor_sider_info_proctor-actions-video">
+          <LocalTrackPlayer></LocalTrackPlayer>
+        </div>
+        <div className="fcr_proctor_sider_info_proctor-actions-name">
+          {EduClassroomConfig.shared.sessionInfo.userName}
+        </div>
+        <div className="fcr_proctor_sider_info_proctor-actions-btn">
+          {localCameraTrackState === AgoraRteMediaSourceState.stopped ? (
+            <Button type="primary" onClick={startSpeak}>
+              {"Speaker"}
+            </Button>
+          ) : (
+            <Button onClick={stopSpeak} type="primary">
+              {"Stop"}
             </Button>
           )}
         </div>

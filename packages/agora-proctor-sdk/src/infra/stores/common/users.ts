@@ -1,4 +1,5 @@
-import { EduUserStruct } from "agora-edu-core";
+import { DeviceTypeEnum } from "@/infra/api";
+import { EduClassroomConfig, EduUserStruct } from "agora-edu-core";
 import { bound } from "agora-rte-sdk";
 import { action, computed, observable } from "mobx";
 import { computedFn } from "mobx-utils";
@@ -19,12 +20,13 @@ export class UsersUIStore extends EduUIStoreBase {
   }
   @computed get studentListByPage() {
     return Array.from(
-      this.studentListByUserUuidPrefix(this.filterTag).values()
+      this.studentListByUserUuidPrefix(this.filterTag).entries()
     ).reduce((prev, cur, index) => {
+      const [userUuidPrefix] = cur;
       if (index % this.videosWallLayout === 0) {
-        prev.push([cur]);
+        prev.push([userUuidPrefix]);
       } else {
-        prev[Math.floor(index / this.videosWallLayout)].push(cur);
+        prev[Math.floor(index / this.videosWallLayout)].push(userUuidPrefix);
       }
       return prev;
     }, [] as string[][]);
@@ -72,11 +74,14 @@ export class UsersUIStore extends EduUIStoreBase {
         const studentList: Map<string, EduUserStruct> = new Map();
 
         this.classroomStore.userStore.studentList.forEach((user) => {
-          if (user.userProperties?.get("tags")?.focus === 1) {
+          if (!!user.userProperties?.get("tags")?.abnormal) {
             studentList.set(user.userUuid, user);
           }
         });
         return studentList;
+      }
+      default: {
+        return this.classroomStore.userStore.studentList;
       }
     }
   });
@@ -96,10 +101,28 @@ export class UsersUIStore extends EduUIStoreBase {
     this.filterTag = filterTag;
   }
   @bound
-  async focusUser(roomUuid: string, userUuid: string, tags: Record<any, any>) {
+  async updateUserTags(
+    roomUuid: string,
+    userUuid: string,
+    tags: Record<any, any>
+  ) {
     return this.classroomStore.api.updateUserTags({ roomUuid, userUuid, tags });
   }
-
+  @bound
+  async queryUserEvents(roomUuid: string, userUuid: string) {
+    return this.classroomStore.api.queryRoomEvents({ roomUuid, userUuid });
+  }
+  @bound
+  async queryRecordList(roomUuid: string, nextId?: number) {
+    return this.classroomStore.api.queryRecordList({ roomUuid, nextId });
+  }
+  generateGroupUuid(userUuidPrefix: string) {
+    const { roomUuid } = EduClassroomConfig.shared.sessionInfo;
+    return `${roomUuid}-${userUuidPrefix}`;
+  }
+  generateDeviceUuid(userUuidPrefix: string, deviceType: DeviceTypeEnum) {
+    return `${userUuidPrefix}-${deviceType}`;
+  }
   onInstall() {}
   onDestroy() {}
 }

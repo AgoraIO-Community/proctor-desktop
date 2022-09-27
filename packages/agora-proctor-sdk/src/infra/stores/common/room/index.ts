@@ -151,7 +151,7 @@ export class RoomUIStore extends EduUIStoreBase {
   get currentGroupUuid() {
     const { userUuid, roomUuid } = EduClassroomConfig.shared.sessionInfo;
     const userUuidPrefix = userUuid.split("-")[0];
-    return `${userUuidPrefix}-${roomUuid}`;
+    return `${roomUuid}-${userUuidPrefix}`;
   }
 
   /**

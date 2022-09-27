@@ -40,12 +40,6 @@ export class StudentViewUIStore extends EduUIStoreBase {
     this.exitProcessing = state ? state : !this.exitProcessing;
   }
 
-  generateGroupUuid = () => {
-    const { userUuid, roomUuid } = EduClassroomConfig.shared.sessionInfo;
-    const userUuidPrefix = userUuid.split("-")[0];
-    return `${userUuidPrefix}-${roomUuid}`;
-  };
-
   @action.bound
   exitRoom() {
     // leave room
