@@ -5,7 +5,11 @@ import {
   EduRoomTypeEnum,
   Platform,
 } from "agora-edu-core";
-import { AgoraRegion } from "agora-rte-sdk";
+import {
+  AgoraRegion,
+  AgoraRteEngineConfig,
+  AgoraRteRuntimePlatform,
+} from "agora-rte-sdk";
 import { useCallback } from "react";
 import { useHistory } from "react-router";
 import { aMessage, useI18n } from "~ui-kit";
@@ -19,6 +23,7 @@ import {
   REACT_APP_AGORA_APP_ID,
   REACT_APP_AGORA_APP_SDK_DOMAIN,
 } from "../utils/env";
+import { ShareLink } from "../utils/room";
 import { useBuilderConfig } from "./useBuildConfig";
 import { useCheckRoomInfo } from "./useCheckRoomInfo";
 import { useHomeStore } from "./useHomeStore";
@@ -83,6 +88,22 @@ type ShareURLParams = {
   roomId: string;
 };
 
+const shareLinkInClass = ({ region, roomId }: ShareURLParams) => {
+  if (AgoraRteEngineConfig.platform === AgoraRteRuntimePlatform.Electron) {
+    return "";
+  }
+  const companyId = window.__launchCompanyId;
+  const projectId = window.__launchProjectId;
+  let url = ShareLink.instance.generateUrl({
+    owner: UserApi.shared.nickName,
+    roomId: roomId,
+    region: region,
+  });
+  if (companyId && projectId) {
+    url = url + `&companyId=${companyId}&projectId=${projectId}`;
+  }
+  return url;
+};
 const defaultPlatform = checkBrowserDevice();
 export const useJoinRoom = () => {
   const history = useHistory();
@@ -192,17 +213,25 @@ export const useJoinRoom = () => {
         .join({ roomId, role })
         .then((response) => {
           const { roomDetail, token, appId } = response.data.data;
-          const { serviceType, ...rProps } = roomDetail.roomProperties;
+          const { roomId, roomType, roomName, roomProperties } = roomDetail;
+          const { serviceType, ...rProps } = roomProperties;
+          let userId = UserApi.shared.userInfo.companyId;
           if (!checkRoomInfoBeforeJoin(roomDetail)) {
             return;
           }
+          if (
+            roomType === EduRoomTypeEnum.RoomProctor &&
+            role === EduRoleTypeEnum.student
+          ) {
+            userId += "-main";
+          }
           return joinRoomHandle(
             {
-              roomId: roomDetail.roomId,
-              roomName: roomDetail.roomName,
-              roomType: roomDetail.roomType,
+              roomId: roomId,
+              roomName: roomName,
+              roomType: roomType,
               roomServiceType: serviceType,
-              userId: UserApi.shared.userInfo.companyId,
+              userId,
               userName: nickName || UserApi.shared.nickName,
               role,
               token,

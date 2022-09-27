@@ -1,5 +1,7 @@
 import { LanguageEnum } from "agora-proctor-sdk";
 import { isEmpty } from "lodash";
+import { UserApi } from "../api/user";
+import { indexURL } from "./url";
 
 export const getBrowserLanguage = (): LanguageEnum => {
   const usrlang = navigator.language;
@@ -310,4 +312,12 @@ export const formatRoomID = (id: string, separator = " ") => {
     result.push(id.slice(i, i + 3));
   }
   return result.join(separator);
+};
+
+export const init = () => {
+  if (window.__accessToken && window.__refreshToken) {
+    UserApi.accessToken = window.__accessToken;
+    UserApi.refreshToken = window.__refreshToken;
+    history.replaceState({}, "", indexURL);
+  }
 };

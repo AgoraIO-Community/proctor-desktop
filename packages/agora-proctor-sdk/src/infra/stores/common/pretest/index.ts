@@ -508,7 +508,7 @@ export class PretestUIStore extends EduUIStoreBase {
   @computed
   get rightBtnText() {
     if (this.currentStep === 0 || this.currentStep === 1)
-      return transI18n("fcr_exam_prep_button_previous");
+      return transI18n("fcr_exam_prep_button_next_step");
     if (this.currentStep === 2)
       return transI18n("fcr_exam_prep_button_confirm_sharing");
     if (this.currentStep === 3)
@@ -765,6 +765,9 @@ export class PretestUIStore extends EduUIStoreBase {
       }
       this.setCurrentStep(currentStep);
     } catch (e) {
+      runInAction(() => {
+        this.snapshotImageProcess = false;
+      });
       Logger.warn(e);
     }
   }

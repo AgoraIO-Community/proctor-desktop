@@ -76,6 +76,12 @@ export const CreateRoom = observer(() => {
       value: EduRoomTypeEnum.RoomBigClass,
       className: "card-green",
     },
+    {
+      label: transI18n("fcr_h5create_label_online_proctoring"),
+      description: transI18n("fcr_create_label_online_proctoring_description"),
+      value: EduRoomTypeEnum.RoomProctor,
+      className: "card-purple",
+    },
   ];
 
   const serviceTypeOptions = [

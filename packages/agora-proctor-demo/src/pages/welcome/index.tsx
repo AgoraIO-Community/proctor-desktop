@@ -11,7 +11,7 @@ import {
   ASkeleton,
   SvgIconEnum,
   SvgImg,
-  transI18n,
+  useI18n,
 } from "~ui-kit";
 import { RoomAPI, RoomInfo } from "../../api/room";
 import { UserApi } from "../../api/user";
@@ -20,7 +20,7 @@ import JoinClassIcon from "../../assets/fcr_join_class.svg";
 import roomListEmptyImg from "../../assets/welcome-empty-list.png";
 import { Settings } from "../../components/settings";
 import { useAuth, useHomeStore } from "../../hooks";
-import { encodeUrl } from "../../utils/url";
+import { ShareLink } from "../../utils/room";
 import "./index.css";
 import { RoomListItem } from "./room-list";
 import { RoomToast } from "./room-toast";
@@ -32,9 +32,14 @@ export const Welcome = observer(() => {
   const nextRoomID = useRef<RoomInfo["roomId"]>();
   const { isLogin } = useHomeStore();
   const { auth } = useAuth();
+  const transI18n = useI18n();
 
   const [total, setTotal] = useState(30);
   const history = useHistory();
+
+  // useEffect(() => {
+  //   addResource();
+  // }, []);
 
   const fetchMoreRoomList = useCallback(() => {
     setFetching(true);
@@ -69,7 +74,7 @@ export const Welcome = observer(() => {
   }, []);
 
   const onJoin = useCallback((data: RoomInfo) => {
-    const query = encodeUrl({
+    const query = ShareLink.instance.query({
       roomId: data.roomId,
       owner: UserApi.shared.nickName,
     });

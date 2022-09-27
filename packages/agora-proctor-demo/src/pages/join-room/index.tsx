@@ -1,6 +1,6 @@
 import { EduRoleTypeEnum } from "agora-edu-core";
 import { observer } from "mobx-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AForm, AFormItem, AInput, useAForm, useI18n } from "~ui-kit";
 import { UserApi } from "../../api/user";
 import { RadioIcon } from "../../components/radio-icon";
@@ -12,6 +12,7 @@ import { useNickNameRule } from "../../hooks/useNickNameRule";
 import { useRoomIdRule } from "../../hooks/useRoomIdRule";
 import { NavFooter, NavPageLayout } from "../../layout/nav-page-layout";
 import { formatRoomID } from "../../utils";
+import { ShareLink } from "../../utils/room";
 import "./index.css";
 type JoinFormValue = {
   roomId: string;
@@ -46,8 +47,20 @@ export const JoinRoom = observer(() => {
   const { quickJoinRoom } = useJoinRoom();
   const { setLoading } = useLoading();
   const historyBackHandle = useHistoryBack();
+  const query = ShareLink.instance.parseHashURLQuery(location.hash);
   const { checkRoomID } = useCheckRoomInfo();
   const homeStore = useHomeStore();
+
+  useEffect(() => {
+    if (query && query.roomId) {
+      form.setFieldValue("roomId", formatRoomID(query.roomId));
+    }
+    // 将本地的区域和分享的区域对齐
+    if (query && query.region) {
+      homeStore.setRegion(query.region);
+    }
+    form.setFieldValue("nickName", UserApi.shared.nickName);
+  }, []);
 
   const onSubmit = () => {
     form.validateFields().then((data) => {
@@ -101,9 +114,9 @@ export const JoinRoom = observer(() => {
       >
         <div className="form-item">
           <div className="label">{transI18n("fcr_joinroom_label_RoomID")}</div>
-          {/* <AFormItem name="roomId" rules={roomIdRule}>
+          <AFormItem name="roomId" rules={roomIdRule}>
             <AInput disabled={!!(query && query.roomId)} />
-          </AFormItem> */}
+          </AFormItem>
         </div>
         <div className="form-item">
           <div className="label">{transI18n("fcr_joinroom_label_name")}</div>

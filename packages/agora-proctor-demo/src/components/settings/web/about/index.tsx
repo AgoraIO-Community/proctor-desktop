@@ -30,7 +30,7 @@ export const About = () => {
       </p>
       <div className="logo">
         <img src={logo} alt="" />
-        {transI18n("home.header-left-title")}
+        {transI18n("header-left-title")}
       </div>
     </div>
   );
