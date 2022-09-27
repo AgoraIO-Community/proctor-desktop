@@ -14,6 +14,7 @@ import {
 } from "agora-edu-core";
 import {
   AgoraRteMediaPublishState,
+  AgoraRteMediaSourceState,
   AgoraRteScene,
   bound,
   Logger,
@@ -54,7 +55,16 @@ export class RoomUIStore extends EduUIStoreBase {
     return this._sceneSubscriptions.get(scene.sceneId);
   }
   @bound
-  async joinClassroom(roomUuid: string, roomType?: EduRoomTypeEnum) {
+  async joinClassroom(
+    roomUuid: string,
+    roomType?: EduRoomTypeEnum,
+    stream?: {
+      videoState?: AgoraRteMediaPublishState;
+      audioState?: AgoraRteMediaPublishState;
+      videoSourceState?: AgoraRteMediaSourceState;
+      audioSourceState?: AgoraRteMediaSourceState;
+    }
+  ) {
     if (this.roomSceneByRoomUuid(roomUuid)) {
       if (
         this.roomSceneByRoomUuid(roomUuid)?.roomState.state !==
@@ -77,7 +87,7 @@ export class RoomUIStore extends EduUIStoreBase {
             roomUuid,
             roomType: roomType ? roomType : sessionInfo.roomType,
           };
-          await this.checkIn(sessionInfo, roomScene);
+          await this.checkIn(sessionInfo, roomScene, stream);
           const scene = engine.createAgoraRteScene(roomUuid);
           this.createSceneSubscription(scene);
           roomScene.setScene(scene);
@@ -113,8 +123,21 @@ export class RoomUIStore extends EduUIStoreBase {
     roomScene.setClassroomState(ClassroomState.Connected);
     return roomScene;
   }
-  async checkIn(sessionInfo: EduSessionInfo, roomScene: RoomScene) {
-    const { data, ts } = await this.classroomStore.api.checkIn(sessionInfo);
+  async checkIn(
+    sessionInfo: EduSessionInfo,
+    roomScene: RoomScene,
+    stream?: {
+      videoState?: AgoraRteMediaPublishState;
+      audioState?: AgoraRteMediaPublishState;
+      videoSourceState?: AgoraRteMediaSourceState;
+      audioSourceState?: AgoraRteMediaSourceState;
+    }
+  ) {
+    const { data, ts } = await this.classroomStore.api.checkIn(
+      sessionInfo,
+      undefined,
+      stream
+    );
     const {
       state = 0,
       startTime,

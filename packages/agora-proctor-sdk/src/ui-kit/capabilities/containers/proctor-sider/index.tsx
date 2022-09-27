@@ -6,17 +6,18 @@ import md5 from "js-md5";
 import { observer } from "mobx-react";
 import { SvgIconEnum, SvgImg } from "~ui-kit";
 import { LocalTrackPlayer } from "../stream/track-player";
+import { useEffect } from "react";
 import "./index.css";
 export const ProctorSider = observer(() => {
   const {
     navigationBarUIStore: { startClass, classStatusText, classState },
     usersUIStore: { studentListByUserUuidPrefix, filterTag },
+    streamUIStore: { updateLocalPublishState, teacherCameraStream },
     classroomStore: {
       widgetStore: { setActive },
-      mediaStore: { localCameraTrackState, enableLocalVideo, mediaControl },
+      mediaStore: { localCameraTrackState, enableLocalVideo, enableLocalAudio },
     },
   } = useStore();
-
   const startExam = async () => {
     await setActive("webView" + "-" + md5("https://www.baidu.com"), {
       position: { xaxis: 0, yaxis: 0 },
@@ -26,12 +27,29 @@ export const ProctorSider = observer(() => {
     });
     await startClass();
   };
-  const startSpeak = () => {
-    enableLocalVideo(true);
-  };
-  const stopSpeak = () => {
+  useEffect(() => {
+    enableLocalVideo(false);
+    enableLocalAudio(false);
+  }, []);
+  const muteVideo = () => {
+    updateLocalPublishState({ videoState: 0 });
     enableLocalVideo(false);
   };
+  const unMuteVideo = () => {
+    updateLocalPublishState({ videoState: 1 });
+    enableLocalVideo(true);
+  };
+  const startSpeak = () => {
+    updateLocalPublishState({ audioState: 1, videoState: 1 });
+    enableLocalVideo(true);
+    enableLocalAudio(true);
+  };
+  const stopSpeak = () => {
+    updateLocalPublishState({ audioState: 0, videoState: 0 });
+    enableLocalVideo(false);
+    enableLocalAudio(false);
+  };
+
   return (
     <div className={"fcr_proctor_sider"}>
       <div className={"fcr_proctor_sider_logo"}>灵动课堂</div>
@@ -74,14 +92,53 @@ export const ProctorSider = observer(() => {
           {EduClassroomConfig.shared.sessionInfo.userName}
         </div>
         <div className="fcr_proctor_sider_info_proctor-actions-btn">
-          {localCameraTrackState === AgoraRteMediaSourceState.stopped ? (
-            <Button type="primary" onClick={startSpeak}>
+          {teacherCameraStream?.isCameraMuted &&
+          teacherCameraStream.isMicMuted ? (
+            <Button
+              className="fcr_proctor_sider_info_proctor-actions-speaker"
+              type="primary"
+              block
+              onClick={startSpeak}
+            >
               {"Speaker"}
             </Button>
           ) : (
-            <Button onClick={stopSpeak} type="primary">
-              {"Stop"}
-            </Button>
+            <div className="fcr_proctor_sider_info_proctor-actions-video-group">
+              {localCameraTrackState === AgoraRteMediaSourceState.started ? (
+                <Button
+                  className={
+                    "fcr_proctor_sider_info_proctor-actions-video-left"
+                  }
+                  onClick={muteVideo}
+                  block
+                  type="primary"
+                  danger
+                >
+                  <SvgImg size={36} type={SvgIconEnum.CAMERA_OFF}></SvgImg>
+                </Button>
+              ) : (
+                <Button
+                  className={
+                    "fcr_proctor_sider_info_proctor-actions-video-left"
+                  }
+                  onClick={unMuteVideo}
+                  block
+                  type="primary"
+                >
+                  <SvgImg size={36} type={SvgIconEnum.CAMERA_ON}></SvgImg>
+                </Button>
+              )}
+
+              <Button
+                className={"fcr_proctor_sider_info_proctor-actions-video-right"}
+                onClick={stopSpeak}
+                block
+                type="primary"
+                danger
+              >
+                <SvgImg type={SvgIconEnum.PHONE} size={36}></SvgImg>
+              </Button>
+            </div>
           )}
         </div>
       </div>

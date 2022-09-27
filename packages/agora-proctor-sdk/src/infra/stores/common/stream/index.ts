@@ -15,6 +15,7 @@ import {
   AGError,
   AgoraRteMediaPublishState,
   AgoraRteMediaSourceState,
+  AgoraRteScene,
   AgoraRteVideoSourceType,
   AGRenderMode,
   bound,
@@ -931,6 +932,19 @@ export class StreamUIStore extends EduUIStoreBase {
     } else {
       return this.classroomStore.mediaStore.stopScreenShareCapture();
     }
+  }
+  @bound
+  updateLocalPublishState(
+    streamState: {
+      videoState?: AgoraRteMediaPublishState;
+      audioState?: AgoraRteMediaPublishState;
+    },
+    fromScene?: AgoraRteScene
+  ) {
+    this.classroomStore.streamStore.updateLocalPublishState(
+      streamState,
+      fromScene
+    );
   }
 
   @action.bound

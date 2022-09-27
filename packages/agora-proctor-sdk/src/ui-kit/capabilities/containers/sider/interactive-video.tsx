@@ -15,11 +15,13 @@ export const InteractiveVideo = observer(() => {
         scale={!!teacherCameraStream ? 0.5 : 1}
         backgroundImage={userAvatar}
       />
-      {!!teacherCameraStream && (
-        <TeacherVideo>
-          <RemoteTrackPlayer stream={teacherCameraStream.stream} />
-        </TeacherVideo>
-      )}
+      {teacherCameraStream &&
+        (!teacherCameraStream?.isCameraMuted ||
+          !teacherCameraStream.isMicMuted) && (
+          <TeacherVideo>
+            <RemoteTrackPlayer stream={teacherCameraStream.stream} />
+          </TeacherVideo>
+        )}
     </Space>
   );
 });
@@ -53,4 +55,7 @@ const StudentPhoto = styled.div<{ scale?: number; backgroundImage?: string }>`
 
 const TeacherVideo = styled.div`
   ${siderVideoBox}
+  ${css`
+    overflow: hidden;
+  `}
 `;

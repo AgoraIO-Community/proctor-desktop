@@ -131,7 +131,11 @@ export const StudentVideos = observer(
     const join = async () => {
       const roomScene = await joinClassroom(
         roomUuid,
-        EduRoomTypeEnum.RoomGroup
+        EduRoomTypeEnum.RoomGroup,
+        {
+          audioState: 0,
+          videoState: 0,
+        }
       );
       if (roomScene?.scene) {
         await roomScene.scene.joinRTC();

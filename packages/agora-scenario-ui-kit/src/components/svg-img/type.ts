@@ -152,4 +152,7 @@ export enum SvgIconEnum {
   MESSAGE_ACTIVE = "message-active",
   VIDEO_FULLSCREEN = "video-fullscreen",
   NO_VIDEO = "no-video",
+  PHONE = "phone",
+  CAMERA_ON = "camera-on",
+  CAMERA_OFF = "camera-off",
 }
