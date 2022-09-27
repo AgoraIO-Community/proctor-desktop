@@ -144,3 +144,15 @@ export enum StudentFilterTag {
   Focus = "focus",
   Abnormal = "abnormal",
 }
+export interface UserEvents<T> {
+  cmd: number;
+  data: T;
+  roomUuid: string;
+  sequence: number;
+  ts: number;
+  version: number;
+}
+export interface UserAbnormal {
+  reason: string;
+  type: "warning" | "normal";
+}

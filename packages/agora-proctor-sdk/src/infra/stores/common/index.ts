@@ -152,7 +152,7 @@ export class EduClassroomUIStore {
   async join() {
     const { joinClassroom, joinRTC } = this.classroomStore.connectionStore;
     try {
-      await joinClassroom();
+      await joinClassroom({ audioState: 0, videoState: 0 });
     } catch (e) {
       if (
         AGError.isOf(e as AGError, AGServiceErrorCode.SERV_CANNOT_JOIN_ROOM)

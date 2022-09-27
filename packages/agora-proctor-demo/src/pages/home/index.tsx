@@ -129,8 +129,8 @@ const TestRoomInfoArea = React.forwardRef((props, ref) => {
   const defaultRoomInfo = {
     userRole: 2,
     roomType: 4,
-    userName: `agora${Date.now()}`,
-    roomName: `agoraTestRoom${Date.now()}`,
+    userName: `zhanhengq111`,
+    roomName: `zhanhengTestRoomq111`,
   };
 
   const [value, setValue] = useState<string>(

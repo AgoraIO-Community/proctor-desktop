@@ -40,13 +40,17 @@ export class SubscriptionUIStore extends EduUIStoreBase {
   }
 
   onInstall(): void {
-    // this._disposers.push(
-    //   computed(() => this.classroomStore.connectionStore.subRoomScene).observe(({ oldValue }) => {
-    //     if (oldValue) {
-    //       SubscriptionUIStore._sceneSubscriptions.delete(oldValue.sceneId);
-    //     }
-    //   }),
-    // );
+    this._disposers.push(
+      reaction(
+        () => this.classroomStore.connectionStore.scene,
+        (scene) => {
+          if (scene) {
+            this.createSceneSubscription(scene);
+            this.setActive(scene.sceneId);
+          }
+        }
+      )
+    );
     this._disposers.push(
       reaction(
         () => this.classroomStore.roomStore.isCDNMode,

@@ -725,6 +725,11 @@ export class PretestUIStore extends EduUIStoreBase {
   private _backToLoginPage() {
     // back to login page
     console.log("back to login page");
+    window.location.replace("/");
+  }
+  @bound
+  handleClose() {
+    this._backToLoginPage();
   }
 
   @action

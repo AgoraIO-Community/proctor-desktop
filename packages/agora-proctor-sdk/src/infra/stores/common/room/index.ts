@@ -14,6 +14,7 @@ import {
 } from "agora-edu-core";
 import {
   AgoraRteMediaPublishState,
+  AgoraRteMediaSourceState,
   AgoraRteScene,
   bound,
   Logger,
@@ -53,7 +54,16 @@ export class RoomUIStore extends EduUIStoreBase {
     return this._sceneSubscriptions.get(scene.sceneId);
   }
   @bound
-  async joinClassroom(roomUuid: string, roomType?: EduRoomTypeEnum) {
+  async joinClassroom(
+    roomUuid: string,
+    roomType?: EduRoomTypeEnum,
+    stream?: {
+      videoState?: AgoraRteMediaPublishState;
+      audioState?: AgoraRteMediaPublishState;
+      videoSourceState?: AgoraRteMediaSourceState;
+      audioSourceState?: AgoraRteMediaSourceState;
+    }
+  ) {
     if (this.roomSceneByRoomUuid(roomUuid)) {
       if (
         this.roomSceneByRoomUuid(roomUuid)?.roomState.state !==
@@ -76,7 +86,7 @@ export class RoomUIStore extends EduUIStoreBase {
             roomUuid,
             roomType: roomType ? roomType : sessionInfo.roomType,
           };
-          await this.checkIn(sessionInfo, roomScene);
+          await this.checkIn(sessionInfo, roomScene, stream);
           const scene = engine.createAgoraRteScene(roomUuid);
           this.createSceneSubscription(scene);
           roomScene.setScene(scene);
@@ -112,8 +122,21 @@ export class RoomUIStore extends EduUIStoreBase {
     roomScene.setClassroomState(ClassroomState.Connected);
     return roomScene;
   }
-  async checkIn(sessionInfo: EduSessionInfo, roomScene: RoomScene) {
-    const { data, ts } = await this.classroomStore.api.checkIn(sessionInfo);
+  async checkIn(
+    sessionInfo: EduSessionInfo,
+    roomScene: RoomScene,
+    stream?: {
+      videoState?: AgoraRteMediaPublishState;
+      audioState?: AgoraRteMediaPublishState;
+      videoSourceState?: AgoraRteMediaSourceState;
+      audioSourceState?: AgoraRteMediaSourceState;
+    }
+  ) {
+    const { data, ts } = await this.classroomStore.api.checkIn(
+      sessionInfo,
+      undefined,
+      stream
+    );
     const {
       state = 0,
       startTime,
@@ -150,7 +173,7 @@ export class RoomUIStore extends EduUIStoreBase {
   get currentGroupUuid() {
     const { userUuid, roomUuid } = EduClassroomConfig.shared.sessionInfo;
     const userUuidPrefix = userUuid.split("-")[0];
-    return `${userUuidPrefix}-${roomUuid}`;
+    return `${roomUuid}-${userUuidPrefix}`;
   }
 
   /**
@@ -254,7 +277,7 @@ export class RoomUIStore extends EduUIStoreBase {
           if (this.classroomSchedule.startTime !== undefined) {
             duration = Math.max(
               this.classroomSchedule.duration
-                ? this.classroomSchedule.duration -
+                ? this.classroomSchedule.duration * 1000 -
                     this.calibratedTime +
                     this.classroomSchedule.startTime
                 : this.calibratedTime - this.classroomSchedule.startTime,
@@ -279,7 +302,7 @@ export class RoomUIStore extends EduUIStoreBase {
   }
 
   formatCountDown = (time: number) => {
-    const classDuration = dayjs.duration({ milliseconds: time });
+    const classDuration = dayjs.duration(time, "ms");
     return classDuration.format("mm:ss");
   };
   /**
@@ -291,7 +314,6 @@ export class RoomUIStore extends EduUIStoreBase {
     const duration = this.classTimeDuration || 0;
 
     if (duration < 0) {
-      // return `-- ${transI18n('nav.short.minutes')} -- ${transI18n('nav.short.seconds')}`;
       return `-- : --`;
     }
     switch (this.classState) {

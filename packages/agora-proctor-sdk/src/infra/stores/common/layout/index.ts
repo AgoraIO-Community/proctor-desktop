@@ -78,15 +78,18 @@ export class LayoutUIStore extends EduUIStoreBase {
     this.currentTab = key;
   };
   @action.bound
-  addStudentTab = (userUuid: string, userName: string) => {
-    if (this.studentTabItemsMap.has(userUuid)) return;
-    this.studentTabItemsMap.set(userUuid, { label: userName, key: userUuid });
-    this.setCurrentTab(userUuid);
+  addStudentTab = (userUuidPrefix: string, userName: string) => {
+    if (this.studentTabItemsMap.has(userUuidPrefix)) return;
+    this.studentTabItemsMap.set(userUuidPrefix, {
+      label: userName,
+      key: userUuidPrefix,
+    });
+    this.setCurrentTab(userUuidPrefix);
   };
   @action.bound
-  removeStudentTab = (userUuid: string) => {
-    if (!this.studentTabItemsMap.has(userUuid)) return;
-    this.studentTabItemsMap.delete(userUuid);
+  removeStudentTab = (userUuidPrefix: string) => {
+    if (!this.studentTabItemsMap.has(userUuidPrefix)) return;
+    this.studentTabItemsMap.delete(userUuidPrefix);
     this.setCurrentTab(
       this.studentTabItems.length > 0
         ? this.studentTabItems[this.studentTabItems.length - 1].key

@@ -1,3 +1,5 @@
+import dayjs from "dayjs";
+import duration from "dayjs/plugin/duration";
 import { Provider } from "mobx-react";
 import ReactDOM from "react-dom";
 import { addResource } from "./components/i18n";
@@ -22,6 +24,7 @@ declare global {
 
 init();
 
+dayjs.extend(duration);
 addResource();
 
 export const App = () => {

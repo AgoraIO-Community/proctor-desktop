@@ -182,4 +182,5 @@ export default {
   fcr_vocational_video_start_early_alert:
     "The lesson video will be played immediately in advance, is it confirmed?",
   "header-left-title": "Online Exam",
+  fcr_loading: "loading",
 };

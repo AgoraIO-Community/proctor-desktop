@@ -89,7 +89,7 @@ export const ProctorContent = observer(() => {
                 </div>
               ),
               key: s.key,
-              children: <StudentDetail userUuid={s.key} />,
+              children: <StudentDetail userUuidPrefix={s.key} />,
             };
           }),
         ]}

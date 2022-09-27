@@ -173,4 +173,5 @@ export default {
   fcr_vocational_video_start_early_alert:
     "提前上课将立即播放课程录像，是否确认？",
   "header-left-title": "声网灵动课堂",
+  fcr_loading: "加载中",
 };
