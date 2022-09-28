@@ -1,8 +1,11 @@
 import "./index.css";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useRef } from "react";
 import { VideosWallLayoutEnum } from "@/infra/stores/common/type";
 import { useStore } from "@/infra/hooks/ui-store";
-import { RemoteTrackPlayerWithFullScreen } from "../stream/track-player";
+import {
+  RemoteTrackPlayer,
+  RemoteTrackPlayerWithFullScreen,
+} from "../stream/track-player";
 import { observer } from "mobx-react";
 import { EduClassroomConfig, EduRoomTypeEnum } from "agora-edu-core";
 import { AgoraRteVideoSourceType } from "agora-rte-sdk";
@@ -20,7 +23,6 @@ export const StudentCard = observer(
       layoutUIStore: { addStudentTab },
       usersUIStore: {
         videosWallLayout,
-        updateUserTags,
 
         generateDeviceUuid,
       },
@@ -36,18 +38,6 @@ export const StudentCard = observer(
 
     const mainDeviceStudent = studentList.get(mainDeviceUserUuid);
 
-    const focus: React.MouseEventHandler = async (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      await updateUserTags(
-        EduClassroomConfig.shared.sessionInfo.roomUuid,
-        mainDeviceUserUuid,
-        {
-          focus:
-            mainDeviceStudent?.userProperties?.get("tags")?.focus === 1 ? 0 : 1,
-        }
-      );
-    };
     return (
       <div
         className="fcr-student-card"
@@ -58,6 +48,11 @@ export const StudentCard = observer(
           )
         }
       >
+        {!!mainDeviceStudent?.userProperties?.get("tags")?.abnormal && (
+          <div className="fcr-student-card-abnormal">
+            <SvgImg type={SvgIconEnum.ABNORMAL}></SvgImg>
+          </div>
+        )}
         {renderVideos && (
           <StudentVideos
             userUuidPrefix={userUuidPrefix}
@@ -67,29 +62,13 @@ export const StudentCard = observer(
 
         <div className="fcr-student-card-extra">
           <div className="fcr-student-card-user">
-            <div className="fcr-student-card-user-avatar">
-              <img
-                src={
-                  mainDeviceStudent?.userProperties?.get("flexProps")?.avatar
-                }
-              />
-            </div>
+            <UserAvatar userUuidPrefix={userUuidPrefix} />
             <div className="fcr-student-card-user-name">
               {mainDeviceStudent?.userName}
             </div>
           </div>
           <div className="fcr-student-card-actions">
-            <div className="fcr-student-card-actions-like" onClick={focus}>
-              <SvgImg
-                type={SvgIconEnum.FAV}
-                colors={{
-                  iconPrimary:
-                    mainDeviceStudent?.userProperties?.get("tags")?.focus === 1
-                      ? "#FF5474"
-                      : "#63626F",
-                }}
-              ></SvgImg>
-            </div>
+            <UserFocus userUuidPrefix={userUuidPrefix} />
             <div className="fcr-student-card-actions-chat">
               <SvgImg type={SvgIconEnum.CHAT}></SvgImg>
             </div>
@@ -107,9 +86,11 @@ export const StudentVideos = observer(
   ({
     layout,
     userUuidPrefix,
+    showFullscreen = false,
   }: {
     layout: VideosWallLayoutEnum;
     userUuidPrefix: string;
+    showFullscreen?: boolean;
   }) => {
     const {
       roomUIStore: { joinClassroom, roomSceneByRoomUuid, leaveClassroom },
@@ -182,6 +163,11 @@ export const StudentVideos = observer(
     const subDeviceStream =
       subDeviceStreamUuid &&
       scene?.streamController?.streamByStreamUuid?.get(subDeviceStreamUuid);
+    const Player = useMemo(
+      () =>
+        showFullscreen ? RemoteTrackPlayerWithFullScreen : RemoteTrackPlayer,
+      [showFullscreen]
+    );
     return (
       <div
         className={`fcr-student-card-videos ${
@@ -192,34 +178,191 @@ export const StudentVideos = observer(
       >
         <div className="fcr-student-card-videos-screen">
           {screenShareStream ? (
-            <RemoteTrackPlayerWithFullScreen
+            <Player
               fromScene={scene?.scene}
               stream={screenShareStream}
-            ></RemoteTrackPlayerWithFullScreen>
+            ></Player>
           ) : (
             <SvgImg type={SvgIconEnum.NO_VIDEO}></SvgImg>
           )}
         </div>
         <div className="fcr-student-card-videos-camera">
           {mainDeviceCameraStream ? (
-            <RemoteTrackPlayerWithFullScreen
+            <Player
               fromScene={scene?.scene}
               stream={mainDeviceCameraStream}
-            ></RemoteTrackPlayerWithFullScreen>
+            ></Player>
           ) : (
             <SvgImg type={SvgIconEnum.NO_VIDEO}></SvgImg>
           )}
         </div>
         <div className="fcr-student-card-videos-mobile">
           {subDeviceStream ? (
-            <RemoteTrackPlayerWithFullScreen
-              fromScene={scene?.scene}
-              stream={subDeviceStream}
-            ></RemoteTrackPlayerWithFullScreen>
+            <Player fromScene={scene?.scene} stream={subDeviceStream}></Player>
           ) : (
             <SvgImg type={SvgIconEnum.NO_VIDEO}></SvgImg>
           )}
         </div>
+      </div>
+    );
+  }
+);
+
+export const StudentHLSVideos = observer(
+  ({
+    layout,
+    mainDeviceScreenVideo,
+  }: {
+    layout: VideosWallLayoutEnum;
+    mainDeviceScreenVideo?: string;
+    mainDeviceCameraVideo?: string;
+    subDeviceCameraVideo?: string;
+  }) => {
+    const screenContainerRef = useRef(null);
+    const {
+      classroomStore: {
+        mediaStore: { setupMediaStream },
+      },
+    } = useStore();
+    useEffect(() => {
+      mainDeviceScreenVideo &&
+        setupMediaStream(
+          mainDeviceScreenVideo,
+          screenContainerRef.current!,
+          false,
+          true,
+          true
+        );
+    }, [mainDeviceScreenVideo]);
+    return (
+      <div
+        className={`fcr-student-card-videos ${
+          layout === VideosWallLayoutEnum.Compact
+            ? "fcr-student-card-videos-compact"
+            : "fcr-student-card-videos-loose"
+        }`}
+      >
+        <div
+          ref={screenContainerRef}
+          className="fcr-student-card-videos-screen"
+        ></div>
+        <div className="fcr-student-card-videos-camera"></div>
+        <div className="fcr-student-card-videos-mobile"></div>
+      </div>
+    );
+  }
+);
+export const UserAbnormal = observer(
+  ({
+    userUuidPrefix,
+    size = 30,
+  }: {
+    userUuidPrefix: string;
+    size?: number;
+  }) => {
+    const {
+      usersUIStore: { generateDeviceUuid },
+      classroomStore: {
+        userStore: { studentList },
+      },
+    } = useStore();
+    const mainDeviceUserUuid = generateDeviceUuid(
+      userUuidPrefix,
+      DeviceTypeEnum.Main
+    );
+    const mainDeviceStudent = studentList.get(mainDeviceUserUuid);
+    return mainDeviceStudent?.userProperties?.get("tags")?.abnormal ? (
+      <SvgImg type={SvgIconEnum.ABNORMAL} size={size}></SvgImg>
+    ) : null;
+  }
+);
+export const UserAvatar = observer(
+  ({
+    userUuidPrefix,
+    size = 30,
+    children,
+  }: {
+    userUuidPrefix: string;
+    size?: number;
+    children?: JSX.Element;
+  }) => {
+    const {
+      usersUIStore: { generateDeviceUuid },
+      classroomStore: {
+        userStore: { studentList },
+      },
+    } = useStore();
+    const mainDeviceUserUuid = generateDeviceUuid(
+      userUuidPrefix,
+      DeviceTypeEnum.Main
+    );
+    const mainDeviceStudent = studentList.get(mainDeviceUserUuid);
+
+    return (
+      <div style={{ position: "relative" }}>
+        {children}
+        <div
+          style={{ width: size, height: size }}
+          className="fcr-student-card-user-avatar"
+        >
+          <img
+            src={mainDeviceStudent?.userProperties?.get("flexProps")?.avatar}
+          />
+        </div>
+      </div>
+    );
+  }
+);
+
+export const UserFocus = observer(
+  ({
+    userUuidPrefix,
+    size = 32,
+    iconSize = 24,
+  }: {
+    userUuidPrefix: string;
+    size?: number;
+    iconSize?: number;
+  }) => {
+    const {
+      usersUIStore: { generateDeviceUuid, updateUserTags },
+      classroomStore: {
+        userStore: { studentList },
+      },
+    } = useStore();
+    const mainDeviceUserUuid = generateDeviceUuid(
+      userUuidPrefix,
+      DeviceTypeEnum.Main
+    );
+    const mainDeviceStudent = studentList.get(mainDeviceUserUuid);
+    const focus: React.MouseEventHandler = async (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      await updateUserTags(
+        EduClassroomConfig.shared.sessionInfo.roomUuid,
+        mainDeviceUserUuid,
+        {
+          focus:
+            mainDeviceStudent?.userProperties?.get("tags")?.focus === 1 ? 0 : 1,
+        }
+      );
+    };
+    return (
+      <div
+        className="fcr-student-card-actions-like"
+        style={{ width: size, height: size }}
+        onClick={focus}
+      >
+        <SvgImg
+          size={iconSize}
+          type={SvgIconEnum.FAV}
+          colors={{
+            iconPrimary:
+              mainDeviceStudent?.userProperties?.get("tags")?.focus === 1
+                ? "#FF5474"
+                : "#63626F",
+          }}
+        ></SvgImg>
       </div>
     );
   }

@@ -96,6 +96,7 @@ export type LaunchOption = {
   uiMode?: FcrMultiThemeMode;
   shareUrl?: string; // 分享URL
   deviceType: DeviceTypeEnum;
+  examinationUrl: string;
 };
 
 /**

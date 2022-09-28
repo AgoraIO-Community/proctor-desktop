@@ -1,13 +1,19 @@
 import "./index.css";
 import { observer } from "mobx-react";
-import { StudentVideos } from "../../student-card";
 import {
+  StudentHLSVideos,
+  StudentVideos,
   UserAbnormal,
+  UserAvatar,
+  UserFocus,
+} from "../../student-card";
+import {
+  UserAbnormal as UserAbnormalType,
   UserEvents,
   VideosWallLayoutEnum,
 } from "@/infra/stores/common/type";
-import { Button, SvgIconEnum, SvgImg } from "~ui-kit";
-import { Select } from "antd";
+import { SvgIconEnum, SvgImg } from "~ui-kit";
+import { Select, Button } from "antd";
 import { useStore } from "@/infra/hooks/ui-store";
 import { useEffect, useState, useCallback, useMemo } from "react";
 
@@ -36,11 +42,13 @@ export const StudentDetail = observer(
     const [userEvents, setUserEvents] = useState<
       UserEvents<{
         tags: {
-          abnormal: UserAbnormal;
+          abnormal: UserAbnormalType;
         };
       }>[]
     >([]);
-    const [abnormal, setAbnormal] = useState("");
+    const [abnormal, setAbnormal] = useState(undefined);
+    const [recordList, setRecordList] = useState([]);
+
     const queryUserAbnormal = async () => {
       const res = await queryUserEvents(
         EduClassroomConfig.shared.sessionInfo.roomUuid,
@@ -50,6 +58,7 @@ export const StudentDetail = observer(
     };
     const queryRecords = async () => {
       queryRecordList(roomUuid).then((res) => {
+        setRecordList(res.list);
         console.log(res, "recordlist");
       });
     };
@@ -73,8 +82,8 @@ export const StudentDetail = observer(
     return (
       <div className="fcr-student-detail-tab">
         <div className="fcr-student-detail-tab-replay">
-          <StudentVideos
-            userUuidPrefix={userUuidPrefix}
+          <StudentHLSVideos
+            mainDeviceScreenVideo={recordList[0]?.recordDetails?.[0].url}
             layout={VideosWallLayoutEnum.Compact}
           />
           <div className="fcr-student-detail-tab-replay-bottom">
@@ -83,10 +92,10 @@ export const StudentDetail = observer(
               <span>Review and information alarm（{userEvents.length}）</span>
             </div>
             <div className="fcr-student-detail-tab-replay-bottom-list">
-              {userEvents.map((e, index) => {
+              {userEvents.reverse().map((e, index) => {
                 return (
                   <div className="fcr-student-detail-tab-replay-bottom-list-item">
-                    <div>{index}</div>
+                    <div>{Math.abs(index - userEvents.length) + 1}</div>
                     <div>
                       <div className="fcr-student-detail-tab-replay-bottom-list-item-logo">
                         <SvgImg type={SvgIconEnum.AI} size={36}></SvgImg>
@@ -111,6 +120,7 @@ export const StudentDetail = observer(
         </div>
         <div className="fcr-student-detail-tab-live">
           <StudentVideos
+            showFullscreen
             userUuidPrefix={userUuidPrefix}
             layout={VideosWallLayoutEnum.Compact}
           />
@@ -133,18 +143,36 @@ export const StudentDetail = observer(
                     "fcr-student-detail-tab-live-bottom-suspicious-select"
                   }
                   size="large"
-                  placeholder={"select one reason"}
+                  placeholder={"select one reason..."}
+                  suffixIcon={<SvgImg type={SvgIconEnum.DROPDOWN}></SvgImg>}
                 >
                   <Select.Option value={"test"}>test</Select.Option>
                 </Select>
-                <Button onClick={submitAbnormal} size="lg">
+                <Button
+                  onClick={submitAbnormal}
+                  size="large"
+                  type="primary"
+                  className="fcr-student-detail-tab-live-bottom-suspicious-submit"
+                >
                   Submit the suspicious behavior
                 </Button>
               </div>
             </div>
           </div>
         </div>
-        <div className="fcr-student-detail-tab-info"></div>
+        <div className="fcr-student-detail-tab-info">
+          <UserAvatar size={40} userUuidPrefix={userUuidPrefix}>
+            <div className="fcr-student-detail-tab-info-abnormal">
+              <UserAbnormal userUuidPrefix={userUuidPrefix} />
+            </div>
+          </UserAvatar>
+
+          <UserFocus
+            iconSize={35}
+            size={50}
+            userUuidPrefix={userUuidPrefix}
+          ></UserFocus>
+        </div>
       </div>
     );
   }

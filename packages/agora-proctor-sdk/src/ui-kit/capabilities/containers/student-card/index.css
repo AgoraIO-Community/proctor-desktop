@@ -4,6 +4,20 @@
   display: flex;
   flex-direction: column;
   padding: 4px;
+  position: relative;
+  overflow: hidden;
+}
+.fcr-student-card-abnormal {
+  width: 46px;
+  height: 30px;
+  background: #f3f3f3;
+  position: absolute;
+  top: 0;
+  left: 0;
+  border-bottom-right-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 .fcr-student-card-videos {
   flex: 1;
@@ -30,9 +44,9 @@
   width: 30px;
   height: 30px;
   border-radius: 50%;
-  margin-right: 10px;
   overflow: hidden;
   font-size: 0;
+  position: relative;
 }
 .fcr-student-card-user-avatar img {
   width: 100%;
@@ -42,7 +56,8 @@
 .fcr-student-card-actions {
   display: flex;
 }
-.fcr-student-card-actions > div {
+.fcr-student-card-actions > div,
+.fcr-student-card-actions-like {
   width: 32px;
   height: 32px;
   border-radius: 8px;
@@ -51,6 +66,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  border: 1px solid #dbdfec;
 }
 /* 6宫格 */
 .fcr-student-card-videos-compact {
@@ -80,4 +96,7 @@
   justify-content: center;
   align-items: center;
   background: #f8faff;
+}
+.fcr-student-card-user-name {
+  padding-left: 10px;
 }

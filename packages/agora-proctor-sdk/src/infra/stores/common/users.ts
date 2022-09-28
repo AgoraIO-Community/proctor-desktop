@@ -121,6 +121,7 @@ export class UsersUIStore extends EduUIStoreBase {
     return `${roomUuid}-${userUuidPrefix}`;
   }
   generateDeviceUuid(userUuidPrefix: string, deviceType: DeviceTypeEnum) {
+    if (deviceType === DeviceTypeEnum.Main) return userUuidPrefix;
     return `${userUuidPrefix}-${deviceType}`;
   }
   onInstall() {}

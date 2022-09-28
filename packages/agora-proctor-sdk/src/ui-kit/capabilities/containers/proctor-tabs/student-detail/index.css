@@ -17,6 +17,9 @@
 .fcr-student-detail-tab-info {
   width: 90px;
 }
+.fcr-student-detail-tab-info > div {
+  margin-bottom: 30px;
+}
 .fcr-student-detail-tab .fcr-student-detail-tab-replay {
   margin-right: 20px;
 }
@@ -69,7 +72,8 @@
   padding: 0 60px 0 15px;
 }
 .fcr-student-detail-tab-replay-bottom-list-item:hover {
-  background: #343434e5;
+  background: rgba(52, 52, 52, 0.4);
+  backdrop-filter: blur(25px);
 }
 .fcr-student-detail-tab-replay-bottom-list-item > div:first-child {
   font-weight: 800;
@@ -147,7 +151,30 @@
   width: 350px;
   margin-bottom: 12px;
 }
+.fcr-student-detail-tab-live-bottom-suspicious-submit {
+  width: 350px;
+  border-radius: 10px;
+}
+.fcr-student-detail-tab-live-bottom-suspicious-select .ant-select-arrow {
+  margin-top: -10px;
+}
+.fcr-student-detail-tab-live-bottom-suspicious-select-popup
+  .ant-select-item-option-active:not(.ant-select-item-option-disabled) {
+  background-color: #3d404b;
+  color: #fff;
+}
 .fcr-student-detail-tab-live-bottom-suspicious-select-popup {
   background-color: #3d404b;
   color: #bdbec6;
+}
+.fcr-student-detail-tab-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.fcr-student-detail-tab-info-abnormal {
+  position: absolute;
+  right: -10px;
+  bottom: -10px;
+  z-index: 9;
 }
