@@ -95,7 +95,6 @@ export type LaunchOption = {
   recordRetryTimeout?: number; // 录制重试间隔
   uiMode?: FcrMultiThemeMode;
   shareUrl?: string; // 分享URL
-  deviceType: DeviceTypeEnum;
   examinationUrl: string;
 };
 

@@ -11,6 +11,7 @@ import {
 import { useState } from "react";
 import { StudentDetail } from "../proctor-tabs/student-detail";
 import { UserAbnormal, UserAvatar } from "../student-card";
+import { LeaveReason } from "agora-edu-core";
 export const ProctorContent = observer(() => {
   const {
     layoutUIStore: {
@@ -140,7 +141,15 @@ export const ProctorContent = observer(() => {
 });
 
 const LeaveBtnGroup = () => {
+  const {
+    classroomStore: {
+      connectionStore: { leaveClassroomUntil },
+    },
+  } = useStore();
   const [showButtonPopover, setShowButtonPopover] = useState(false);
+  const leave = () => {
+    leaveClassroomUntil(LeaveReason.leave, Promise.resolve());
+  };
   return (
     <div className="fcr-proctor-content-footer-leave-btn-group">
       <div>
@@ -159,7 +168,7 @@ const LeaveBtnGroup = () => {
               >
                 End the Exam
               </Button>
-              <Button type="ghost" block danger>
+              <Button type="ghost" onClick={leave} block danger>
                 Leave the Room
               </Button>
             </div>
