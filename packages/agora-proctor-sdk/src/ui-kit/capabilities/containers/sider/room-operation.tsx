@@ -25,7 +25,7 @@ const ExistBtn = observer(() => {
 
   const handleExitRoom = useCallback(async () => {
     if (exitRoom()) {
-      await leaveClassroom(currentGroupUuid);
+      await leaveClassroom(currentGroupUuid!);
       await leaveMainClassroom();
     }
   }, []);

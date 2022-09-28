@@ -54,6 +54,16 @@ export class RoomUIStore extends EduUIStoreBase {
     }
     return this._sceneSubscriptions.get(scene.sceneId);
   }
+  groupUuidByGroupName = computedFn((groupName: string) => {
+    for (const [
+      groupUuid,
+      group,
+    ] of this.classroomStore.groupStore.groupDetails.entries()) {
+      if (group.groupName === groupName) {
+        return groupUuid;
+      }
+    }
+  });
   @bound
   async joinClassroom(
     roomUuid: string,
@@ -172,9 +182,10 @@ export class RoomUIStore extends EduUIStoreBase {
    * for student only
    */
   get currentGroupUuid() {
-    const { userUuid, roomUuid } = EduClassroomConfig.shared.sessionInfo;
-    const userUuidPrefix = userUuid.split("-")[0];
-    return `${roomUuid}-${userUuidPrefix}`;
+    const { userUuid } = EduClassroomConfig.shared.sessionInfo;
+    const groupUuid =
+      this.classroomStore.groupStore.groupUuidByUserUuid.get(userUuid);
+    return groupUuid;
   }
 
   /**
@@ -183,13 +194,13 @@ export class RoomUIStore extends EduUIStoreBase {
   @action.bound
   addGroup() {
     const { userUuid } = EduClassroomConfig.shared.sessionInfo;
-    const groupUuid = this.currentGroupUuid;
     const newUsers = { userUuid };
+    const userUuidPrefix = userUuid.split("-")[0];
+
     this.classroomStore.groupStore.addGroups(
       [
         {
-          groupUuid: `${groupUuid}`,
-          groupName: groupUuid,
+          groupName: userUuidPrefix,
           users: [newUsers],
         },
       ],
@@ -197,38 +208,32 @@ export class RoomUIStore extends EduUIStoreBase {
     );
   }
 
-  private _checkUserRoomState = (groupDetails: Map<string, GroupDetail>) => {
+  private _checkUserRoomState = () => {
     const currentGroupUuid = this.currentGroupUuid;
-    let visibleGroup = false;
-    for (let [groupUuid] of groupDetails) {
-      if (groupUuid === currentGroupUuid) {
-        visibleGroup = true;
-        return;
-      }
-    }
-    if (!visibleGroup) {
+
+    if (!currentGroupUuid) {
       Logger.info(`${currentGroupUuid} join in`);
       this.addGroup();
     }
   };
   @bound
-  private _addGroupDetailsChange(groupDetails: Map<string, GroupDetail>) {
+  private _addGroupDetailsChange() {
     EduClassroomConfig.shared.sessionInfo.role === EduRoleTypeEnum.student &&
-      this._checkUserRoomState(groupDetails);
+      this._checkUserRoomState();
   }
   @bound
   private async _handleClassroomEvent(type: AgoraEduClassroomEvent, args: any) {
     if (type === AgoraEduClassroomEvent.JoinSubRoom) {
       const currentGroupUuid = this.currentGroupUuid;
-      await this.joinClassroom(currentGroupUuid, EduRoomTypeEnum.RoomGroup);
-      if (this.roomSceneByRoomUuid(currentGroupUuid)!.scene) {
-        await this.roomSceneByRoomUuid(currentGroupUuid)?.scene?.joinRTC();
+      await this.joinClassroom(currentGroupUuid!, EduRoomTypeEnum.RoomGroup);
+      if (this.roomSceneByRoomUuid(currentGroupUuid!)!.scene) {
+        await this.roomSceneByRoomUuid(currentGroupUuid!)?.scene?.joinRTC();
         this.classroomStore.streamStore.updateLocalPublishState(
           {
             videoState: AgoraRteMediaPublishState.Published,
             audioState: AgoraRteMediaPublishState.Published,
           },
-          this.roomSceneByRoomUuid(currentGroupUuid)?.scene
+          this.roomSceneByRoomUuid(currentGroupUuid!)?.scene
         );
       }
     }
@@ -339,7 +344,7 @@ export class RoomUIStore extends EduUIStoreBase {
       computed(() => this.classroomStore.groupStore.groupDetails).observe(
         ({ newValue, oldValue }) => {
           if (!oldValue?.size) {
-            this._addGroupDetailsChange(newValue);
+            this._addGroupDetailsChange();
           }
         }
       )

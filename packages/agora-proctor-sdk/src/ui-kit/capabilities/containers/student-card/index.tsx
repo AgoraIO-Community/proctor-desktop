@@ -93,8 +93,13 @@ export const StudentVideos = observer(
     showFullscreen?: boolean;
   }) => {
     const {
-      roomUIStore: { joinClassroom, roomSceneByRoomUuid, leaveClassroom },
-      usersUIStore: { generateDeviceUuid, generateGroupUuid },
+      roomUIStore: {
+        joinClassroom,
+        roomSceneByRoomUuid,
+        leaveClassroom,
+        groupUuidByGroupName,
+      },
+      usersUIStore: { generateDeviceUuid },
     } = useStore();
     const mainDeviceUserUuid = useMemo(
       () => generateDeviceUuid(userUuidPrefix, DeviceTypeEnum.Main),
@@ -104,8 +109,7 @@ export const StudentVideos = observer(
       () => generateDeviceUuid(userUuidPrefix, DeviceTypeEnum.Sub),
       []
     );
-    const roomUuid = useMemo(() => generateGroupUuid(userUuidPrefix), []);
-
+    const roomUuid = groupUuidByGroupName(userUuidPrefix)!;
     const [joinSuccess, setJoinSuccess] = useState(false);
     const scene = roomSceneByRoomUuid(roomUuid);
 

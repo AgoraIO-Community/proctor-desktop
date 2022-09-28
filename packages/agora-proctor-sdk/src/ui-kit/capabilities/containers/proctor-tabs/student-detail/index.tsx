@@ -26,18 +26,15 @@ export const StudentDetail = observer(
         queryUserEvents,
         updateUserTags,
         generateDeviceUuid,
-        generateGroupUuid,
         queryRecordList,
       },
-      classroomStore: {
-        userStore: { studentList },
-      },
+      roomUIStore: { groupUuidByGroupName },
     } = useStore();
     const mainDeviceUserUuid = useMemo(() => {
       return generateDeviceUuid(userUuidPrefix, DeviceTypeEnum.Main);
     }, []);
     const roomUuid = useMemo(() => {
-      return generateGroupUuid(userUuidPrefix);
+      return groupUuidByGroupName(userUuidPrefix);
     }, []);
     const [userEvents, setUserEvents] = useState<
       UserEvents<{
@@ -57,7 +54,7 @@ export const StudentDetail = observer(
       setUserEvents(res.list);
     };
     const queryRecords = async () => {
-      queryRecordList(roomUuid).then((res) => {
+      queryRecordList(roomUuid!).then((res) => {
         setRecordList(res.list);
         console.log(res, "recordlist");
       });
