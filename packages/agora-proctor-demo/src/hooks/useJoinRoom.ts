@@ -213,13 +213,17 @@ export const useJoinRoom = () => {
   const quickJoinRoom = useCallback(
     async (params: QuickJoinRoomParams) => {
       const { roomId, role, nickName, platform = defaultPlatform } = params;
+      let userUuid = UserApi.shared.userInfo.companyId;
+      if (role === EduRoleTypeEnum.student) {
+        userUuid += "-main";
+      }
       return RoomAPI.shared
-        .join({ roomId, role })
+        .join({ roomId, role, userUuid }) //  for proctor now
         .then((response) => {
           const { roomDetail, token, appId } = response.data.data;
           const { roomId, roomType, roomName, roomProperties } = roomDetail;
           const { serviceType, ...rProps } = roomProperties;
-          let userId = UserApi.shared.userInfo.companyId;
+
           let deviceType = DeviceTypeEnum.Main;
           if (!checkRoomInfoBeforeJoin(roomDetail)) {
             return;
@@ -233,7 +237,7 @@ export const useJoinRoom = () => {
               roomName: roomName,
               roomType: roomType,
               roomServiceType: serviceType,
-              userId,
+              userId: userUuid,
               userName: nickName || UserApi.shared.nickName,
               role,
               token,

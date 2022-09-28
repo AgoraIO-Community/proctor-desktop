@@ -90,6 +90,7 @@ const Content = styled.div`
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  z-index: 9;
 `;
 const Tip = styled.div`
   font-size: 24px;

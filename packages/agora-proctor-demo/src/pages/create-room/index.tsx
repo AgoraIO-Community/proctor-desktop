@@ -59,6 +59,12 @@ export const CreateRoom = observer(() => {
 
   const roomTypeOptions = [
     {
+      label: transI18n("fcr_h5create_label_online_proctoring"),
+      description: transI18n("fcr_create_label_online_proctoring_description"),
+      value: EduRoomTypeEnum.RoomProctor,
+      className: "card-purple",
+    },
+    {
       label: transI18n("fcr_h5create_label_1on1"),
       description: transI18n("fcr_create_label_1on1_description"),
       value: EduRoomTypeEnum.Room1v1Class,
@@ -75,12 +81,6 @@ export const CreateRoom = observer(() => {
       description: transI18n("fcr_create_label_lecturehall_description"),
       value: EduRoomTypeEnum.RoomBigClass,
       className: "card-green",
-    },
-    {
-      label: transI18n("fcr_h5create_label_online_proctoring"),
-      description: transI18n("fcr_create_label_online_proctoring_description"),
-      value: EduRoomTypeEnum.RoomProctor,
-      className: "card-purple",
     },
   ];
 
