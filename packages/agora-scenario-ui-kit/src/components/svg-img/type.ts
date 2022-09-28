@@ -141,6 +141,8 @@ export enum SvgIconEnum {
   MENU_UNFOLD = "menu-unfold",
   MINIMIZE = "minimize",
   LAYOUT_COMPACT = "layout-compact",
+  LAYOUT_LOOSE = "layout-loose",
+
   ALL_VIDEOS_TAB = "all-videos-tab",
   QUIT = "quit",
   ALARM = "alarm",
@@ -156,4 +158,7 @@ export enum SvgIconEnum {
   PHONE = "phone",
   CAMERA_ON = "camera-on",
   CAMERA_OFF = "camera-off",
+  VOLUME = "volume",
+  ABNORMAL = "abnormal",
+  DROPDOWN = "dropdown",
 }

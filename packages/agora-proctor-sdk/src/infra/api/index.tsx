@@ -53,6 +53,7 @@ export class AgoraEduSDK {
   private static _uiConfig: FcrUIConfig;
   private static _theme: FcrTheme;
   private static _shareUrl: string;
+  private static _examinationUrl: string;
   //default use GLOBAL region(including CN)
   private static region: EduRegion = EduRegion.CN;
 
@@ -174,7 +175,9 @@ export class AgoraEduSDK {
   static get shareUrl() {
     return this._shareUrl;
   }
-
+  static get examinationUrl() {
+    return this._examinationUrl;
+  }
   private static _validateOptions(option: LaunchOption) {
     const isInvalid = (value: string) =>
       value === undefined || value === null || value === "";
@@ -238,6 +241,7 @@ export class AgoraEduSDK {
       recordRetryTimeout,
       uiMode,
       shareUrl,
+      examinationUrl,
     } = option;
     const sessionInfo = {
       userUuid,
@@ -255,7 +259,7 @@ export class AgoraEduSDK {
     };
 
     this._shareUrl = shareUrl || "";
-
+    this._examinationUrl = examinationUrl || "";
     this._language = option.language;
 
     this._widgets = {

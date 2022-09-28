@@ -1,3 +1,4 @@
+import { AgoraEduSDK } from "@/infra/api";
 import { useStore } from "@/infra/hooks/ui-store";
 import { ClassState, EduClassroomConfig } from "agora-edu-core";
 import { AgoraRteMediaSourceState } from "agora-rte-sdk";
@@ -14,18 +15,27 @@ export const ProctorSider = observer(() => {
     usersUIStore: { studentListByUserUuidPrefix, filterTag },
     streamUIStore: { updateLocalPublishState, teacherCameraStream },
     classroomStore: {
+      roomStore: { updateClassState },
       widgetStore: { setActive },
-      mediaStore: { localCameraTrackState, enableLocalVideo, enableLocalAudio },
+      mediaStore: {
+        localCameraTrackState,
+        localMicTrackState,
+        enableLocalVideo,
+        enableLocalAudio,
+      },
     },
   } = useStore();
   const startExam = async () => {
-    await setActive("webView" + "-" + md5("https://www.baidu.com"), {
+    await setActive("webView" + "-" + md5(AgoraEduSDK.examinationUrl), {
       position: { xaxis: 0, yaxis: 0 },
       extra: {
-        webViewUrl: encodeURIComponent("https://www.baidu.com"),
+        webViewUrl: encodeURIComponent(AgoraEduSDK.examinationUrl),
       },
     });
     await startClass();
+  };
+  const endExam = async () => {
+    updateClassState(ClassState.afterClass);
   };
   useEffect(() => {
     enableLocalVideo(false);
@@ -52,18 +62,17 @@ export const ProctorSider = observer(() => {
 
   return (
     <div className={"fcr_proctor_sider"}>
-      <div className={"fcr_proctor_sider_logo"}>
-        {transI18n("fcr_home_page_scene_option_online_proctoring")}
-      </div>
-      <div className={"fcr_proctor_sider_info_wrap"}>
-        <div className={"fcr_proctor_sider_info_room_number"}>
-          <div className={"fcr_proctor_sider_info_title"}>
-            {transI18n("fcr_room_label_room_number")}
-          </div>
-          <div className={"fcr_proctor_sider_info_val"}>
-            {EduClassroomConfig.shared.sessionInfo.roomName}
+      <div>
+        <div className={"fcr_proctor_sider_logo"}>灵动课堂</div>
+        <div className={"fcr_proctor_sider_info_wrap"}>
+          <div className={"fcr_proctor_sider_info_room_number"}>
+            <div className={"fcr_proctor_sider_info_title"}>RoomNumber</div>
+            <div className={"fcr_proctor_sider_info_val"}>
+              {EduClassroomConfig.shared.sessionInfo.roomName}
+            </div>
           </div>
         </div>
+
         <div className={"fcr_proctor_sider_info_room_remaining"}>
           <div>
             <div className={"fcr_proctor_sider_info_title"}>
@@ -78,25 +87,62 @@ export const ProctorSider = observer(() => {
             <span>{studentListByUserUuidPrefix(filterTag).size}</span>
           </div>
         </div>
-        <div>
+        <div className="fcr_proctor_sider_info_btn">
           {classState === ClassState.beforeClass ? (
-            <Button type="primary" block onClick={startExam}>
-              {transI18n("fcr_room_button_exam_start")}
+            <Button
+              className="fcr_proctor_sider_info_start"
+              type="primary"
+              block
+              onClick={startExam}
+              size="large"
+            >
+              Start Exam
             </Button>
           ) : (
-            <Button type="primary" block onClick={startClass}>
-              {transI18n("fcr_room_button_exam_end")}
+            <Button
+              className="fcr_proctor_sider_info_end"
+              type="primary"
+              block
+              size="large"
+              onClick={endExam}
+            >
+              End Exam
             </Button>
           )}
         </div>
       </div>
       <div className="fcr_proctor_sider_info_proctor-actions">
-        <div className="fcr_proctor_sider_info_proctor-actions-video">
-          <LocalTrackPlayer></LocalTrackPlayer>
+        <div>
+          <div
+            className={`fcr_proctor_sider_info_proctor-actions-video-container ${
+              localMicTrackState === AgoraRteMediaSourceState.started
+                ? "fcr_proctor_sider_info_proctor-actions-video-container-active"
+                : ""
+            }`}
+          >
+            <div className="fcr_proctor_sider_info_proctor-actions-video">
+              {localMicTrackState === AgoraRteMediaSourceState.started && (
+                <SvgImg
+                  className={
+                    "fcr_proctor_sider_info_proctor-actions-video-volume"
+                  }
+                  type={SvgIconEnum.VOLUME}
+                ></SvgImg>
+              )}
+              {localCameraTrackState === AgoraRteMediaSourceState.started ? (
+                <LocalTrackPlayer></LocalTrackPlayer>
+              ) : (
+                <div className="fcr_proctor_sider_info_proctor-actions-video-placeholder">
+                  MY
+                </div>
+              )}
+            </div>
+          </div>
+          <div className="fcr_proctor_sider_info_proctor-actions-name">
+            {EduClassroomConfig.shared.sessionInfo.userName}
+          </div>
         </div>
-        <div className="fcr_proctor_sider_info_proctor-actions-name">
-          {EduClassroomConfig.shared.sessionInfo.userName}
-        </div>
+
         <div className="fcr_proctor_sider_info_proctor-actions-btn">
           {teacherCameraStream?.isCameraMuted &&
           teacherCameraStream.isMicMuted ? (

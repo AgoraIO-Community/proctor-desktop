@@ -9,7 +9,7 @@ import { useState } from "react";
 import { SvgIconEnum, SvgImg, transI18n } from "~ui-kit";
 import { AllVideos } from "../proctor-tabs/all-videos";
 import { StudentDetail } from "../proctor-tabs/student-detail";
-import "./index.css";
+import { UserAbnormal, UserAvatar } from "../student-card";
 export const ProctorContent = observer(() => {
   const {
     layoutUIStore: {
@@ -57,10 +57,7 @@ export const ProctorContent = observer(() => {
                 },
                 {
                   label: (
-                    <SvgImg
-                      type={SvgIconEnum.LAYOUT_COMPACT}
-                      size={36}
-                    ></SvgImg>
+                    <SvgImg type={SvgIconEnum.LAYOUT_LOOSE} size={36}></SvgImg>
                   ),
                   value: "Loose",
                 },
@@ -84,8 +81,9 @@ export const ProctorContent = observer(() => {
             return {
               label: (
                 <div className="fcr-proctor-content-tab-label">
-                  <SvgImg type={SvgIconEnum.ALL_VIDEOS_TAB} />{" "}
-                  <span>{s.label}</span>
+                  <UserAvatar userUuidPrefix={s.key} />
+                  <UserAbnormal userUuidPrefix={s.key} />
+                  <span style={{ paddingLeft: "10px" }}>{s.label}</span>
                 </div>
               ),
               key: s.key,
