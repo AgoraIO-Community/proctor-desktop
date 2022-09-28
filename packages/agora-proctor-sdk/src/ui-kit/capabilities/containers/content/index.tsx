@@ -2,6 +2,7 @@ import { useStore } from "@/infra/hooks/ui-store";
 import { FlexContainer } from "@/ui-kit/components/container";
 import { Counter } from "@/ui-kit/components/counter";
 import { observer } from "mobx-react";
+import { useCallback } from "react";
 import styled, { css } from "styled-components";
 import { transI18n } from "~ui-kit";
 import { TrackArea } from "../root-box";
@@ -33,6 +34,10 @@ const ContentProspect = observer(() => {
   const {
     studentViewUIStore: { ClassOpening, beforeClass },
   } = useStore();
+
+  const handleFinished = useCallback(() => {
+    console.log("finished");
+  }, []);
   return (
     <>
       {beforeClass && (
@@ -41,7 +46,7 @@ const ContentProspect = observer(() => {
           {transI18n("fcr_room_label_wait_teacher_start_exam")}
         </>
       )}
-      {ClassOpening && <Counter />}
+      {ClassOpening && <Counter onFinished={handleFinished} />}
     </>
   );
 });

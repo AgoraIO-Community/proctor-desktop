@@ -23,9 +23,6 @@ export class StudentViewUIStore extends EduUIStoreBase {
   @observable
   widgetBlur = false;
 
-  @observable
-  before5S = false;
-
   @computed
   get userAvatar() {
     return typeof this.classroomStore.userStore.localUserProperties ===
