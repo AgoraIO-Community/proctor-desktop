@@ -1,5 +1,5 @@
 import { EduRegion } from "agora-edu-core";
-import { EnumDeviceType, LanguageEnum } from "agora-proctor-sdk";
+import { DeviceTypeEnum, LanguageEnum } from "agora-proctor-sdk";
 import React, { useEffect, useImperativeHandle, useRef, useState } from "react";
 import { useHistory } from "react-router";
 import styled from "styled-components";
@@ -93,7 +93,7 @@ export const HomePage = () => {
         region: region as EduRegion,
         duration: +30 * 60,
         latencyLevel: 2,
-        deviceType: EnumDeviceType.Main,
+        deviceType: DeviceTypeEnum.Main,
       };
 
       config.appId = REACT_APP_AGORA_APP_ID || config.appId;

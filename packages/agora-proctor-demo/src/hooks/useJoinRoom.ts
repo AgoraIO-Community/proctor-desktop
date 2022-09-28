@@ -5,6 +5,7 @@ import {
   EduRoomTypeEnum,
   Platform,
 } from "agora-edu-core";
+import { DeviceTypeEnum } from "agora-proctor-sdk";
 import {
   AgoraRegion,
   AgoraRteEngineConfig,
@@ -40,6 +41,7 @@ type JoinRoomParams = {
   token: string;
   appId: string;
   platform?: Platform;
+  deviceType: DeviceTypeEnum;
 };
 type QuickJoinRoomParams = {
   role: EduRoleTypeEnum;
@@ -127,6 +129,7 @@ export const useJoinRoom = () => {
         appId,
         duration = 30,
         platform = defaultPlatform,
+        deviceType,
       } = params;
       try {
         if (platform === Platform.H5 && !h5ClassModeIsSupport(roomType)) {
@@ -172,6 +175,7 @@ export const useJoinRoom = () => {
           themes: builderResource.current.themes,
           shareUrl: "",
           platform,
+          deviceType: deviceType,
           mediaOptions: {
             web: {
               codec: webRTCCodec,
@@ -216,14 +220,12 @@ export const useJoinRoom = () => {
           const { roomId, roomType, roomName, roomProperties } = roomDetail;
           const { serviceType, ...rProps } = roomProperties;
           let userId = UserApi.shared.userInfo.companyId;
+          let deviceType = DeviceTypeEnum.Main;
           if (!checkRoomInfoBeforeJoin(roomDetail)) {
             return;
           }
-          if (
-            roomType === EduRoomTypeEnum.RoomProctor &&
-            role === EduRoleTypeEnum.student
-          ) {
-            userId += "-main";
+          if (roomType === EduRoomTypeEnum.RoomProctor) {
+            deviceType = DeviceTypeEnum.Main;
           }
           return joinRoomHandle(
             {
@@ -237,6 +239,7 @@ export const useJoinRoom = () => {
               token,
               appId,
               platform,
+              deviceType,
             },
             { roomProperties: rProps }
           );

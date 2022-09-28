@@ -322,7 +322,7 @@ export class RoomUIStore extends EduUIStoreBase {
       case ClassState.ongoing:
         return `${this.formatCountDown(duration)}`;
       case ClassState.afterClass:
-        return `${this.formatCountDown(duration)}`;
+        return `00 : 00`;
       default:
         return `-- : --`;
     }
