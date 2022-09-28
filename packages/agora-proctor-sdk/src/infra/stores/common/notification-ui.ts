@@ -1,7 +1,7 @@
-import { action, computed, IReactionDisposer, Lambda, reaction } from 'mobx';
-import dayjs from 'dayjs';
-import { bound, Scheduler } from 'agora-rte-sdk';
-import { EduUIStoreBase } from './base';
+import { action, computed, IReactionDisposer, Lambda, reaction } from "mobx";
+import dayjs from "dayjs";
+import { bound, Scheduler } from "agora-rte-sdk";
+import { EduUIStoreBase } from "./base";
 import {
   AgoraEduClassroomEvent,
   ClassroomState,
@@ -11,11 +11,11 @@ import {
   EduEventCenter,
   EduRoleTypeEnum,
   LeaveReason,
-} from 'agora-edu-core';
-import { ToastFilter } from '@/infra/utils/toast-filter';
-import { getEduErrorMessage } from '@/infra/utils/error';
-import { Duration } from 'dayjs/plugin/duration';
-import { transI18n } from '~ui-kit';
+} from "agora-edu-core";
+import { ToastFilter } from "@/infra/utils/toast-filter";
+import { getEduErrorMessage } from "@/infra/utils/error";
+import { Duration } from "dayjs/plugin/duration";
+import { transI18n } from "~ui-kit";
 
 export class NotificationUIStore extends EduUIStoreBase {
   private _notificationTask?: Scheduler.Task;
@@ -28,11 +28,11 @@ export class NotificationUIStore extends EduUIStoreBase {
 
   private _filterUsers(
     users: string[],
-    userList: Map<string, { userUuid: string; userName: string }>,
+    userList: Map<string, { userUuid: string; userName: string }>
   ) {
     return users
       .filter((userUuid: string) => userList.has(userUuid))
-      .map((userUuid: string) => userList.get(userUuid)?.userName || 'unknown');
+      .map((userUuid: string) => userList.get(userUuid)?.userName || "unknown");
   }
 
   @bound
@@ -42,13 +42,15 @@ export class NotificationUIStore extends EduUIStoreBase {
     }
     const emsg =
       getEduErrorMessage(error) ||
-      (error.message.length > 64 ? `${error.message.substr(0, 64)}...` : error.message);
+      (error.message.length > 64
+        ? `${error.message.substr(0, 64)}...`
+        : error.message);
 
-    this.shareUIStore.addToast(emsg, 'error');
+    this.shareUIStore.addToast(emsg, "error");
   }
 
   onInstall() {
-    EduErrorCenter.shared.on('error', this._handleError);
+    EduErrorCenter.shared.on("error", this._handleError);
     // class is end
     this._disposers.push(
       reaction(
@@ -58,7 +60,7 @@ export class NotificationUIStore extends EduUIStoreBase {
           if (ClassState.ongoing === state) {
             this._notificationTask = Scheduler.shared.addIntervalTask(
               this.checkClassroomNotification,
-              Scheduler.Duration.second(1),
+              Scheduler.Duration.second(1)
             );
             this._prevClassState = ClassState.ongoing;
           } else if (
@@ -67,31 +69,35 @@ export class NotificationUIStore extends EduUIStoreBase {
           ) {
             const { classroomSchedule } = this.classroomStore.roomStore;
 
-            const delayDuration = dayjs.duration({ seconds: classroomSchedule.closeDelay });
+            const delayDuration = dayjs.duration({
+              seconds: classroomSchedule.closeDelay,
+            });
 
             this.addClassStateNotification(state, delayDuration.asMinutes());
 
             this._notificationTask = Scheduler.shared.addIntervalTask(
               this.checkClassroomNotification,
-              Scheduler.Duration.second(1),
+              Scheduler.Duration.second(1)
             );
           } else if (ClassState.close === state) {
+            debugger;
             this.classroomStore.connectionStore.leaveClassroomUntil(
               LeaveReason.leave,
-              new Promise((resolve) => {
-                this.shareUIStore.addConfirmDialog(
-                  transI18n('toast.leave_room'),
-                  transI18n('error.class_end'),
-                  {
-                    onOK: resolve,
-                    actions: ['ok'],
-                  },
-                );
-              }),
+              Promise.resolve()
+              // new Promise((resolve) => {
+              //   this.shareUIStore.addConfirmDialog(
+              //     transI18n("toast.leave_room"),
+              //     transI18n("error.class_end"),
+              //     {
+              //       onOK: resolve,
+              //       actions: ["ok"],
+              //     }
+              //   );
+              // })
             );
           }
-        },
-      ),
+        }
+      )
     );
     // connection error
     this._disposers.push(
@@ -103,20 +109,21 @@ export class NotificationUIStore extends EduUIStoreBase {
               LeaveReason.leave,
               new Promise((resolve) => {
                 this.shareUIStore.addConfirmDialog(
-                  transI18n('toast.leave_room'),
+                  transI18n("toast.leave_room"),
                   this._getStateErrorReason(
-                    this.classroomStore.connectionStore.classroomStateErrorReason,
+                    this.classroomStore.connectionStore
+                      .classroomStateErrorReason
                   ),
                   {
                     onOK: resolve,
-                    actions: ['ok'],
-                  },
+                    actions: ["ok"],
+                  }
                 );
-              }),
+              })
             );
           }
-        },
-      ),
+        }
+      )
     );
 
     // interaction events
@@ -137,35 +144,41 @@ export class NotificationUIStore extends EduUIStoreBase {
     }
     // teacher turn on my mic
     if (event === AgoraEduClassroomEvent.TeacherTurnOnMyMic) {
-      this.shareUIStore.addToast(transI18n('toast2.teacher.turn.on.my.mic'));
+      this.shareUIStore.addToast(transI18n("toast2.teacher.turn.on.my.mic"));
     }
     // teacher turn off my mic
     if (event === AgoraEduClassroomEvent.TeacherTurnOffMyMic) {
-      this.shareUIStore.addToast(transI18n('toast2.teacher.turn.off.my.mic'), 'error');
+      this.shareUIStore.addToast(
+        transI18n("toast2.teacher.turn.off.my.mic"),
+        "error"
+      );
     }
     // teacher turn on my mic
     if (event === AgoraEduClassroomEvent.TeacherTurnOnMyCam) {
-      this.shareUIStore.addToast(transI18n('toast2.teacher.turn.on.my.cam'));
+      this.shareUIStore.addToast(transI18n("toast2.teacher.turn.on.my.cam"));
     }
     // teacher turn off my mic
     if (event === AgoraEduClassroomEvent.TeacherTurnOffMyCam) {
-      this.shareUIStore.addToast(transI18n('toast2.teacher.turn.off.my.cam'), 'error');
+      this.shareUIStore.addToast(
+        transI18n("toast2.teacher.turn.off.my.cam"),
+        "error"
+      );
     }
     // teacher grant permission
     if (event === AgoraEduClassroomEvent.TeacherGrantPermission) {
-      this.shareUIStore.addToast(transI18n('toast2.teacher.grant.permission'));
+      this.shareUIStore.addToast(transI18n("toast2.teacher.grant.permission"));
     }
     // teacher revoke permission
     if (event === AgoraEduClassroomEvent.TeacherRevokePermission) {
-      this.shareUIStore.addToast(transI18n('toast2.teacher.revoke.permission'));
+      this.shareUIStore.addToast(transI18n("toast2.teacher.revoke.permission"));
     }
     // user accpeted to stage
     if (event === AgoraEduClassroomEvent.UserAcceptToStage) {
-      this.shareUIStore.addToast(transI18n('toast2.teacher.accept.onpodium'));
+      this.shareUIStore.addToast(transI18n("toast2.teacher.accept.onpodium"));
     }
     // teacher leave stage
     if (event === AgoraEduClassroomEvent.UserLeaveStage) {
-      this.shareUIStore.addToast(transI18n('toast2.teacher.revoke.onpodium'));
+      this.shareUIStore.addToast(transI18n("toast2.teacher.revoke.onpodium"));
     }
     // reward received
     if (
@@ -175,20 +188,23 @@ export class NotificationUIStore extends EduUIStoreBase {
       const userNames = param;
       if (userNames.length > 3) {
         this.shareUIStore.addToast(
-          transI18n('toast2.teacher.reward2', {
-            reason1: userNames.slice(0, 3).join(','),
+          transI18n("toast2.teacher.reward2", {
+            reason1: userNames.slice(0, 3).join(","),
             reason2: userNames.length,
-          }),
+          })
         );
       } else {
         this.shareUIStore.addToast(
-          transI18n('toast2.teacher.reward', { reason: userNames.join(',') }),
+          transI18n("toast2.teacher.reward", { reason: userNames.join(",") })
         );
       }
     }
     // capture screen permission denied received
     if (event === AgoraEduClassroomEvent.CaptureScreenPermissionDenied) {
-      this.shareUIStore.addToast(transI18n('toast2.screen_permission_denied'), 'error');
+      this.shareUIStore.addToast(
+        transI18n("toast2.screen_permission_denied"),
+        "error"
+      );
     }
     // user join group
     if (event === AgoraEduClassroomEvent.UserJoinGroup) {
@@ -201,16 +217,17 @@ export class NotificationUIStore extends EduUIStoreBase {
       const students = this._filterUsers(users, studentList);
       const assistants = this._filterUsers(users, assistantList);
 
-      const isCurrentRoom = this.classroomStore.groupStore.currentSubRoom === groupUuid;
+      const isCurrentRoom =
+        this.classroomStore.groupStore.currentSubRoom === groupUuid;
 
       if (isCurrentRoom) {
         if (teachers.length) {
           if (role === EduRoleTypeEnum.student) {
             this.shareUIStore.addToast(
-              transI18n('fcr_group_enter_group', {
-                reason1: transI18n('role.teacher'),
-                reason2: teachers.join(','),
-              }),
+              transI18n("fcr_group_enter_group", {
+                reason1: transI18n("role.teacher"),
+                reason2: teachers.join(","),
+              })
             );
           }
         }
@@ -218,21 +235,23 @@ export class NotificationUIStore extends EduUIStoreBase {
         if (assistants.length) {
           if (role === EduRoleTypeEnum.student) {
             this.shareUIStore.addToast(
-              transI18n('fcr_group_enter_group', {
-                reason1: transI18n('role.assistant'),
-                reason2: assistants.join(','),
-              }),
+              transI18n("fcr_group_enter_group", {
+                reason1: transI18n("role.assistant"),
+                reason2: assistants.join(","),
+              })
             );
           }
         }
 
         if (students.length) {
-          if ([EduRoleTypeEnum.teacher, EduRoleTypeEnum.assistant].includes(role)) {
+          if (
+            [EduRoleTypeEnum.teacher, EduRoleTypeEnum.assistant].includes(role)
+          ) {
             this.shareUIStore.addToast(
-              transI18n('fcr_group_enter_group', {
-                reason1: transI18n('role.student'),
-                reason2: students.join(','),
-              }),
+              transI18n("fcr_group_enter_group", {
+                reason1: transI18n("role.student"),
+                reason2: students.join(","),
+              })
             );
           }
         }
@@ -249,17 +268,18 @@ export class NotificationUIStore extends EduUIStoreBase {
       const students = this._filterUsers(users, studentList);
       const assistants = this._filterUsers(users, assistantList);
 
-      const isCurrentRoom = this.classroomStore.groupStore.currentSubRoom === groupUuid;
+      const isCurrentRoom =
+        this.classroomStore.groupStore.currentSubRoom === groupUuid;
 
       if (isCurrentRoom) {
         if (teachers.length) {
           if (role === EduRoleTypeEnum.student) {
             this.shareUIStore.addToast(
-              transI18n('fcr_group_exit_group', {
-                reason1: transI18n('role.teacher'),
-                reason2: teachers.join(','),
+              transI18n("fcr_group_exit_group", {
+                reason1: transI18n("role.teacher"),
+                reason2: teachers.join(","),
               }),
-              'warning',
+              "warning"
             );
           }
         }
@@ -267,23 +287,25 @@ export class NotificationUIStore extends EduUIStoreBase {
         if (assistants.length) {
           if (role === EduRoleTypeEnum.student) {
             this.shareUIStore.addToast(
-              transI18n('fcr_group_exit_group', {
-                reason1: transI18n('role.assistant'),
-                reason2: assistants.join(','),
+              transI18n("fcr_group_exit_group", {
+                reason1: transI18n("role.assistant"),
+                reason2: assistants.join(","),
               }),
-              'warning',
+              "warning"
             );
           }
         }
 
         if (students.length) {
-          if ([EduRoleTypeEnum.teacher, EduRoleTypeEnum.assistant].includes(role)) {
+          if (
+            [EduRoleTypeEnum.teacher, EduRoleTypeEnum.assistant].includes(role)
+          ) {
             this.shareUIStore.addToast(
-              transI18n('fcr_group_exit_group', {
-                reason1: transI18n('role.student'),
-                reason2: students.join(','),
+              transI18n("fcr_group_exit_group", {
+                reason1: transI18n("role.student"),
+                reason2: students.join(","),
               }),
-              'warning',
+              "warning"
             );
           }
         }
@@ -295,18 +317,18 @@ export class NotificationUIStore extends EduUIStoreBase {
       const { role } = EduClassroomConfig.shared.sessionInfo;
       if (role === EduRoleTypeEnum.student && inviting) {
         this.shareUIStore.addConfirmDialog(
-          transI18n('fcr_group_help_title'),
-          transI18n('fcr_group_help_teacher_busy_msg'),
+          transI18n("fcr_group_help_title"),
+          transI18n("fcr_group_help_teacher_busy_msg"),
           {
-            actions: ['ok'],
-          },
+            actions: ["ok"],
+          }
         );
       }
     }
   }
 
   onDestroy() {
-    EduErrorCenter.shared.off('error', this._handleError);
+    EduErrorCenter.shared.off("error", this._handleError);
     EduEventCenter.shared.offClassroomEvents(this._handleClassroomEvent);
     this._notificationTask?.stop();
     this._disposers.forEach((d) => d());
@@ -320,8 +342,8 @@ export class NotificationUIStore extends EduUIStoreBase {
    */
   protected addClassStateNotification(state: ClassState, minutes: number) {
     const transMap = {
-      [ClassState.ongoing]: 'toast.time_interval_between_end',
-      [ClassState.afterClass]: 'toast.time_interval_between_close',
+      [ClassState.ongoing]: "toast.time_interval_between_end",
+      [ClassState.afterClass]: "toast.time_interval_between_close",
     } as Record<ClassState, string>;
 
     const text = transI18n(transMap[state as ClassState], {
@@ -348,15 +370,23 @@ export class NotificationUIStore extends EduUIStoreBase {
           break;
         case ClassState.ongoing:
           //距离下课的时间
-          this._checkMinutesThrough([5, 1], this.durationToClassEnd, (minutes) => {
-            this.addClassStateNotification(ClassState.ongoing, minutes);
-          });
+          this._checkMinutesThrough(
+            [5, 1],
+            this.durationToClassEnd,
+            (minutes) => {
+              this.addClassStateNotification(ClassState.ongoing, minutes);
+            }
+          );
           break;
         case ClassState.afterClass:
           //距离教室关闭的时间
-          this._checkMinutesThrough([1], this.durationToRoomClose, (minutes) => {
-            this.addClassStateNotification(ClassState.afterClass, minutes);
-          });
+          this._checkMinutesThrough(
+            [1],
+            this.durationToRoomClose,
+            (minutes) => {
+              this.addClassStateNotification(ClassState.afterClass, minutes);
+            }
+          );
           break;
       }
     }
@@ -365,10 +395,14 @@ export class NotificationUIStore extends EduUIStoreBase {
   private _checkMinutesThrough = (
     throughMinutes: number[],
     duration: Duration,
-    cb: (minutes: number) => void,
+    cb: (minutes: number) => void
   ) => {
     throughMinutes.forEach((minutes) => {
-      if (duration.hours() === 0 && duration.minutes() === minutes && duration.seconds() === 0) {
+      if (
+        duration.hours() === 0 &&
+        duration.minutes() === minutes &&
+        duration.seconds() === 0
+      ) {
         cb(minutes);
       }
     });
@@ -384,7 +418,8 @@ export class NotificationUIStore extends EduUIStoreBase {
    */
   @computed
   get classDuration() {
-    const { classroomSchedule, clientServerTimeShift } = this.classroomStore.roomStore;
+    const { classroomSchedule, clientServerTimeShift } =
+      this.classroomStore.roomStore;
 
     const { startTime = 0, duration = 0, state } = classroomSchedule;
 
@@ -419,7 +454,7 @@ export class NotificationUIStore extends EduUIStoreBase {
     const classDuration = this.classDuration;
 
     const durationToClose = dayjs.duration(
-      (classroomSchedule.closeDelay || 0) * 1000 - classDuration,
+      (classroomSchedule.closeDelay || 0) * 1000 - classDuration
     );
 
     return durationToClose;
@@ -438,7 +473,9 @@ export class NotificationUIStore extends EduUIStoreBase {
 
     const classDuration = this.classDuration;
 
-    const durationToEnd = dayjs.duration(duration.asMilliseconds() - classDuration);
+    const durationToEnd = dayjs.duration(
+      duration.asMilliseconds() - classDuration
+    );
 
     return durationToEnd;
   }
@@ -451,12 +488,12 @@ export class NotificationUIStore extends EduUIStoreBase {
    */
   private _getStateErrorReason(reason?: string): string {
     switch (reason) {
-      case 'REMOTE_LOGIN':
-        return transI18n('toast.kick_by_other_side');
-      case 'BANNED_BY_SERVER':
-        return transI18n('error.banned');
+      case "REMOTE_LOGIN":
+        return transI18n("toast.kick_by_other_side");
+      case "BANNED_BY_SERVER":
+        return transI18n("error.banned");
       default:
-        return reason ?? transI18n('error.unknown');
+        return reason ?? transI18n("error.unknown");
     }
   }
 }

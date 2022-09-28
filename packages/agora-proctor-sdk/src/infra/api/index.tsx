@@ -240,9 +240,13 @@ export class AgoraEduSDK {
       uiMode,
       shareUrl,
       examinationUrl,
+      deviceType,
     } = option;
     const sessionInfo = {
-      userUuid,
+      userUuid:
+        roleType === EduRoleTypeEnum.student
+          ? `${userUuid}-${deviceType}`
+          : userUuid,
       userName,
       role: roleType,
       roomUuid,

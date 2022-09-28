@@ -18,6 +18,7 @@ export class UsersUIStore extends EduUIStoreBase {
         this.videosWallLayout
     );
   }
+
   @computed get studentListByPage() {
     return Array.from(
       this.studentListByUserUuidPrefix(this.filterTag).entries()
@@ -121,7 +122,6 @@ export class UsersUIStore extends EduUIStoreBase {
     return `${roomUuid}-${userUuidPrefix}`;
   }
   generateDeviceUuid(userUuidPrefix: string, deviceType: DeviceTypeEnum) {
-    if (deviceType === DeviceTypeEnum.Main) return userUuidPrefix;
     return `${userUuidPrefix}-${deviceType}`;
   }
   onInstall() {}
