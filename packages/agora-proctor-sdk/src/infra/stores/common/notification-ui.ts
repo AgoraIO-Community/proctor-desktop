@@ -80,7 +80,6 @@ export class NotificationUIStore extends EduUIStoreBase {
               Scheduler.Duration.second(1)
             );
           } else if (ClassState.close === state) {
-            debugger;
             this.classroomStore.connectionStore.leaveClassroomUntil(
               LeaveReason.leave,
               Promise.resolve()

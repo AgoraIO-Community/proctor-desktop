@@ -8,6 +8,7 @@ import { Button, Select } from "antd";
 import { observer } from "mobx-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { SvgIconEnum, SvgImg } from "~ui-kit";
+import dayjs from "dayjs";
 import {
   StudentHLSVideos,
   StudentVideos,
@@ -36,6 +37,9 @@ export const StudentDetail = observer(
     const mainDeviceUserUuid = useMemo(() => {
       return generateDeviceUuid(userUuidPrefix, DeviceTypeEnum.Main);
     }, []);
+    const subDeviceUserUuid = useMemo(() => {
+      return generateDeviceUuid(userUuidPrefix, DeviceTypeEnum.Sub);
+    }, []);
     const roomUuid = useMemo(() => {
       return generateGroupUuid(userUuidPrefix);
     }, []);
@@ -43,18 +47,18 @@ export const StudentDetail = observer(
 
     const [userEvents, setUserEvents] = useState<
       UserEvents<{
-        tags: {
-          abnormal: UserAbnormalType;
-        };
+        abnormal: UserAbnormalType;
       }>[]
     >([]);
     const [abnormal, setAbnormal] = useState(undefined);
+    const [startTime, setStartTime] = useState(0);
     const [recordList, setRecordList] = useState<
       {
         recordDetails: {
           streamUuid: string;
           type: "audio" | "video";
           url: string;
+          startTime: number;
         }[];
       }[]
     >([]);
@@ -68,8 +72,7 @@ export const StudentDetail = observer(
     };
     const queryRecords = async () => {
       queryRecordList(roomUuid!).then((res) => {
-        setRecordList(res.list);
-        console.log(res, "recordlist");
+        setRecordList(res.list.sort((a, b) => a.ts - b.ts > 0));
       });
     };
     useEffect(() => {
@@ -89,35 +92,64 @@ export const StudentDetail = observer(
       );
       queryUserAbnormal();
     }, [abnormal]);
-    const mainDeviceScreenVideo = recordList[0]?.recordDetails.find((i) => {
+
+    const mainDeviceScreenVideo = recordList[
+      recordList.length - 1 < 0 ? 0 : recordList.length - 1
+    ]?.recordDetails?.find((i) => {
       return (
         i.type === "video" &&
         roomScene?.streamController?.streamByStreamUuid.get(i.streamUuid)
           ?.videoSourceType === AgoraRteVideoSourceType.ScreenShare
       );
-    })?.url;
-    const mainDeviceCameraVideo = recordList[0]?.recordDetails.find((i) => {
+    });
+    useEffect(() => {
+      if (
+        mainDeviceScreenVideo &&
+        mainDeviceScreenVideo.startTime !== startTime
+      ) {
+        setStartTime(mainDeviceScreenVideo.startTime);
+      }
+    }, [mainDeviceScreenVideo, startTime]);
+    const mainDeviceCameraVideo = recordList[
+      recordList.length - 1 < 0 ? 0 : recordList.length - 1
+    ]?.recordDetails?.find((i) => {
       return (
         i.type === "video" &&
-        roomScene?.streamController?.streamByStreamUuid.get(i.streamUuid)
-          ?.videoSourceType === AgoraRteVideoSourceType.Camera
+        Array.from(
+          roomScene?.streamController?.streamByUserUuid.get(
+            mainDeviceUserUuid
+          ) || []
+        ).find(
+          (i) =>
+            roomScene?.streamController?.streamByStreamUuid.get(i)
+              ?.videoSourceType === AgoraRteVideoSourceType.Camera
+        ) === i.streamUuid
       );
-    })?.url;
-    const subDeviceCameraVideo = recordList[0]?.recordDetails.find((i) => {
+    });
+    const subDeviceCameraVideo = recordList[
+      recordList.length - 1 < 0 ? 0 : recordList.length - 1
+    ]?.recordDetails?.find((i) => {
       return (
         i.type === "video" &&
-        roomScene?.streamController?.streamByStreamUuid.get(i.streamUuid)
-          ?.videoSourceType === AgoraRteVideoSourceType.Camera
+        Array.from(
+          roomScene?.streamController?.streamByUserUuid.get(
+            subDeviceUserUuid
+          ) || []
+        ).find(
+          (i) =>
+            roomScene?.streamController?.streamByStreamUuid.get(i)
+              ?.videoSourceType === AgoraRteVideoSourceType.Camera
+        ) === i.streamUuid
       );
-    })?.url;
+    });
 
     return (
       <div className="fcr-student-detail-tab">
         <div className="fcr-student-detail-tab-replay">
           <StudentHLSVideos
-            mainDeviceScreenVideo={mainDeviceScreenVideo}
-            mainDeviceCameraVideo={mainDeviceCameraVideo}
-            subDeviceCameraVideo={subDeviceCameraVideo}
+            mainDeviceScreenVideo={mainDeviceScreenVideo?.url}
+            mainDeviceCameraVideo={mainDeviceCameraVideo?.url}
+            subDeviceCameraVideo={subDeviceCameraVideo?.url}
             layout={VideosWallLayoutEnum.Compact}
           />
           <div className="fcr-student-detail-tab-replay-bottom">
@@ -126,17 +158,23 @@ export const StudentDetail = observer(
               <span>Review and information alarm（{userEvents.length}）</span>
             </div>
             <div className="fcr-student-detail-tab-replay-bottom-list">
-              {userEvents.reverse().map((e, index) => {
+              {userEvents.map((e, index) => {
                 return (
-                  <div className="fcr-student-detail-tab-replay-bottom-list-item">
-                    <div>{Math.abs(index - userEvents.length) + 1}</div>
+                  <div
+                    key={e.ts}
+                    className="fcr-student-detail-tab-replay-bottom-list-item"
+                  >
+                    <div>{Math.abs(index - userEvents.length)}</div>
                     <div>
                       <div className="fcr-student-detail-tab-replay-bottom-list-item-logo">
                         <SvgImg type={SvgIconEnum.AI} size={36}></SvgImg>
                       </div>
                       <div className="fcr-student-detail-tab-replay-bottom-list-item-info">
                         <div className="fcr-student-detail-tab-replay-bottom-list-item-type">
-                          02:23 {e.data?.tags?.abnormal?.reason}
+                          {dayjs
+                            .duration(Math.abs(startTime - e.ts), "ms")
+                            .format("mm:ss")}{" "}
+                          {e.data?.abnormal?.reason}
                         </div>
                         <div className="fcr-student-detail-tab-replay-bottom-list-item-desc">
                           Description From AI
