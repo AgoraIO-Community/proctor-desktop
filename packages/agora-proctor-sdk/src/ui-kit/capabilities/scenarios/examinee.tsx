@@ -32,10 +32,10 @@ const RoomCloseModal = observer(() => {
   const {
     studentViewUIStore: { roomClose, userAvatar },
   } = useStore();
-  return roomClose ? (
+  return (
     <AgoraModal
       centered
-      open={true}
+      open={roomClose}
       width={730}
       placement="bottom"
       footer={<LeaveRoomFooter />}
@@ -58,7 +58,7 @@ const RoomCloseModal = observer(() => {
         </Description>
       </section>
     </AgoraModal>
-  ) : null;
+  );
 });
 
 const LeaveRoomFooter = observer(() => {

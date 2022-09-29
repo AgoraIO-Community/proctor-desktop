@@ -13,9 +13,12 @@ import {
 } from "agora-edu-core";
 import { FcrWebviewWidget } from "agora-plugin-gallery";
 import { ApiBase } from "agora-rte-sdk";
+import dayjs from "dayjs";
+import duration from "dayjs/plugin/duration";
 import { render, unmountComponentAtNode } from "react-dom";
 import { FcrTheme } from "~ui-kit";
 import { EduContext } from "../contexts";
+
 import { FcrMultiThemeMode, FcrUIConfig } from "../types/config";
 import {
   applyTheme,
@@ -41,7 +44,6 @@ import {
 } from "./type";
 
 export * from "./type";
-
 export class AgoraEduSDK {
   private static _config: any = {};
   private static _widgets: Record<string, typeof AgoraWidgetBase> = {};
@@ -387,3 +389,4 @@ export class AgoraEduSDK {
 }
 
 loadGeneratedFiles();
+dayjs.extend(duration);

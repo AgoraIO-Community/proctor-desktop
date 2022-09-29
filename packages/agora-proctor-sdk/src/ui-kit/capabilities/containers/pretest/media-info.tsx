@@ -9,7 +9,7 @@ import { Col, Row } from "antd";
 import { observer } from "mobx-react";
 import { FC, useCallback, useEffect, useRef } from "react";
 import styled from "styled-components";
-import { SvgIconEnum, SvgImg } from "~ui-kit";
+import { SvgIconEnum, SvgImg, transI18n } from "~ui-kit";
 import PretestAudio from "./assets/pretest-audio.mp3";
 
 const { Option } = AgoraSelect;
@@ -119,7 +119,7 @@ export const PreTestSpeaker: FC = observer(() => {
           style={{ width: "100%" }}
           onClick={(_) => startPlaybackDeviceTest(urlRef.current)}
         >
-          test
+          {transI18n("fcr_exam_prep_button_test")}
         </AgoraButton>
       </Col>
     </Row>

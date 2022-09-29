@@ -1,14 +1,14 @@
+import { AgoraEduSDK } from "@/infra/api";
 import { useStore } from "@/infra/hooks/ui-store";
-import { ClassroomState, ClassState, EduClassroomConfig } from "agora-edu-core";
+import { ClassState, EduClassroomConfig } from "agora-edu-core";
 import { AgoraRteMediaSourceState } from "agora-rte-sdk";
 import { Button } from "antd";
 import md5 from "js-md5";
 import { observer } from "mobx-react";
-import { SvgIconEnum, SvgImg } from "~ui-kit";
-import { LocalTrackPlayer } from "../stream/track-player";
 import { useEffect } from "react";
+import { SvgIconEnum, SvgImg, transI18n } from "~ui-kit";
+import { LocalTrackPlayer } from "../stream/track-player";
 import "./index.css";
-import { AgoraEduSDK } from "@/infra/api";
 export const ProctorSider = observer(() => {
   const {
     navigationBarUIStore: { startClass, classStatusText, classState },
@@ -74,7 +74,9 @@ export const ProctorSider = observer(() => {
 
         <div className={"fcr_proctor_sider_info_room_remaining"}>
           <div>
-            <div className={"fcr_proctor_sider_info_title"}>TimeRemaining</div>
+            <div className={"fcr_proctor_sider_info_title"}>
+              {transI18n("fcr_room_label_time_remaining")}
+            </div>
             <div className={"fcr_proctor_sider_info_val"}>
               {classStatusText}
             </div>

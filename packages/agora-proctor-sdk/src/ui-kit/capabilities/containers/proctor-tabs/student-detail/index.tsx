@@ -1,5 +1,13 @@
-import "./index.css";
+import { useStore } from "@/infra/hooks/ui-store";
+import {
+  UserAbnormal as UserAbnormalType,
+  UserEvents,
+  VideosWallLayoutEnum,
+} from "@/infra/stores/common/type";
+import { Button, Select } from "antd";
 import { observer } from "mobx-react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { SvgIconEnum, SvgImg } from "~ui-kit";
 import {
   StudentHLSVideos,
   StudentVideos,
@@ -7,19 +15,12 @@ import {
   UserAvatar,
   UserFocus,
 } from "../../student-card";
-import {
-  UserAbnormal as UserAbnormalType,
-  UserEvents,
-  VideosWallLayoutEnum,
-} from "@/infra/stores/common/type";
-import { SvgIconEnum, SvgImg } from "~ui-kit";
-import { Select, Button } from "antd";
-import { useStore } from "@/infra/hooks/ui-store";
-import { useEffect, useState, useCallback, useMemo } from "react";
+import "./index.css";
 
-import { EduClassroomConfig } from "agora-edu-core";
 import { DeviceTypeEnum } from "@/infra/api";
 import { AgoraRteVideoSourceType } from "agora-rte-sdk";
+import { EduClassroomConfig } from "agora-edu-core";
+import "./index.css";
 export const StudentDetail = observer(
   ({ userUuidPrefix }: { userUuidPrefix: string }) => {
     const {

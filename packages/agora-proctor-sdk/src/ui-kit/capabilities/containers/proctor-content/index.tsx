@@ -1,14 +1,13 @@
-import "./index.css";
-import { Tabs, Segmented, Button, Popover } from "antd";
-import { AllVideos } from "../proctor-tabs/all-videos";
-import { SvgIconEnum, SvgImg } from "~ui-kit";
 import { useStore } from "@/infra/hooks/ui-store";
-import { observer } from "mobx-react";
 import {
   StudentFilterTag,
   VideosWallLayoutEnum,
 } from "@/infra/stores/common/type";
+import { Button, Popover, Segmented, Tabs } from "antd";
+import { observer } from "mobx-react";
 import { useState } from "react";
+import { SvgIconEnum, SvgImg, transI18n } from "~ui-kit";
+import { AllVideos } from "../proctor-tabs/all-videos";
 import { StudentDetail } from "../proctor-tabs/student-detail";
 import { UserAbnormal, UserAvatar } from "../student-card";
 import { LeaveReason } from "agora-edu-core";
@@ -72,7 +71,7 @@ export const ProctorContent = observer(() => {
             label: (
               <div className="fcr-proctor-content-tab-label">
                 <SvgImg type={SvgIconEnum.ALL_VIDEOS_TAB} />{" "}
-                <span>All Videos</span>
+                <span>{transI18n("fcr_room_label_all_videos")}</span>
               </div>
             ),
             key: "ALL_VIDEOS",
@@ -103,7 +102,8 @@ export const ProctorContent = observer(() => {
               {
                 label: (
                   <span>
-                    All·{studentListByUserUuidPrefix(StudentFilterTag.All).size}
+                    {transI18n("fcr_room_tab_all")}·
+                    {studentListByUserUuidPrefix(StudentFilterTag.All).size}
                   </span>
                 ),
                 value: StudentFilterTag.All,
@@ -111,7 +111,7 @@ export const ProctorContent = observer(() => {
               {
                 label: (
                   <span>
-                    Abnormal·
+                    {transI18n("fcr_room_tab_abnormal")}·
                     {
                       studentListByUserUuidPrefix(StudentFilterTag.Abnormal)
                         .size
@@ -123,7 +123,7 @@ export const ProctorContent = observer(() => {
               {
                 label: (
                   <span>
-                    Focus·
+                    {transI18n("fcr_room_tab_focus")}·
                     {studentListByUserUuidPrefix(StudentFilterTag.Focus).size}
                   </span>
                 ),
@@ -166,17 +166,18 @@ const LeaveBtnGroup = () => {
                 block
                 danger
               >
-                End the Exam
+                {transI18n("fcr_room_button_exam_end")}
               </Button>
+
               <Button type="ghost" onClick={leave} block danger>
-                Leave the Room
+                {transI18n("fcr_room_button_leave")}
               </Button>
             </div>
           }
         >
           {showButtonPopover ? (
             <Button onClick={() => setShowButtonPopover(false)} type="primary">
-              Cancel
+              {transI18n("fcr_exam_prep_button_cancel")}
             </Button>
           ) : (
             <Button
@@ -184,7 +185,8 @@ const LeaveBtnGroup = () => {
               type="primary"
               danger
             >
-              <SvgImg type={SvgIconEnum.QUIT} /> <span>Leave</span>
+              <SvgImg type={SvgIconEnum.QUIT} />{" "}
+              <span>{transI18n("fcr_room_button_leave")}</span>
             </Button>
           )}
         </Popover>

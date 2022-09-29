@@ -4,6 +4,7 @@ import { FlexContainer } from "@/ui-kit/components/container";
 import { Space } from "antd";
 import { observer } from "mobx-react";
 import styled from "styled-components";
+import { transI18n } from "~ui-kit";
 import { InteractiveVideo } from "./interactive-video";
 import { MainCameraView } from "./main-camera-view";
 import { RoomOperation } from "./room-operation";
@@ -19,7 +20,9 @@ export const Sider = observer(() => {
     >
       <AgoraCard background="linear-gradient(180deg, #FAFAFA 0%, #F3F3F3 100%)">
         <SiderSpace size={17} direction="vertical">
-          <HelloHeader>Hello, student</HelloHeader>
+          <HelloHeader>
+            {transI18n("fcr_device_test_label_hello")}, student
+          </HelloHeader>
           <RoomOperation />
           <InteractiveVideo />
         </SiderSpace>

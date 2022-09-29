@@ -3,6 +3,7 @@ import { AgoraButton } from "@/ui-kit/components/button";
 import { AgoraMidBorderRadius } from "@/ui-kit/components/common";
 import { observer } from "mobx-react";
 import styled from "styled-components";
+import { transI18n } from "~ui-kit";
 import { PureVideo } from "../media-info";
 
 export const ImageSnapshot = observer(() => {
@@ -21,7 +22,9 @@ export const ImageSnapshot = observer(() => {
           size="large"
           onClick={getSnapshotImage}
         >
-          {snapshotImage ? "reset" : "Take Photo"}
+          {snapshotImage
+            ? transI18n("fcr_exam_prep_button_retake")
+            : transI18n("fcr_exam_prep_button_take_photo")}
         </AgoraButton>
       </Actions>
     </Container>

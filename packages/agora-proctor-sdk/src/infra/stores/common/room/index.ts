@@ -32,7 +32,6 @@ import {
   runInAction,
 } from "mobx";
 import { computedFn } from "mobx-utils";
-import { transI18n } from "~ui-kit";
 import { EduUIStoreBase } from "../base";
 import { SceneSubscription, SubscriptionFactory } from "../subscription/room";
 import { RoomScene } from "./struct";
@@ -279,7 +278,7 @@ export class RoomUIStore extends EduUIStoreBase {
           if (this.classroomSchedule.startTime !== undefined) {
             duration = Math.max(
               this.classroomSchedule.duration
-                ? this.classroomSchedule.duration -
+                ? this.classroomSchedule.duration * 1000 -
                     this.calibratedTime +
                     this.classroomSchedule.startTime
                 : this.calibratedTime - this.classroomSchedule.startTime,
@@ -304,7 +303,7 @@ export class RoomUIStore extends EduUIStoreBase {
   }
 
   formatCountDown = (time: number) => {
-    const classDuration = dayjs.duration({ milliseconds: time });
+    const classDuration = dayjs.duration(time, "ms");
     return classDuration.format("mm:ss");
   };
   /**
@@ -316,20 +315,15 @@ export class RoomUIStore extends EduUIStoreBase {
     const duration = this.classTimeDuration || 0;
 
     if (duration < 0) {
-      // return `-- ${transI18n('nav.short.minutes')} -- ${transI18n('nav.short.seconds')}`;
       return `-- : --`;
     }
     switch (this.classState) {
       case ClassState.beforeClass:
         return `-- : --`;
       case ClassState.ongoing:
-        return `${transI18n("nav.started_elapse")}${this.formatCountDown(
-          duration
-        )}`;
+        return `${this.formatCountDown(duration)}`;
       case ClassState.afterClass:
-        return `${transI18n("nav.ended_elapse")}${this.formatCountDown(
-          duration
-        )}`;
+        return `00 : 00`;
       default:
         return `-- : --`;
     }

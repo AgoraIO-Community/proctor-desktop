@@ -1,15 +1,16 @@
 import { useStore } from "@/infra/hooks/ui-store";
-import { AgoraButton } from "@/ui-kit/components/button";
 import { FlexContainer } from "@/ui-kit/components/container";
+import { Counter } from "@/ui-kit/components/counter";
 import { observer } from "mobx-react";
-import styled from "styled-components";
+import { useCallback } from "react";
+import styled, { css } from "styled-components";
 import { transI18n } from "~ui-kit";
 import { TrackArea } from "../root-box";
 import { WidgetContainer } from "../widget";
 
 export const Content = observer(() => {
   const {
-    studentViewUIStore: { openWebview, testToast },
+    studentViewUIStore: { openWebview, widgetBlur },
   } = useStore();
   return (
     <FlexContainer direction="column" gap={13} flex={1}>
@@ -18,22 +19,35 @@ export const Content = observer(() => {
       </ScenarioHeader>
       <FlexContainer flex={1}>
         <InitialPanel>
-          <>
-            <img src={require("./waiting.png")} width={256} />
-            {transI18n("fcr_room_label_wait_teacher_start_exam")}
-            <AgoraButton type="primary" onClick={openWebview}>
-              开启webview
-            </AgoraButton>
-            <AgoraButton type="primary" subType="red" onClick={testToast}>
-              toast student
-            </AgoraButton>
-          </>
-          {/* <Counter /> */}
+          <ContentProspect />
           <TrackArea top={0} boundaryName="classroom-track-bounds" />
-          <WidgetContainer />
+          <WidgetExamContainer blur={widgetBlur}>
+            <WidgetContainer />
+          </WidgetExamContainer>
         </InitialPanel>
       </FlexContainer>
     </FlexContainer>
+  );
+});
+
+const ContentProspect = observer(() => {
+  const {
+    studentViewUIStore: { ClassOpening, beforeClass },
+  } = useStore();
+
+  const handleFinished = useCallback(() => {
+    console.log("finished");
+  }, []);
+  return (
+    <>
+      {beforeClass && (
+        <>
+          <img src={require("./waiting.png")} width={256} />
+          {transI18n("fcr_room_label_wait_teacher_start_exam")}
+        </>
+      )}
+      {ClassOpening && <Counter onFinished={handleFinished} />}
+    </>
   );
 });
 
@@ -53,4 +67,20 @@ const InitialPanel = styled.div`
   height: 100%;
   font-size: 20px;
   position: relative;
+`;
+const WidgetExamContainer = styled.div<{ blur?: boolean }>`
+  ${(props) =>
+    props.blur &&
+    css`
+      filter: blur(14px);
+    `}
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  & .react-draggable {
+    width: 100% !important;
+    height: 100% !important;
+  }
 `;

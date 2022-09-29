@@ -7,7 +7,6 @@ const { dev } = require("./utils/loaders");
 const webpack = require("webpack");
 const dotenv = require("dotenv-webpack");
 const ESLintPlugin = require("eslint-webpack-plugin");
-
 const entry = path.resolve(__dirname, "../src/index.tsx");
 const template = path.resolve(__dirname, "../public/index.html");
 

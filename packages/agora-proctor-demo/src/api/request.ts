@@ -1,5 +1,5 @@
 import axios from "axios";
-import { UserApi } from "./user";
+import { UserApi } from "../api/user";
 
 export interface Response<T = unknown> {
   code: string;
@@ -13,8 +13,8 @@ const retryDelay = 300;
 export const request = axios.create();
 
 request.interceptors.request.use(function (config) {
-  if (UserApi.access_token) {
-    config.headers["Authorization"] = `Bearer ${UserApi.access_token}`;
+  if (UserApi.accessToken) {
+    config.headers["Authorization"] = `Bearer ${UserApi.accessToken}`;
   }
   return config;
 });
@@ -29,7 +29,7 @@ request.interceptors.response.use(
       !(error.config?.url || "").includes("/refresh/refreshToken")
     ) {
       const { retryTimes = 0 } = error.config;
-      if (retryTimes < maxRetryTimes && UserApi.refresh_token) {
+      if (retryTimes < maxRetryTimes && UserApi.refreshToken) {
         return UserApi.shared
           .refreshToken()
           .then(() => {
@@ -44,11 +44,11 @@ request.interceptors.response.use(
             });
           })
           .catch((err) => {
-            UserApi.shared.redirectLogin();
+            UserApi.shared.logout();
             return err;
           });
       } else {
-        UserApi.shared.redirectLogin();
+        UserApi.shared.logout();
       }
     }
     return Promise.reject(error);

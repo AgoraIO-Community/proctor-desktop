@@ -1,38 +1,31 @@
+import dayjs from "dayjs";
+import duration from "dayjs/plugin/duration";
 import { Provider } from "mobx-react";
 import ReactDOM from "react-dom";
-import { HashRouter, Route, Switch } from "react-router-dom";
-import { routesMap } from "./router";
-import { BizPageRouter } from "./router/type";
+import { addResource } from "./components/i18n";
+import { RouteContainer } from "./router";
 import { HomeStore } from "./stores/home";
-import { GlobalStorage } from "./utils";
+import { GlobalStorage, init } from "./utils";
 
-const routes: BizPageRouter[] = [
-  BizPageRouter.HomePage,
-  BizPageRouter.LaunchPage,
-  BizPageRouter.ColorPage,
-  BizPageRouter.ManipulatePage,
-];
+declare global {
+  interface Window {
+    __launchRegion: string;
+    __launchLanguage: string;
+    __launchRoomName: string;
+    __launchUserName: string;
+    __launchRoleType: string;
+    __launchRoomType: string;
+    __launchCompanyId: string;
+    __launchProjectId: string;
+    __accessToken: string;
+    __refreshToken: string;
+  }
+}
 
-const RouteContainer = () => {
-  return (
-    <HashRouter>
-      <Switch>
-        {routes.map((item, index) => {
-          const route = routesMap[item];
-          if (!route) return null;
-          return (
-            <Route
-              key={index}
-              exact
-              path={route.path}
-              component={route.component}
-            />
-          );
-        })}
-      </Switch>
-    </HashRouter>
-  );
-};
+init();
+
+dayjs.extend(duration);
+addResource();
 
 export const App = () => {
   GlobalStorage.useLocalStorage();

@@ -1,4 +1,4 @@
-import { ClassState, EduClassroomConfig, LeaveReason } from "agora-edu-core";
+import { ClassState, LeaveReason } from "agora-edu-core";
 import { bound, Log } from "agora-rte-sdk";
 import {
   action,
@@ -6,6 +6,7 @@ import {
   IReactionDisposer,
   Lambda,
   observable,
+  reaction,
   runInAction,
 } from "mobx";
 import { EduUIStoreBase } from "../base";
@@ -18,6 +19,9 @@ export class StudentViewUIStore extends EduUIStoreBase {
 
   @observable
   roomClose = false; // 房间是否关闭
+
+  @observable
+  widgetBlur = false;
 
   @computed
   get userAvatar() {
@@ -33,6 +37,20 @@ export class StudentViewUIStore extends EduUIStoreBase {
       "undefined"
       ? {}
       : this.classroomStore.userStore.localUserProperties.get("warning");
+  }
+
+  @computed
+  get classRoomState() {
+    return this.classroomStore.roomStore.classroomSchedule.state;
+  }
+
+  @computed
+  get ClassOpening() {
+    return this.classRoomState === ClassState.ongoing;
+  }
+
+  get beforeClass() {
+    return this.classRoomState === ClassState.beforeClass;
   }
 
   @action.bound
@@ -62,29 +80,20 @@ export class StudentViewUIStore extends EduUIStoreBase {
       title: "baidu",
     });
   };
-  testToast = () => {
-    // update user message
-    const { userUuid } = EduClassroomConfig.shared.sessionInfo;
-    this.classroomStore.userStore.updateUserProperties([
-      {
-        userUuid,
-        properties: { warning: { message: "你小心点", time: Date.now() } },
-      },
-    ]);
-  };
-
   onInstall() {
     this._disposers.push(
-      computed(() => this.classroomStore.roomStore.classroomSchedule).observe(
-        ({ newValue }) => {
-          if (newValue.state === ClassState.close) {
+      reaction(
+        () => this.classRoomState,
+        (state) => {
+          if (state === ClassState.beforeClass) {
             runInAction(() => {
-              this.roomClose = true;
+              this.widgetBlur = true;
             });
           }
         }
       )
     );
+
     this._disposers.push(
       computed(() => this.userWarning).observe(({ newValue }) => {
         if (newValue?.message) {

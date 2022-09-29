@@ -1,12 +1,14 @@
-import { isEmpty } from 'lodash';
-import { LanguageEnum } from 'agora-proctor-sdk';
+import { LanguageEnum } from "agora-proctor-sdk";
+import { isEmpty } from "lodash";
+import { UserApi } from "../api/user";
+import { indexURL } from "./url";
 
 export const getBrowserLanguage = (): LanguageEnum => {
   const usrlang = navigator.language;
-  if (usrlang.startsWith('zh')) {
-    return 'zh';
+  if (usrlang.startsWith("zh")) {
+    return "zh";
   }
-  return 'en';
+  return "en";
 };
 
 export type AppStorage = Storage | MemoryStorage;
@@ -30,7 +32,7 @@ export class MemoryStorage {
 export class CustomStorage {
   private storage: AppStorage;
 
-  languageKey = 'demo_language';
+  languageKey = "demo_language";
 
   constructor() {
     this.storage = new MemoryStorage();
@@ -66,18 +68,22 @@ export class CustomStorage {
   }
 
   getLanguage() {
-    const language = this.read(this.languageKey) ? this.read(this.languageKey) : navigator.language;
+    const language = this.read(this.languageKey)
+      ? this.read(this.languageKey)
+      : navigator.language;
     return language;
   }
 
   getRtmMessage(): { count: number; messages: any[] } {
-    const channelMessages = GlobalStorage.read('channelMessages');
+    const channelMessages = GlobalStorage.read("channelMessages");
     if (isEmpty(channelMessages))
       return {
         count: 0,
         messages: [],
       };
-    const messages = channelMessages.filter((it: any) => it.message_type === 'group_message');
+    const messages = channelMessages.filter(
+      (it: any) => it.message_type === "group_message"
+    );
     const chatMessages = messages.reduce((collect: any[], value: any) => {
       const payload = value.payload;
       const json = JSON.parse(payload);
@@ -101,18 +107,18 @@ export class CustomStorage {
 export class PersistLocalStorage {
   private storage: AppStorage;
 
-  languageKey = 'app_storage';
+  languageKey = "app_storage";
 
   constructor() {
     this.storage = window.localStorage;
   }
 
   saveCourseWareList(jsonStringify: string) {
-    this.storage.setItem('courseWare', jsonStringify);
+    this.storage.setItem("courseWare", jsonStringify);
   }
 
   getCourseWareSaveList() {
-    const str = this.storage.getItem('courseWare');
+    const str = this.storage.getItem("courseWare");
     if (!str) {
       return [];
     }
@@ -129,7 +135,7 @@ export const GlobalStorage = new CustomStorage();
 export const storage = new PersistLocalStorage();
 
 export const number2Percent = (v: number, fixed = 0): string => {
-  return !isNaN(Number(v * 100)) ? Number(v * 100).toFixed(fixed) + '%' : '0%';
+  return !isNaN(Number(v * 100)) ? Number(v * 100).toFixed(fixed) + "%" : "0%";
 };
 
 export function audioBufferToWav(buffer: any, opt?: any) {
@@ -150,7 +156,13 @@ export function audioBufferToWav(buffer: any, opt?: any) {
   return encodeWAV(result, format, sampleRate, numChannels, bitDepth);
 }
 
-function encodeWAV(samples: any, format: any, sampleRate: any, numChannels: any, bitDepth: any) {
+function encodeWAV(
+  samples: any,
+  format: any,
+  sampleRate: any,
+  numChannels: any,
+  bitDepth: any
+) {
   const bytesPerSample = bitDepth / 8;
   const blockAlign = numChannels * bytesPerSample;
 
@@ -158,13 +170,13 @@ function encodeWAV(samples: any, format: any, sampleRate: any, numChannels: any,
   const view = new DataView(buffer);
 
   /* RIFF identifier */
-  writeString(view, 0, 'RIFF');
+  writeString(view, 0, "RIFF");
   /* RIFF chunk length */
   view.setUint32(4, 36 + samples.length * bytesPerSample, true);
   /* RIFF type */
-  writeString(view, 8, 'WAVE');
+  writeString(view, 8, "WAVE");
   /* format chunk identifier */
-  writeString(view, 12, 'fmt ');
+  writeString(view, 12, "fmt ");
   /* format chunk length */
   view.setUint32(16, 16, true);
   /* sample format (raw) */
@@ -180,7 +192,7 @@ function encodeWAV(samples: any, format: any, sampleRate: any, numChannels: any,
   /* bits per sample */
   view.setUint16(34, bitDepth, true);
   /* data chunk identifier */
-  writeString(view, 36, 'data');
+  writeString(view, 36, "data");
   /* data chunk length */
   view.setUint32(40, samples.length * bytesPerSample, true);
   if (format === 1) {
@@ -234,20 +246,23 @@ export const appendBuffer = (buffer1: Float32Array, buffer2: Float32Array) => {
   return tmp;
 };
 export const mapToObject = (map: Map<any, any>) => {
-  return [...map.entries()].reduce((obj, [key, value]) => ((obj[key] = value), obj), {});
+  return [...map.entries()].reduce(
+    (obj, [key, value]) => ((obj[key] = value), obj),
+    {}
+  );
 };
 
 const ImageFileTypes = [
-  'image/png',
-  'image/jpg',
-  'image/jpeg',
-  'image/webp',
-  'image/apng',
-  'image/svg+xml',
-  'image/gif',
-  'image/bmp',
-  'image/avif',
-  'image/tiff',
+  "image/png",
+  "image/jpg",
+  "image/jpeg",
+  "image/webp",
+  "image/apng",
+  "image/svg+xml",
+  "image/gif",
+  "image/bmp",
+  "image/avif",
+  "image/tiff",
 ];
 
 export function isSupportedImageType(file: File): boolean {
@@ -257,10 +272,10 @@ export function isSupportedImageType(file: File): boolean {
 export const dataURIToFile = (dataURI: string, filename: string) => {
   // convert base64 to raw binary data held in a string
   // doesn't handle URLEncoded DataURIs - see SO answer #6850276 for code that does this
-  const byteString = atob(dataURI.split(',')[1]);
+  const byteString = atob(dataURI.split(",")[1]);
 
   // separate out the mime component
-  const mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
+  const mimeString = dataURI.split(",")[0].split(":")[1].split(";")[0];
 
   // write the bytes of the string to an ArrayBuffer
   const ab = new ArrayBuffer(byteString.length);
@@ -278,5 +293,31 @@ export const dataURIToFile = (dataURI: string, filename: string) => {
   return file;
 };
 export const humpToLine = (str: string) => {
-  return str.replace(/([A-Z])/g, '_$1').toLowerCase();
+  return str.replace(/([A-Z])/g, "_$1").toLowerCase();
+};
+
+/**
+ * Format the room ID for a specific format.
+ * example: "001002003"=>"001 002 003"
+ *
+ * @returns string
+ */
+export const formatRoomID = (id: string, separator = " ") => {
+  id = id.replace(/\s+/g, "");
+  if (id.length > 9) {
+    id = id.slice(0, 9);
+  }
+  const result = [];
+  for (let i = 0; i < id.length; i = i + 3) {
+    result.push(id.slice(i, i + 3));
+  }
+  return result.join(separator);
+};
+
+export const init = () => {
+  if (window.__accessToken && window.__refreshToken) {
+    UserApi.accessToken = window.__accessToken;
+    UserApi.refreshToken = window.__refreshToken;
+    history.replaceState({}, "", indexURL);
+  }
 };
