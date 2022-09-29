@@ -100,7 +100,7 @@ export const HomePage = () => {
         mediaOptions: {
           web: {
             codec: "h264",
-            mode: "rtc",
+            mode: "live",
           },
         },
         examinationUrl:
