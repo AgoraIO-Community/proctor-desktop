@@ -1,6 +1,7 @@
 import { DeviceTypeEnum } from "@/infra/api";
 import { EduClassroomConfig, EduUserStruct } from "agora-edu-core";
 import { bound } from "agora-rte-sdk";
+import md5 from "js-md5";
 import { action, computed, observable } from "mobx";
 import { computedFn } from "mobx-utils";
 import { EduUIStoreBase } from "./base";
@@ -18,6 +19,7 @@ export class UsersUIStore extends EduUIStoreBase {
         this.videosWallLayout
     );
   }
+
   @computed get studentListByPage() {
     return Array.from(
       this.studentListByUserUuidPrefix(this.filterTag).entries()
@@ -118,10 +120,9 @@ export class UsersUIStore extends EduUIStoreBase {
   }
   generateGroupUuid(userUuidPrefix: string) {
     const { roomUuid } = EduClassroomConfig.shared.sessionInfo;
-    return `${roomUuid}-${userUuidPrefix}`;
+    return md5(`${roomUuid}-${userUuidPrefix}`);
   }
   generateDeviceUuid(userUuidPrefix: string, deviceType: DeviceTypeEnum) {
-    if (deviceType === DeviceTypeEnum.Main) return userUuidPrefix;
     return `${userUuidPrefix}-${deviceType}`;
   }
   onInstall() {}

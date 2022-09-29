@@ -22,6 +22,7 @@ import {
 } from "agora-rte-sdk";
 import to from "await-to-js";
 import dayjs from "dayjs";
+import md5 from "js-md5";
 import {
   action,
   computed,
@@ -53,6 +54,7 @@ export class RoomUIStore extends EduUIStoreBase {
     }
     return this._sceneSubscriptions.get(scene.sceneId);
   }
+
   @bound
   async joinClassroom(
     roomUuid: string,
@@ -173,7 +175,7 @@ export class RoomUIStore extends EduUIStoreBase {
   get currentGroupUuid() {
     const { userUuid, roomUuid } = EduClassroomConfig.shared.sessionInfo;
     const userUuidPrefix = userUuid.split("-")[0];
-    return `${roomUuid}-${userUuidPrefix}`;
+    return md5(`${roomUuid}-${userUuidPrefix}`);
   }
 
   /**
@@ -182,13 +184,14 @@ export class RoomUIStore extends EduUIStoreBase {
   @action.bound
   addGroup() {
     const { userUuid } = EduClassroomConfig.shared.sessionInfo;
-    const groupUuid = this.currentGroupUuid;
     const newUsers = { userUuid };
+    const userUuidPrefix = userUuid.split("-")[0];
+
     this.classroomStore.groupStore.addGroups(
       [
         {
-          groupUuid: `${groupUuid}`,
-          groupName: groupUuid,
+          groupUuid: this.currentGroupUuid,
+          groupName: userUuidPrefix,
           users: [newUsers],
         },
       ],
@@ -196,38 +199,36 @@ export class RoomUIStore extends EduUIStoreBase {
     );
   }
 
-  private _checkUserRoomState = (groupDetails: Map<string, GroupDetail>) => {
-    const currentGroupUuid = this.currentGroupUuid;
-    let visibleGroup = false;
-    for (let [groupUuid] of groupDetails) {
-      if (groupUuid === currentGroupUuid) {
-        visibleGroup = true;
-        return;
-      }
-    }
-    if (!visibleGroup) {
-      Logger.info(`${currentGroupUuid} join in`);
+  private _checkUserRoomState = () => {
+    const group = this.classroomStore.groupStore.groupDetails.get(
+      this.currentGroupUuid
+    );
+
+    if (!group) {
+      Logger.info(`${this.currentGroupUuid} join in`);
       this.addGroup();
     }
   };
   @bound
-  private _addGroupDetailsChange(groupDetails: Map<string, GroupDetail>) {
+  private _addGroupDetailsChange() {
     EduClassroomConfig.shared.sessionInfo.role === EduRoleTypeEnum.student &&
-      this._checkUserRoomState(groupDetails);
+      this._checkUserRoomState();
   }
   @bound
   private async _handleClassroomEvent(type: AgoraEduClassroomEvent, args: any) {
     if (type === AgoraEduClassroomEvent.JoinSubRoom) {
-      const currentGroupUuid = this.currentGroupUuid;
-      await this.joinClassroom(currentGroupUuid, EduRoomTypeEnum.RoomGroup);
-      if (this.roomSceneByRoomUuid(currentGroupUuid)!.scene) {
-        await this.roomSceneByRoomUuid(currentGroupUuid)?.scene?.joinRTC();
+      const roomScene = await this.joinClassroom(
+        this.currentGroupUuid,
+        EduRoomTypeEnum.RoomGroup
+      );
+      if (roomScene) {
+        await roomScene.scene?.joinRTC();
         this.classroomStore.streamStore.updateLocalPublishState(
           {
             videoState: AgoraRteMediaPublishState.Published,
             audioState: AgoraRteMediaPublishState.Published,
           },
-          this.roomSceneByRoomUuid(currentGroupUuid)?.scene
+          roomScene.scene
         );
       }
     }
@@ -333,7 +334,7 @@ export class RoomUIStore extends EduUIStoreBase {
       computed(() => this.classroomStore.groupStore.groupDetails).observe(
         ({ newValue, oldValue }) => {
           if (!oldValue?.size) {
-            this._addGroupDetailsChange(newValue);
+            this._addGroupDetailsChange();
           }
         }
       )

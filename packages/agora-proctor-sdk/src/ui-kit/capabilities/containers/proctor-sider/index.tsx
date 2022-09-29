@@ -59,7 +59,6 @@ export const ProctorSider = observer(() => {
     enableLocalVideo(false);
     enableLocalAudio(false);
   };
-
   return (
     <div className={"fcr_proctor_sider"}>
       <div>
@@ -145,7 +144,7 @@ export const ProctorSider = observer(() => {
 
         <div className="fcr_proctor_sider_info_proctor-actions-btn">
           {teacherCameraStream?.isCameraMuted &&
-          teacherCameraStream.isMicMuted ? (
+          teacherCameraStream?.isMicMuted ? (
             <Button
               className="fcr_proctor_sider_info_proctor-actions-speaker"
               type="primary"

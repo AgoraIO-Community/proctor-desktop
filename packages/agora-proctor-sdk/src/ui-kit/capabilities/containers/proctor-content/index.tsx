@@ -3,6 +3,7 @@ import {
   StudentFilterTag,
   VideosWallLayoutEnum,
 } from "@/infra/stores/common/type";
+import { LeaveReason } from "agora-edu-core";
 import { Button, Popover, Segmented, Tabs } from "antd";
 import { observer } from "mobx-react";
 import { useState } from "react";
@@ -140,7 +141,15 @@ export const ProctorContent = observer(() => {
 });
 
 const LeaveBtnGroup = () => {
+  const {
+    classroomStore: {
+      connectionStore: { leaveClassroomUntil },
+    },
+  } = useStore();
   const [showButtonPopover, setShowButtonPopover] = useState(false);
+  const leave = () => {
+    leaveClassroomUntil(LeaveReason.leave, Promise.resolve());
+  };
   return (
     <div className="fcr-proctor-content-footer-leave-btn-group">
       <div>
@@ -159,7 +168,7 @@ const LeaveBtnGroup = () => {
               >
                 {transI18n("fcr_room_button_exam_end")}
               </Button>
-              <Button type="ghost" block danger>
+              <Button type="ghost" onClick={leave} block danger>
                 {transI18n("fcr_room_button_leave")}
               </Button>
             </div>
