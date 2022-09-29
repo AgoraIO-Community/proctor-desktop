@@ -4,6 +4,7 @@ import {
   AGServiceErrorCode,
   CheckInData,
   ClassroomState,
+  DEVICE_DISABLE,
   EduClassroomConfig,
   EduClassroomStore,
   EduErrorCenter,
@@ -14,6 +15,7 @@ import {
 } from "agora-edu-core";
 import {
   AGError,
+  AgoraRteAudioSourceType,
   AgoraRteConnectionState,
   AgoraRteEventType,
   AgoraRteMediaPublishState,
@@ -22,6 +24,7 @@ import {
   AgoraRteScene,
   AgoraRteSceneJoinRTCOptions,
   AgoraRteThread,
+  AgoraRteVideoSourceType,
   AgoraStream,
   AGRtcConnectionType,
   bound,
@@ -160,6 +163,70 @@ class StreamController {
     shareStreamTokens: new Map(),
     screenShareStreamUuid: "",
   };
+  /**
+   * 本地视频 stream id
+   **/
+  /** @en
+   * loal camera stream uuid
+   */
+  @computed get localCameraStreamUuid(): string | undefined {
+    let {
+      sessionInfo: { userUuid },
+    } = EduClassroomConfig.shared;
+    let streamUuids = this.streamByUserUuid.get(userUuid) || new Set();
+    for (const streamUuid of streamUuids) {
+      let stream = this.streamByStreamUuid.get(streamUuid);
+      if (stream && stream.videoSourceType === AgoraRteVideoSourceType.Camera) {
+        return stream.streamUuid;
+      }
+    }
+    return undefined;
+  }
+  /**
+   * 获取视频设备信息
+   **/
+  /** @en
+   * get camera accessors
+   */
+  @computed get cameraAccessors() {
+    return {
+      classroomState: this._roomScene.roomState.state,
+      cameraDeviceId: this._classroomStore.mediaStore.cameraDeviceId,
+      localCameraStreamUuid: this.localCameraStreamUuid,
+    };
+  }
+  /**
+   * 本地音频 stream id
+   **/
+  /** @en
+   * local mic stream id
+   */
+  @computed get localMicStreamUuid(): string | undefined {
+    let {
+      sessionInfo: { userUuid },
+    } = EduClassroomConfig.shared;
+    let streamUuids = this.streamByUserUuid.get(userUuid) || new Set();
+    for (const streamUuid of streamUuids) {
+      let stream = this.streamByStreamUuid.get(streamUuid);
+      if (stream && stream.audioSourceType === AgoraRteAudioSourceType.Mic) {
+        return stream.streamUuid;
+      }
+    }
+    return undefined;
+  }
+  /**
+   * 音频设备信息
+   **/
+  /** @en
+   * mic Accessors
+   */
+  @computed get micAccessors() {
+    return {
+      classroomState: this._roomScene.roomState.state,
+      recordingDeviceId: this._classroomStore.mediaStore.recordingDeviceId,
+      localMicStreamUuid: this.localMicStreamUuid,
+    };
+  }
   @computed
   get screenShareStateAccessor() {
     return {
@@ -199,6 +266,25 @@ class StreamController {
         err
       );
   }
+  private _enableLocalAudio = (value: boolean) => {
+    const track =
+      this._classroomStore.mediaStore.mediaControl.createMicrophoneAudioTrack();
+    if (value) {
+      track.start();
+    } else {
+      track.stop();
+    }
+  };
+  private _enableLocalVideo = (value: boolean) => {
+    const track =
+      this._classroomStore.mediaStore.mediaControl.createCameraVideoTrack();
+    if (value) {
+      track.start();
+    } else {
+      track.stop();
+    }
+    return;
+  };
   constructor(
     private _scene: AgoraRteScene,
     private _classroomStore: EduClassroomStore,
@@ -227,7 +313,41 @@ class StreamController {
       AgoraRteEventType.RoomPropertyUpdated,
       this._handleRoomPropertiesChange
     );
+    reaction(
+      () => this.micAccessors,
+      () => {
+        const { recordingDeviceId, mediaControl } =
+          this._classroomStore.mediaStore;
+        if (this._roomScene.roomState.state === ClassroomState.Idle) {
+          // if idle, e.g. pretest
+          if (recordingDeviceId && recordingDeviceId !== DEVICE_DISABLE) {
+            const track = mediaControl.createMicrophoneAudioTrack();
+            track.setRecordingDevice(recordingDeviceId);
+            this._enableLocalAudio(true);
+          } else {
+            //if no device selected, disable device
+            this._enableLocalAudio(false);
+          }
+        } else if (
+          this._roomScene.roomState.state === ClassroomState.Connected
+        ) {
+          // once connected, should follow stream
+          if (!this.localMicStreamUuid) {
+            // if no local stream
+            this._enableLocalAudio(false);
+          } else {
+            if (recordingDeviceId && recordingDeviceId !== DEVICE_DISABLE) {
+              const track = mediaControl.createMicrophoneAudioTrack();
+              track.setRecordingDevice(recordingDeviceId);
 
+              this._enableLocalAudio(true);
+            } else {
+              this._enableLocalAudio(false);
+            }
+          }
+        }
+      }
+    );
     reaction(
       () => this.screenShareStateAccessor,
       (value) => {
@@ -284,6 +404,41 @@ class StreamController {
           runInAction(() => {
             this.dataStore.shareStreamTokens.clear();
           });
+        }
+      }
+    );
+    reaction(
+      () => this.cameraAccessors,
+      () => {
+        const { cameraDeviceId, mediaControl } =
+          this._classroomStore.mediaStore;
+        if (this._roomScene.roomState.state === ClassroomState.Idle) {
+          // if idle, e.g. pretest
+          if (cameraDeviceId && cameraDeviceId !== DEVICE_DISABLE) {
+            const track = mediaControl.createCameraVideoTrack();
+            track.setDeviceId(cameraDeviceId);
+            this._enableLocalVideo(true);
+          } else {
+            //if no device selected, disable device
+            this._enableLocalVideo(false);
+          }
+        } else if (
+          this._roomScene.roomState.state === ClassroomState.Connected
+        ) {
+          // once connected, should follow stream
+          if (!this.localCameraStreamUuid) {
+            // if no local stream
+            this._enableLocalVideo(false);
+          } else {
+            if (cameraDeviceId && cameraDeviceId !== DEVICE_DISABLE) {
+              const track = mediaControl.createCameraVideoTrack();
+              track.setDeviceId(cameraDeviceId);
+
+              this._enableLocalVideo(true);
+            } else {
+              this._enableLocalVideo(false);
+            }
+          }
         }
       }
     );

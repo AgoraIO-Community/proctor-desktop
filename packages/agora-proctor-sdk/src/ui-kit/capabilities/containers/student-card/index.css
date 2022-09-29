@@ -78,6 +78,7 @@
 
 .fcr-student-card-videos-compact .fcr-student-card-videos-screen {
   grid-column: span 2;
+  overflow: hidden;
 }
 
 /* 4宫格 */
@@ -97,6 +98,7 @@
   justify-content: center;
   align-items: center;
   background: #f8faff;
+  overflow: hidden;
 }
 .fcr-student-card-user-name {
   padding-left: 10px;

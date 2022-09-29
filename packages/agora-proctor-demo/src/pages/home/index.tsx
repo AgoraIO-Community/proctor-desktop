@@ -1,5 +1,5 @@
 import { EduRegion } from "agora-edu-core";
-import { EnumDeviceType, LanguageEnum } from "agora-proctor-sdk";
+import { LanguageEnum } from "agora-proctor-sdk";
 import React, { useEffect, useImperativeHandle, useRef, useState } from "react";
 import { useHistory } from "react-router";
 import { HomeLaunchOption } from "src/stores/home";
@@ -9,7 +9,7 @@ import { getBrowserLanguage } from "../../utils";
 import { useHomeStore } from "../../utils/hooks";
 import { HomeApi } from "./home-api";
 import "./style.css";
-
+import md5 from "js-md5";
 // addResource();
 
 const REACT_APP_AGORA_APP_SDK_DOMAIN =
@@ -63,8 +63,10 @@ export const HomePage = () => {
 
     let { userRole, roomType, userName, roomName } = roomInfo;
     const userUuid =
-      userRole == "1" ? userName + userRole : userName + userRole + "-main";
-    const roomUuid = roomName + roomType;
+      userRole == "1"
+        ? md5(userName) + userRole
+        : md5(userName) + userRole + "-main";
+    const roomUuid = md5(roomName) + roomType;
     try {
       const domain = `${REACT_APP_AGORA_APP_SDK_DOMAIN}`;
       HomeApi.shared.setDomainRegion(region);
@@ -95,7 +97,14 @@ export const HomePage = () => {
         region: region as EduRegion,
         duration: +30 * 60,
         latencyLevel: 2,
-        deviceType: EnumDeviceType.Main,
+        mediaOptions: {
+          web: {
+            codec: "h264",
+            mode: "rtc",
+          },
+        },
+        examinationUrl:
+          "https://forms.clickup.com/8556478/f/853xy-21947/IM8JKH1HOOF3LDJDEB",
       };
 
       config.appId = REACT_APP_AGORA_APP_ID || config.appId;

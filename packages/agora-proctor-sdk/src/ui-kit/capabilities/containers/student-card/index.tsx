@@ -93,13 +93,8 @@ export const StudentVideos = observer(
     showFullscreen?: boolean;
   }) => {
     const {
-      roomUIStore: {
-        joinClassroom,
-        roomSceneByRoomUuid,
-        leaveClassroom,
-        groupUuidByGroupName,
-      },
-      usersUIStore: { generateDeviceUuid },
+      roomUIStore: { joinClassroom, roomSceneByRoomUuid, leaveClassroom },
+      usersUIStore: { generateDeviceUuid, generateGroupUuid },
     } = useStore();
     const mainDeviceUserUuid = useMemo(
       () => generateDeviceUuid(userUuidPrefix, DeviceTypeEnum.Main),
@@ -109,18 +104,14 @@ export const StudentVideos = observer(
       () => generateDeviceUuid(userUuidPrefix, DeviceTypeEnum.Sub),
       []
     );
-    const roomUuid = groupUuidByGroupName(userUuidPrefix)!;
+    const roomUuid = generateGroupUuid(userUuidPrefix)!;
     const [joinSuccess, setJoinSuccess] = useState(false);
     const scene = roomSceneByRoomUuid(roomUuid);
 
     const join = async () => {
       const roomScene = await joinClassroom(
         roomUuid,
-        EduRoomTypeEnum.RoomGroup,
-        {
-          audioState: 0,
-          videoState: 0,
-        }
+        EduRoomTypeEnum.RoomGroup
       );
       if (roomScene?.scene) {
         await roomScene.scene.joinRTC();
@@ -216,6 +207,8 @@ export const StudentHLSVideos = observer(
   ({
     layout,
     mainDeviceScreenVideo,
+    mainDeviceCameraVideo,
+    subDeviceCameraVideo,
   }: {
     layout: VideosWallLayoutEnum;
     mainDeviceScreenVideo?: string;
@@ -223,6 +216,8 @@ export const StudentHLSVideos = observer(
     subDeviceCameraVideo?: string;
   }) => {
     const screenContainerRef = useRef(null);
+    const mainCameraContainerRef = useRef(null);
+    const subCameraContainerRef = useRef(null);
     const {
       classroomStore: {
         mediaStore: { setupMediaStream },
@@ -238,6 +233,26 @@ export const StudentHLSVideos = observer(
           true
         );
     }, [mainDeviceScreenVideo]);
+    useEffect(() => {
+      mainDeviceCameraVideo &&
+        setupMediaStream(
+          mainDeviceCameraVideo,
+          mainCameraContainerRef.current!,
+          false,
+          true,
+          true
+        );
+    }, [mainDeviceCameraVideo]);
+    useEffect(() => {
+      subDeviceCameraVideo &&
+        setupMediaStream(
+          subDeviceCameraVideo,
+          subCameraContainerRef.current!,
+          false,
+          true,
+          true
+        );
+    }, [subDeviceCameraVideo]);
     return (
       <div
         className={`fcr-student-card-videos ${
@@ -250,8 +265,14 @@ export const StudentHLSVideos = observer(
           ref={screenContainerRef}
           className="fcr-student-card-videos-screen"
         ></div>
-        <div className="fcr-student-card-videos-camera"></div>
-        <div className="fcr-student-card-videos-mobile"></div>
+        <div
+          ref={mainCameraContainerRef}
+          className="fcr-student-card-videos-camera"
+        ></div>
+        <div
+          ref={subCameraContainerRef}
+          className="fcr-student-card-videos-mobile"
+        ></div>
       </div>
     );
   }

@@ -19,23 +19,27 @@ import { useEffect, useState, useCallback, useMemo } from "react";
 
 import { EduClassroomConfig } from "agora-edu-core";
 import { DeviceTypeEnum } from "@/infra/api";
+import { AgoraRteVideoSourceType } from "agora-rte-sdk";
 export const StudentDetail = observer(
   ({ userUuidPrefix }: { userUuidPrefix: string }) => {
     const {
+      roomUIStore: { roomSceneByRoomUuid },
       usersUIStore: {
         queryUserEvents,
         updateUserTags,
         generateDeviceUuid,
         queryRecordList,
+        generateGroupUuid,
       },
-      roomUIStore: { groupUuidByGroupName },
     } = useStore();
     const mainDeviceUserUuid = useMemo(() => {
       return generateDeviceUuid(userUuidPrefix, DeviceTypeEnum.Main);
     }, []);
     const roomUuid = useMemo(() => {
-      return groupUuidByGroupName(userUuidPrefix);
+      return generateGroupUuid(userUuidPrefix);
     }, []);
+    const roomScene = roomSceneByRoomUuid(roomUuid);
+
     const [userEvents, setUserEvents] = useState<
       UserEvents<{
         tags: {
@@ -44,7 +48,15 @@ export const StudentDetail = observer(
       }>[]
     >([]);
     const [abnormal, setAbnormal] = useState(undefined);
-    const [recordList, setRecordList] = useState([]);
+    const [recordList, setRecordList] = useState<
+      {
+        recordDetails: {
+          streamUuid: string;
+          type: "audio" | "video";
+          url: string;
+        }[];
+      }[]
+    >([]);
 
     const queryUserAbnormal = async () => {
       const res = await queryUserEvents(
@@ -76,11 +88,35 @@ export const StudentDetail = observer(
       );
       queryUserAbnormal();
     }, [abnormal]);
+    const mainDeviceScreenVideo = recordList[0]?.recordDetails.find((i) => {
+      return (
+        i.type === "video" &&
+        roomScene?.streamController?.streamByStreamUuid.get(i.streamUuid)
+          ?.videoSourceType === AgoraRteVideoSourceType.ScreenShare
+      );
+    })?.url;
+    const mainDeviceCameraVideo = recordList[0]?.recordDetails.find((i) => {
+      return (
+        i.type === "video" &&
+        roomScene?.streamController?.streamByStreamUuid.get(i.streamUuid)
+          ?.videoSourceType === AgoraRteVideoSourceType.Camera
+      );
+    })?.url;
+    const subDeviceCameraVideo = recordList[0]?.recordDetails.find((i) => {
+      return (
+        i.type === "video" &&
+        roomScene?.streamController?.streamByStreamUuid.get(i.streamUuid)
+          ?.videoSourceType === AgoraRteVideoSourceType.Camera
+      );
+    })?.url;
+
     return (
       <div className="fcr-student-detail-tab">
         <div className="fcr-student-detail-tab-replay">
           <StudentHLSVideos
-            mainDeviceScreenVideo={recordList[0]?.recordDetails?.[0].url}
+            mainDeviceScreenVideo={mainDeviceScreenVideo}
+            mainDeviceCameraVideo={mainDeviceCameraVideo}
+            subDeviceCameraVideo={subDeviceCameraVideo}
             layout={VideosWallLayoutEnum.Compact}
           />
           <div className="fcr-student-detail-tab-replay-bottom">
