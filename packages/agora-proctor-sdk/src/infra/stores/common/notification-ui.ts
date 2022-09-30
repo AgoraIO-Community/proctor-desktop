@@ -1,7 +1,5 @@
-import { action, computed, IReactionDisposer, Lambda, reaction } from "mobx";
-import dayjs from "dayjs";
-import { bound, Scheduler } from "agora-rte-sdk";
-import { EduUIStoreBase } from "./base";
+import { getEduErrorMessage } from "@/infra/utils/error";
+import { ToastFilter } from "@/infra/utils/toast-filter";
 import {
   AgoraEduClassroomEvent,
   ClassroomState,
@@ -12,10 +10,12 @@ import {
   EduRoleTypeEnum,
   LeaveReason,
 } from "agora-edu-core";
-import { ToastFilter } from "@/infra/utils/toast-filter";
-import { getEduErrorMessage } from "@/infra/utils/error";
+import { bound, Scheduler } from "agora-rte-sdk";
+import dayjs from "dayjs";
 import { Duration } from "dayjs/plugin/duration";
+import { action, computed, IReactionDisposer, Lambda, reaction } from "mobx";
 import { transI18n } from "~ui-kit";
+import { EduUIStoreBase } from "./base";
 
 export class NotificationUIStore extends EduUIStoreBase {
   private _notificationTask?: Scheduler.Task;
@@ -80,7 +80,6 @@ export class NotificationUIStore extends EduUIStoreBase {
               Scheduler.Duration.second(1)
             );
           } else if (ClassState.close === state) {
-            debugger;
             this.classroomStore.connectionStore.leaveClassroomUntil(
               LeaveReason.leave,
               Promise.resolve()

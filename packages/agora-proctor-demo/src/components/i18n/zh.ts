@@ -174,4 +174,5 @@ export default {
     "提前上课将立即播放课程录像，是否确认？",
   "header-left-title": "声网灵动课堂",
   fcr_loading: "加载中",
+  fcr_should_share_your_screen: "请分享你的屏幕",
 };

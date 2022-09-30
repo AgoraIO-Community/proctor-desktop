@@ -10,7 +10,7 @@ import {
   EduRoleTypeEnum,
   EduRoomTypeEnum,
   EduSessionInfo,
-  GroupDetail,
+  LeaveReason,
 } from "agora-edu-core";
 import {
   AgoraRteMediaPublishState,
@@ -20,6 +20,7 @@ import {
   Logger,
   retryAttempt,
 } from "agora-rte-sdk";
+import { Modal } from "antd";
 import to from "await-to-js";
 import dayjs from "dayjs";
 import md5 from "js-md5";
@@ -32,6 +33,7 @@ import {
   runInAction,
 } from "mobx";
 import { computedFn } from "mobx-utils";
+import { transI18n } from "~ui-kit";
 import { EduUIStoreBase } from "../base";
 import { SceneSubscription, SubscriptionFactory } from "../subscription/room";
 import { RoomScene } from "./struct";
@@ -306,6 +308,11 @@ export class RoomUIStore extends EduUIStoreBase {
     const classDuration = dayjs.duration(time, "ms");
     return classDuration.format("mm:ss");
   };
+
+  @computed
+  get formatStartTime() {
+    return dayjs(this.classroomSchedule.startTime).format("HH:mm");
+  }
   /**
    * 教室状态文字
    * @returns
@@ -319,13 +326,22 @@ export class RoomUIStore extends EduUIStoreBase {
     }
     switch (this.classState) {
       case ClassState.beforeClass:
-        return `-- : --`;
+        return this.formatStartTime;
       case ClassState.ongoing:
         return `${this.formatCountDown(duration)}`;
       case ClassState.afterClass:
         return `00 : 00`;
       default:
         return `-- : --`;
+    }
+  }
+
+  @computed
+  get statusTextTip() {
+    if (this.classState === ClassState.beforeClass) {
+      return transI18n("fcr_room_label_start_time");
+    } else {
+      return transI18n("fcr_room_label_time_remaining");
     }
   }
   /** Hooks */
@@ -338,6 +354,34 @@ export class RoomUIStore extends EduUIStoreBase {
           }
         }
       )
+    );
+
+    this._disposers.push(
+      computed(
+        () => this.classroomStore.mediaStore.localScreenShareTrackState
+      ).observe(({ newValue, oldValue }) => {
+        const { roomUuid, role } = EduClassroomConfig.shared.sessionInfo;
+        if (
+          (newValue === AgoraRteMediaSourceState.stopped ||
+            newValue === AgoraRteMediaSourceState.error) &&
+          role === EduRoleTypeEnum.student
+        ) {
+          setTimeout(() => {
+            this.leaveClassroom(roomUuid)
+              .then(() => {
+                this.classroomStore.connectionStore.leaveClassroom(
+                  LeaveReason.leave
+                );
+              })
+              .catch((e) => {
+                this.shareUIStore.addToast("leave classroom error", e);
+              });
+          }, 1000 * 2);
+          Modal.info({
+            content: transI18n("fcr_should_share_your_screen"),
+          });
+        }
+      })
     );
 
     EduEventCenter.shared.onClassroomEvents(this._handleClassroomEvent);

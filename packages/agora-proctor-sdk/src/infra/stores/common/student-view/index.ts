@@ -23,6 +23,9 @@ export class StudentViewUIStore extends EduUIStoreBase {
   @observable
   widgetBlur = false;
 
+  @observable
+  counterOpening = false;
+
   @computed
   get userAvatar() {
     return typeof this.classroomStore.userStore.localUserProperties ===
@@ -42,11 +45,6 @@ export class StudentViewUIStore extends EduUIStoreBase {
   @computed
   get classRoomState() {
     return this.classroomStore.roomStore.classroomSchedule.state;
-  }
-
-  @computed
-  get ClassOpening() {
-    return this.classRoomState === ClassState.ongoing;
   }
 
   get beforeClass() {
@@ -72,14 +70,6 @@ export class StudentViewUIStore extends EduUIStoreBase {
   async leaveMainClassroom() {
     await this.classroomStore.connectionStore.leaveClassroom(LeaveReason.leave);
   }
-
-  openWebview = () => {
-    this.extensionApi.openWebview({
-      resourceUuid: "openwebview",
-      url: "https://www.agora.io",
-      title: "baidu",
-    });
-  };
   onInstall() {
     this._disposers.push(
       reaction(
@@ -88,6 +78,10 @@ export class StudentViewUIStore extends EduUIStoreBase {
           if (state === ClassState.beforeClass) {
             runInAction(() => {
               this.widgetBlur = true;
+            });
+          } else {
+            runInAction(() => {
+              this.widgetBlur = false;
             });
           }
         }
@@ -100,6 +94,30 @@ export class StudentViewUIStore extends EduUIStoreBase {
           this.shareUIStore.addToast(newValue.message, "error");
         }
       })
+    );
+
+    // class is end
+    this._disposers.push(
+      reaction(
+        () => this.classroomStore.roomStore.classroomSchedule.state,
+        (state) => {
+          if (ClassState.beforeClass === state) {
+            runInAction(() => {
+              this.widgetBlur = true;
+            });
+          } else {
+            runInAction(() => {
+              this.widgetBlur = false;
+            });
+          }
+
+          if (ClassState.close === state) {
+            runInAction(() => {
+              this.roomClose = true;
+            });
+          }
+        }
+      )
     );
   }
 
