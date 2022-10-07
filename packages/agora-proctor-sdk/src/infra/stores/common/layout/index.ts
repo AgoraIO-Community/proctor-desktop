@@ -79,11 +79,12 @@ export class LayoutUIStore extends EduUIStoreBase {
   };
   @action.bound
   addStudentTab = (userUuidPrefix: string, userName: string) => {
-    if (this.studentTabItemsMap.has(userUuidPrefix)) return;
-    this.studentTabItemsMap.set(userUuidPrefix, {
-      label: userName,
-      key: userUuidPrefix,
-    });
+    if (!this.studentTabItemsMap.has(userUuidPrefix)) {
+      this.studentTabItemsMap.set(userUuidPrefix, {
+        label: userName,
+        key: userUuidPrefix,
+      });
+    }
     this.setCurrentTab(userUuidPrefix);
   };
   @action.bound

@@ -90,7 +90,7 @@ export class UsersUIStore extends EduUIStoreBase {
   @computed get currentUserCount() {
     return (
       this.currentPageIndex * this.videosWallLayout +
-      this.studentListByPage.length
+      (this.studentListByPage[this.currentPageIndex]?.length || 0)
     );
   }
 

@@ -22,6 +22,7 @@ import {
 import dayjs from "dayjs";
 import { SvgIconEnum, SvgImg } from "~ui-kit";
 import { DeviceTypeEnum } from "@/infra/api";
+import { MediaController } from "./media-control";
 export const StudentCard = observer(
   ({
     userUuidPrefix,
@@ -227,73 +228,40 @@ export const StudentHLSVideos = observer(
     const screenContainerRef = useRef<HTMLDivElement>(null);
     const mainCameraContainerRef = useRef<HTMLDivElement>(null);
     const subCameraContainerRef = useRef<HTMLDivElement>(null);
-    const playerControlRef = useRef<{
-      screen?: StreamMediaPlayer;
-      mainCamera?: StreamMediaPlayer;
-      subCamera?: StreamMediaPlayer;
-    }>({});
-    const [totalDuration, setTotalDuration] = useState(0);
-    const [currentTime, setCurrentTime] = useState(0);
+    const mediaControllerRef = useRef<MediaController>(new MediaController());
+
     useEffect(() => {
-      if (mainDeviceScreenVideo && !playerControlRef.current.screen) {
-        playerControlRef.current.screen = new StreamMediaPlayer(
+      if (screenContainerRef.current && mainDeviceScreenVideo) {
+        mediaControllerRef.current.setMainDeviceScreenVideoUrl(
           mainDeviceScreenVideo
         );
-        playerControlRef.current.screen.on(
-          MediaPlayerEvents.LevelLoaded,
-          (totalDuration: number) => {
-            setTotalDuration(totalDuration);
-          }
-        );
-        playerControlRef.current.screen.setView(
-          screenContainerRef.current as HTMLDivElement
-        );
-
-        playerControlRef.current.screen.play(true, true);
-        playerControlRef.current.screen.mediaElement?.addEventListener(
-          "timeupdate",
-          (e) => {
-            playerControlRef.current.screen?.mediaElement &&
-              setCurrentTime(
-                playerControlRef.current.screen.mediaElement.currentTime
-              );
-          }
+        mediaControllerRef.current.setMainDeviceScreenView(
+          screenContainerRef.current
         );
       }
     }, [mainDeviceScreenVideo]);
     useEffect(() => {
-      if (mainDeviceCameraVideo) {
-        playerControlRef.current.mainCamera = new StreamMediaPlayer(
+      if (mainCameraContainerRef.current && mainDeviceCameraVideo) {
+        mediaControllerRef.current.setMainDeviceCameraVideoUrl(
           mainDeviceCameraVideo
         );
-        playerControlRef.current.mainCamera.setView(
-          mainCameraContainerRef.current as HTMLDivElement
+        mediaControllerRef.current.setMainDeviceCameraView(
+          mainCameraContainerRef.current
         );
-        playerControlRef.current.mainCamera.play(true, true);
       }
     }, [mainDeviceCameraVideo]);
     useEffect(() => {
-      if (subDeviceCameraVideo) {
-        playerControlRef.current.subCamera = new StreamMediaPlayer(
+      if (subCameraContainerRef.current && subDeviceCameraVideo) {
+        mediaControllerRef.current.setSubDeviceCameraVideoUrl(
           subDeviceCameraVideo
         );
-        playerControlRef.current.subCamera.setView(
-          mainCameraContainerRef.current as HTMLDivElement
+        mediaControllerRef.current.setSubDeviceCameraView(
+          subCameraContainerRef.current
         );
-        playerControlRef.current.subCamera.play(true, true);
       }
     }, [subDeviceCameraVideo]);
     const onSliderChange = (val: number) => {
-      if (playerControlRef.current.screen?.mediaElement) {
-        playerControlRef.current.screen.mediaElement.currentTime = val;
-        setCurrentTime(val);
-      }
-      if (playerControlRef.current.mainCamera?.mediaElement) {
-        playerControlRef.current.mainCamera.mediaElement.currentTime = val;
-      }
-      if (playerControlRef.current.subCamera?.mediaElement) {
-        playerControlRef.current.subCamera.mediaElement.currentTime = val;
-      }
+      mediaControllerRef.current.syncPlyrCurrentTime(val);
     };
     return (
       <div
@@ -311,13 +279,15 @@ export const StudentHLSVideos = observer(
               },
             }}
             onChange={onSliderChange}
-            value={currentTime}
+            value={mediaControllerRef.current.currentTime || 0}
             min={0}
-            max={totalDuration}
+            max={mediaControllerRef.current.totalDuration || 0}
             marks={{
-              0: dayjs.duration(currentTime, "s").format("mm:ss"),
-              [totalDuration]: dayjs
-                .duration(totalDuration, "s")
+              0: dayjs
+                .duration(mediaControllerRef.current.currentTime || 0, "s")
+                .format("mm:ss"),
+              [mediaControllerRef.current.totalDuration || 0]: dayjs
+                .duration(mediaControllerRef.current.totalDuration || 0, "s")
                 .format("mm:ss"),
             }}
           ></Slider>

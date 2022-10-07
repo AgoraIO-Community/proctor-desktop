@@ -85,8 +85,9 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  border: 1px solid #dbdfec;
+  border: 1px solid #f3f3f3;
   position: relative;
+  cursor: pointer;
 }
 /* 6宫格 */
 .fcr-student-card-videos-compact {
@@ -134,4 +135,5 @@
   top: -6px;
   right: -10px;
   padding: 0 4px;
+  font-weight: 700;
 }

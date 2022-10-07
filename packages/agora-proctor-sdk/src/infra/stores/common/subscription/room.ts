@@ -182,7 +182,7 @@ export class MainRoomSubscription extends SceneSubscription {
           } else if (
             s.videoSourceType === AgoraRteVideoSourceType.ScreenShare
           ) {
-            scene.rtcChannel.muteLocalScreenStream(true, type);
+            // scene.rtcChannel.muteLocalScreenStream(true, type);
           }
           break;
         }
@@ -236,7 +236,7 @@ export class MainRoomSubscription extends SceneSubscription {
           } else if (
             s.videoSourceType === AgoraRteVideoSourceType.ScreenShare
           ) {
-            scene.rtcChannel.muteLocalScreenStream(true, type);
+            // scene.rtcChannel.muteLocalScreenStream(true, type);
           }
           break;
         }
@@ -276,8 +276,8 @@ export class MainRoomSubscription extends SceneSubscription {
         scene.rtcChannel.muteLocalVideoStream(true, type);
         this._mediaControl.createCameraVideoTrack().stop();
       } else if (s.videoSourceType === AgoraRteVideoSourceType.ScreenShare) {
-        scene.rtcChannel.muteLocalScreenStream(true, type);
-        this._mediaControl.createScreenShareTrack().stop();
+        // scene.rtcChannel.muteLocalScreenStream(true, type);
+        // this._mediaControl.createScreenShareTrack().stop();
       } else if (s.videoSourceType === AgoraRteVideoSourceType.None) {
         // no action needed
       }
