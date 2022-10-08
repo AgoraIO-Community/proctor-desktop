@@ -10,7 +10,7 @@ import { SvgIconEnum, SvgImg, transI18n } from "~ui-kit";
 import { AllVideos } from "../proctor-tabs/all-videos";
 import { StudentDetail } from "../proctor-tabs/student-detail";
 import { UserAbnormal, UserAvatar } from "../student-card";
-import { LeaveReason } from "agora-edu-core";
+import { ClassState, LeaveReason } from "agora-edu-core";
 import "./index.css";
 export const ProctorContent = observer(() => {
   const {
@@ -33,7 +33,11 @@ export const ProctorContent = observer(() => {
         onChange={(activeKey) => {
           setCurrentTab(activeKey);
         }}
-        className="fcr-proctor-content-tabs"
+        className={`fcr-proctor-content-tabs ${
+          studentTabItems.length === 0
+            ? "fcr-proctor-content-tabs-transparent"
+            : ""
+        }`}
         destroyInactiveTabPane
         hideAdd={true}
         type="editable-card"
@@ -144,9 +148,13 @@ export const ProctorContent = observer(() => {
 const LeaveBtnGroup = () => {
   const {
     classroomStore: {
+      roomStore: { updateClassState },
       connectionStore: { leaveClassroomUntil },
     },
   } = useStore();
+  const endExam = async () => {
+    updateClassState(ClassState.afterClass);
+  };
   const [showButtonPopover, setShowButtonPopover] = useState(false);
   const leave = () => {
     leaveClassroomUntil(LeaveReason.leave, Promise.resolve());
@@ -166,6 +174,7 @@ const LeaveBtnGroup = () => {
                 type="primary"
                 block
                 danger
+                onClick={endExam}
               >
                 {transI18n("fcr_room_button_exam_end")}
               </Button>

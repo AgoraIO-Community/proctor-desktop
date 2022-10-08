@@ -34,7 +34,6 @@ import {
   RtcState,
 } from "agora-rte-sdk";
 import to from "await-to-js";
-import { string } from "joi";
 import { get } from "lodash";
 import { action, computed, observable, reaction, runInAction } from "mobx";
 

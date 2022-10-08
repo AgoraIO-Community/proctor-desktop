@@ -1,6 +1,6 @@
-import { ProctorContainer } from "../containers/proctor-container";
-import { ProctorContent } from "../containers/proctor-content";
-import { ProctorSider } from "../containers/proctor-sider";
+import { ProctorContainer } from "../containers/proctor/proctor-container";
+import { ProctorContent } from "../containers/proctor/proctor-content";
+import { ProctorSider } from "../containers/proctor/proctor-sider";
 import Room from "./room";
 
 export const ProctorScenario = () => {

@@ -5,8 +5,8 @@ import { observer } from "mobx-react";
 import { useCallback } from "react";
 import styled, { css } from "styled-components";
 import { transI18n } from "~ui-kit";
-import { TrackArea } from "../root-box";
-import { WidgetContainer } from "../widget";
+import { TrackArea } from "../../common/root-box";
+import { WidgetContainer } from "../../common/widget";
 
 export const Content = observer(() => {
   const {
@@ -15,7 +15,7 @@ export const Content = observer(() => {
   return (
     <FlexContainer direction="column" gap={13} flex={1}>
       <ScenarioHeader>
-        <img src={require("./logo.png")} width={146} />
+        <img src={require("../../common/logo.png")} width={146} />
       </ScenarioHeader>
       <FlexContainer flex={1}>
         <InitialPanel>
@@ -42,7 +42,7 @@ const ContentProspect = observer(() => {
     <>
       {beforeClass && (
         <>
-          <img src={require("./waiting.png")} width={256} />
+          <img src={require("../../common/waiting.png")} width={256} />
           {transI18n("fcr_room_label_wait_teacher_start_exam")}
         </>
       )}

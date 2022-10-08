@@ -11,7 +11,7 @@ import { Slider } from "antd";
 import {
   RemoteTrackPlayer,
   RemoteTrackPlayerWithFullScreen,
-} from "../stream/track-player";
+} from "../../common/stream/track-player";
 import { observer } from "mobx-react";
 import { EduClassroomConfig, EduRoomTypeEnum } from "agora-edu-core";
 import {

@@ -7,14 +7,14 @@ import md5 from "js-md5";
 import { observer } from "mobx-react";
 import { useEffect } from "react";
 import { SvgIconEnum, SvgImg, transI18n } from "~ui-kit";
-import { LocalTrackPlayer } from "../stream/track-player";
+import { LocalTrackPlayer } from "../../common/stream/track-player";
 import "./index.css";
 export const ProctorSider = observer(() => {
   const {
     navigationBarUIStore: { startClass, classState },
     usersUIStore: { studentListByUserUuidPrefix, filterTag },
-    streamUIStore: { updateLocalPublishState, teacherCameraStream },
-    roomUIStore: { classStatusText },
+    streamUIStore: { updateLocalPublishState },
+    roomUIStore: { classStatusText, statusTextTip },
     classroomStore: {
       roomStore: { updateClassState },
       widgetStore: { setActive },
@@ -63,12 +63,14 @@ export const ProctorSider = observer(() => {
   return (
     <div className={"fcr_proctor_sider"}>
       <div>
-        <div className={"fcr_proctor_sider_logo"}>灵动课堂</div>
+        <div className={"fcr_proctor_sider_logo"}>
+          <img src={require("../../common/logo.png")} width={146} />
+        </div>
         <div className={"fcr_proctor_sider_info_wrap"}>
           <div className={"fcr_proctor_sider_info_room_number"}>
             <div className={"fcr_proctor_sider_info_title"}>RoomNumber</div>
             <div className={"fcr_proctor_sider_info_val"}>
-              {EduClassroomConfig.shared.sessionInfo.roomName}
+              {EduClassroomConfig.shared.sessionInfo.roomUuid}
             </div>
           </div>
         </div>
@@ -76,7 +78,7 @@ export const ProctorSider = observer(() => {
         <div className={"fcr_proctor_sider_info_room_remaining"}>
           <div>
             <div className={"fcr_proctor_sider_info_title"}>
-              {transI18n("fcr_room_label_time_remaining")}
+              {statusTextTip}
             </div>
             <div className={"fcr_proctor_sider_info_val"}>
               {classStatusText}
@@ -96,7 +98,7 @@ export const ProctorSider = observer(() => {
               onClick={startExam}
               size="large"
             >
-              Start Exam
+              {transI18n("fcr_room_button_exam_start")}
             </Button>
           ) : (
             <Button
@@ -106,7 +108,7 @@ export const ProctorSider = observer(() => {
               size="large"
               onClick={endExam}
             >
-              End Exam
+              {transI18n("fcr_room_button_exam_end")}
             </Button>
           )}
         </div>
@@ -144,8 +146,8 @@ export const ProctorSider = observer(() => {
         </div>
 
         <div className="fcr_proctor_sider_info_proctor-actions-btn">
-          {teacherCameraStream?.isCameraMuted &&
-          teacherCameraStream?.isMicMuted ? (
+          {localCameraTrackState === AgoraRteMediaSourceState.stopped &&
+          localMicTrackState === AgoraRteMediaSourceState.stopped ? (
             <Button
               className="fcr_proctor_sider_info_proctor-actions-speaker"
               type="primary"

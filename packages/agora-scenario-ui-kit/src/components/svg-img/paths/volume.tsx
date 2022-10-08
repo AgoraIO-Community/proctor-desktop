@@ -8,8 +8,8 @@ export const path = (props: PathOptions) => (
     <path
       d="M7.3335 10.3605V15.4056M12.1722 7.3335V16.6668M17.3335 10.3605V15.4056"
       stroke="white"
-      stroke-width="1.86667"
-      stroke-linecap="round"
+      strokeWidth="1.86667"
+      strokeLinecap="round"
     />
   </>
 );

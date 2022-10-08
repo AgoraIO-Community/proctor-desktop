@@ -1,6 +1,6 @@
 import { AgoraCard } from "@/ui-kit/components/card";
 import { SupervisorView } from "@/ui-kit/components/supervisor-view";
-import { LocalTrackPlayer } from "../stream/track-player";
+import { LocalTrackPlayer } from "../../common/stream/track-player";
 
 export const MainCameraView = () => {
   return (
