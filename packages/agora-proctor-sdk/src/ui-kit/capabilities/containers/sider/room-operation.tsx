@@ -8,11 +8,11 @@ import { transI18n } from "~ui-kit";
 
 const RoomTimer = observer(() => {
   const {
-    roomUIStore: { classStatusText },
+    roomUIStore: { classStatusText, statusTextTip },
   } = useStore();
   return (
     <div>
-      <TimerTip>{transI18n("fcr_room_label_start_time")}</TimerTip>
+      <TimerTip>{statusTextTip}</TimerTip>
       <Timer>{classStatusText}</Timer>
     </div>
   );

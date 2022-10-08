@@ -10,7 +10,7 @@ import { WidgetContainer } from "../widget";
 
 export const Content = observer(() => {
   const {
-    studentViewUIStore: { openWebview, widgetBlur },
+    studentViewUIStore: { widgetBlur },
   } = useStore();
   return (
     <FlexContainer direction="column" gap={13} flex={1}>
@@ -32,7 +32,7 @@ export const Content = observer(() => {
 
 const ContentProspect = observer(() => {
   const {
-    studentViewUIStore: { ClassOpening, beforeClass },
+    studentViewUIStore: { counterOpening, beforeClass },
   } = useStore();
 
   const handleFinished = useCallback(() => {
@@ -46,7 +46,7 @@ const ContentProspect = observer(() => {
           {transI18n("fcr_room_label_wait_teacher_start_exam")}
         </>
       )}
-      {ClassOpening && <Counter onFinished={handleFinished} />}
+      {counterOpening && <Counter onFinished={handleFinished} />}
     </>
   );
 });

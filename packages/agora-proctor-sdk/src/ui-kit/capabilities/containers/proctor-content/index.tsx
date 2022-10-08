@@ -169,7 +169,6 @@ const LeaveBtnGroup = () => {
               >
                 {transI18n("fcr_room_button_exam_end")}
               </Button>
-
               <Button type="ghost" onClick={leave} block danger>
                 {transI18n("fcr_room_button_leave")}
               </Button>
