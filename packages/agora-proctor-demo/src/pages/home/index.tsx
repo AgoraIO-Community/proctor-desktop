@@ -1,5 +1,6 @@
 import { EduRegion } from "agora-edu-core";
 import { LanguageEnum } from "agora-proctor-sdk";
+import md5 from "js-md5";
 import React, { useEffect, useImperativeHandle, useRef, useState } from "react";
 import { useHistory } from "react-router";
 import styled from "styled-components";
@@ -9,7 +10,6 @@ import { getBrowserLanguage } from "../../utils";
 import { useHomeStore } from "../../utils/hooks";
 import { HomeApi } from "./home-api";
 import "./style.css";
-import md5 from "js-md5";
 // addResource();
 
 const REACT_APP_AGORA_APP_SDK_DOMAIN =

@@ -3,6 +3,7 @@ import {
   StudentFilterTag,
   VideosWallLayoutEnum,
 } from "@/infra/stores/common/type";
+import { ClassState, LeaveReason } from "agora-edu-core";
 import { Button, Popover, Segmented, Tabs } from "antd";
 import { observer } from "mobx-react";
 import { useState } from "react";
@@ -10,7 +11,6 @@ import { SvgIconEnum, SvgImg, transI18n } from "~ui-kit";
 import { AllVideos } from "../proctor-tabs/all-videos";
 import { StudentDetail } from "../proctor-tabs/student-detail";
 import { UserAbnormal, UserAvatar } from "../student-card";
-import { ClassState, LeaveReason } from "agora-edu-core";
 import "./index.css";
 export const ProctorContent = observer(() => {
   const {

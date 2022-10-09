@@ -6,4 +6,5 @@ export enum PageRouter {
   Launch = "launch",
   PretestPage = "pretest",
   Window = "window",
+  Home = "home",
 }

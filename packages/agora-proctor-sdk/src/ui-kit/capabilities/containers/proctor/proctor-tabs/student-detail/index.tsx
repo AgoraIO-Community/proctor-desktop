@@ -5,10 +5,10 @@ import {
   VideosWallLayoutEnum,
 } from "@/infra/stores/common/type";
 import { Button, Select } from "antd";
-import { observer } from "mobx-react";
-import { useCallback, useEffect, useMemo, useState, useRef } from "react";
-import { SvgIconEnum, SvgImg, transI18n } from "~ui-kit";
 import dayjs from "dayjs";
+import { observer } from "mobx-react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { SvgIconEnum, SvgImg, transI18n } from "~ui-kit";
 import {
   StudentHLSVideos,
   StudentVideos,
@@ -19,8 +19,8 @@ import {
 import "./index.css";
 
 import { DeviceTypeEnum } from "@/infra/api";
-import { AgoraRteVideoSourceType } from "agora-rte-sdk";
 import { EduClassroomConfig } from "agora-edu-core";
+import { AgoraRteVideoSourceType } from "agora-rte-sdk";
 import "./index.css";
 export const StudentDetail = observer(
   ({ userUuidPrefix }: { userUuidPrefix: string }) => {
