@@ -103,7 +103,7 @@ echo "------set parameters-----"
 
 
 echo "-----build------"
-   lerna exec --scope=agora-proctor-demo --  npm run build
+  yarn ci:build:web
 echo "-----build finished------"
 echo "-----publish started------"
 aws s3 sync ./packages/agora-proctor-demo/build/. s3://agora-adc-artifacts/$PROCTORING_DEMO_PUBLISH_PATH/ --cache-control no-cache
