@@ -83,16 +83,6 @@ export class NotificationUIStore extends EduUIStoreBase {
             this.classroomStore.connectionStore.leaveClassroomUntil(
               LeaveReason.leave,
               Promise.resolve()
-              // new Promise((resolve) => {
-              //   this.shareUIStore.addConfirmDialog(
-              //     transI18n("toast.leave_room"),
-              //     transI18n("error.class_end"),
-              //     {
-              //       onOK: resolve,
-              //       actions: ["ok"],
-              //     }
-              //   );
-              // })
             );
           }
         }

@@ -9,7 +9,7 @@ import {
 } from "agora-edu-core";
 import { observer } from "mobx-react";
 import { useLayoutEffect, useState } from "react";
-import { PretestContainer } from "~containers/pretest";
+import { PretestContainer } from "@/ui-kit/capabilities/containers/common/pretest";
 import { ExamineeScenario } from "./examinee";
 import { ProctorScenario } from "./proctor";
 

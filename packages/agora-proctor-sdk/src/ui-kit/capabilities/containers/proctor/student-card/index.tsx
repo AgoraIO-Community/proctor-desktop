@@ -1,5 +1,12 @@
 import "./index.css";
-import { useEffect, useMemo, useState, useRef } from "react";
+import {
+  useEffect,
+  useMemo,
+  useState,
+  useRef,
+  forwardRef,
+  useImperativeHandle,
+} from "react";
 
 import {
   UserEvents as userEventsType,
@@ -11,17 +18,14 @@ import { Slider } from "antd";
 import {
   RemoteTrackPlayer,
   RemoteTrackPlayerWithFullScreen,
-} from "../stream/track-player";
+} from "../../common/stream/track-player";
 import { observer } from "mobx-react";
 import { EduClassroomConfig, EduRoomTypeEnum } from "agora-edu-core";
-import {
-  AgoraRteVideoSourceType,
-  MediaPlayerEvents,
-  StreamMediaPlayer,
-} from "agora-rte-sdk";
+import { AgoraRteVideoSourceType } from "agora-rte-sdk";
 import dayjs from "dayjs";
-import { SvgIconEnum, SvgImg } from "~ui-kit";
+import { SvgIconEnum, SvgImg, transI18n } from "~ui-kit";
 import { DeviceTypeEnum } from "@/infra/api";
+import { MediaController } from "./media-control";
 export const StudentCard = observer(
   ({
     userUuidPrefix,
@@ -213,130 +217,111 @@ export const StudentVideos = observer(
 );
 
 export const StudentHLSVideos = observer(
-  ({
-    layout,
-    mainDeviceScreenVideo,
-    mainDeviceCameraVideo,
-    subDeviceCameraVideo,
-  }: {
-    layout: VideosWallLayoutEnum;
-    mainDeviceScreenVideo?: string;
-    mainDeviceCameraVideo?: string;
-    subDeviceCameraVideo?: string;
-  }) => {
-    const screenContainerRef = useRef<HTMLDivElement>(null);
-    const mainCameraContainerRef = useRef<HTMLDivElement>(null);
-    const subCameraContainerRef = useRef<HTMLDivElement>(null);
-    const playerControlRef = useRef<{
-      screen?: StreamMediaPlayer;
-      mainCamera?: StreamMediaPlayer;
-      subCamera?: StreamMediaPlayer;
-    }>({});
-    const [totalDuration, setTotalDuration] = useState(0);
-    const [currentTime, setCurrentTime] = useState(0);
-    useEffect(() => {
-      if (mainDeviceScreenVideo && !playerControlRef.current.screen) {
-        playerControlRef.current.screen = new StreamMediaPlayer(
-          mainDeviceScreenVideo
-        );
-        playerControlRef.current.screen.on(
-          MediaPlayerEvents.LevelLoaded,
-          (totalDuration: number) => {
-            setTotalDuration(totalDuration);
-          }
-        );
-        playerControlRef.current.screen.setView(
-          screenContainerRef.current as HTMLDivElement
-        );
-
-        playerControlRef.current.screen.play(true, true);
-        playerControlRef.current.screen.mediaElement?.addEventListener(
-          "timeupdate",
-          (e) => {
-            playerControlRef.current.screen?.mediaElement &&
-              setCurrentTime(
-                playerControlRef.current.screen.mediaElement.currentTime
-              );
-          }
-        );
-      }
-    }, [mainDeviceScreenVideo]);
-    useEffect(() => {
-      if (mainDeviceCameraVideo) {
-        playerControlRef.current.mainCamera = new StreamMediaPlayer(
-          mainDeviceCameraVideo
-        );
-        playerControlRef.current.mainCamera.setView(
-          mainCameraContainerRef.current as HTMLDivElement
-        );
-        playerControlRef.current.mainCamera.play(true, true);
-      }
-    }, [mainDeviceCameraVideo]);
-    useEffect(() => {
-      if (subDeviceCameraVideo) {
-        playerControlRef.current.subCamera = new StreamMediaPlayer(
-          subDeviceCameraVideo
-        );
-        playerControlRef.current.subCamera.setView(
-          mainCameraContainerRef.current as HTMLDivElement
-        );
-        playerControlRef.current.subCamera.play(true, true);
-      }
-    }, [subDeviceCameraVideo]);
-    const onSliderChange = (val: number) => {
-      if (playerControlRef.current.screen?.mediaElement) {
-        playerControlRef.current.screen.mediaElement.currentTime = val;
-        setCurrentTime(val);
-      }
-      if (playerControlRef.current.mainCamera?.mediaElement) {
-        playerControlRef.current.mainCamera.mediaElement.currentTime = val;
-      }
-      if (playerControlRef.current.subCamera?.mediaElement) {
-        playerControlRef.current.subCamera.mediaElement.currentTime = val;
-      }
-    };
-    return (
-      <div
-        className={`fcr-student-card-videos ${
-          layout === VideosWallLayoutEnum.Compact
-            ? "fcr-student-card-videos-compact"
-            : "fcr-student-card-videos-loose"
-        }`}
-      >
-        <div className="fcr-student-card-videos-progress">
-          <Slider
-            tooltip={{
-              formatter: (val) => {
-                return dayjs.duration(val || 0, "s").format("mm:ss");
-              },
-            }}
-            onChange={onSliderChange}
-            value={currentTime}
-            min={0}
-            max={totalDuration}
-            marks={{
-              0: dayjs.duration(currentTime, "s").format("mm:ss"),
-              [totalDuration]: dayjs
-                .duration(totalDuration, "s")
-                .format("mm:ss"),
-            }}
-          ></Slider>
+  forwardRef<
+    { seek: (time: number) => void },
+    {
+      layout: VideosWallLayoutEnum;
+      mainDeviceScreenVideo?: string;
+      mainDeviceCameraVideo?: string;
+      subDeviceCameraVideo?: string;
+    }
+  >(
+    (
+      {
+        layout,
+        mainDeviceScreenVideo,
+        mainDeviceCameraVideo,
+        subDeviceCameraVideo,
+      },
+      ref
+    ) => {
+      const screenContainerRef = useRef<HTMLDivElement>(null);
+      const mainCameraContainerRef = useRef<HTMLDivElement>(null);
+      const subCameraContainerRef = useRef<HTMLDivElement>(null);
+      const mediaControllerRef = useRef<MediaController>(new MediaController());
+      useImperativeHandle(ref, () => ({
+        seek: (time: number) => {
+          mediaControllerRef.current.syncPlyrCurrentTime(time);
+        },
+      }));
+      useEffect(() => {
+        if (screenContainerRef.current && mainDeviceScreenVideo) {
+          mediaControllerRef.current.setMainDeviceScreenVideoUrl(
+            mainDeviceScreenVideo
+          );
+          mediaControllerRef.current.setMainDeviceScreenView(
+            screenContainerRef.current
+          );
+        }
+      }, [mainDeviceScreenVideo]);
+      useEffect(() => {
+        if (mainCameraContainerRef.current && mainDeviceCameraVideo) {
+          mediaControllerRef.current.setMainDeviceCameraVideoUrl(
+            mainDeviceCameraVideo
+          );
+          mediaControllerRef.current.setMainDeviceCameraView(
+            mainCameraContainerRef.current
+          );
+        }
+      }, [mainDeviceCameraVideo]);
+      useEffect(() => {
+        if (subCameraContainerRef.current && subDeviceCameraVideo) {
+          mediaControllerRef.current.setSubDeviceCameraVideoUrl(
+            subDeviceCameraVideo
+          );
+          mediaControllerRef.current.setSubDeviceCameraView(
+            subCameraContainerRef.current
+          );
+        }
+      }, [subDeviceCameraVideo]);
+      const onSliderChange = (val: number) => {
+        mediaControllerRef.current.syncPlyrCurrentTime(val);
+      };
+      return (
+        <div
+          className={`fcr-student-card-videos ${
+            layout === VideosWallLayoutEnum.Compact
+              ? "fcr-student-card-videos-compact"
+              : "fcr-student-card-videos-loose"
+          }`}
+        >
+          <div className="fcr-student-card-videos-progress">
+            <Slider
+              tooltip={{
+                formatter: (val) => {
+                  return dayjs.duration(val || 0, "s").format("mm:ss");
+                },
+              }}
+              onChange={onSliderChange}
+              value={mediaControllerRef.current.currentTime || 0}
+              min={0}
+              max={mediaControllerRef.current.totalDuration || 0}
+              marks={{
+                0: dayjs
+                  .duration(mediaControllerRef.current.currentTime || 0, "s")
+                  .format("mm:ss"),
+                [mediaControllerRef.current.totalDuration || 0]: dayjs
+                  .duration(mediaControllerRef.current.totalDuration || 0, "s")
+                  .format("mm:ss"),
+              }}
+            ></Slider>
+          </div>
+          <div
+            ref={screenContainerRef}
+            className="fcr-student-card-videos-screen"
+          ></div>
+          <div
+            ref={mainCameraContainerRef}
+            className="fcr-student-card-videos-camera"
+          ></div>
+          <div
+            ref={subCameraContainerRef}
+            className="fcr-student-card-videos-mobile"
+          ></div>
         </div>
-        <div
-          ref={screenContainerRef}
-          className="fcr-student-card-videos-screen"
-        ></div>
-        <div
-          ref={mainCameraContainerRef}
-          className="fcr-student-card-videos-camera"
-        ></div>
-        <div
-          ref={subCameraContainerRef}
-          className="fcr-student-card-videos-mobile"
-        ></div>
-      </div>
-    );
-  }
+      );
+    }
+  )
 );
 export const UserEvents = observer(
   ({
@@ -360,7 +345,8 @@ export const UserEvents = observer(
     const queryUserAbnormal = async () => {
       const res = await queryUserEvents(
         EduClassroomConfig.shared.sessionInfo.roomUuid,
-        mainDeviceUserUuid
+        mainDeviceUserUuid,
+        1600
       );
       setUserEvents(res.list);
     };
@@ -490,6 +476,7 @@ export const UserFocus = observer(
         className="fcr-student-card-actions-like"
         style={{ width: size, height: size }}
         onClick={focus}
+        title={transI18n("fcr_room_tab_focus")}
       >
         <SvgImg
           size={iconSize}

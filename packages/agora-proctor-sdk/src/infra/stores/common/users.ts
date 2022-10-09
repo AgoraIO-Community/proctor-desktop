@@ -90,7 +90,7 @@ export class UsersUIStore extends EduUIStoreBase {
   @computed get currentUserCount() {
     return (
       this.currentPageIndex * this.videosWallLayout +
-      this.studentListByPage.length
+      (this.studentListByPage[this.currentPageIndex]?.length || 0)
     );
   }
 
@@ -111,8 +111,8 @@ export class UsersUIStore extends EduUIStoreBase {
     return this.classroomStore.api.updateUserTags({ roomUuid, userUuid, tags });
   }
   @bound
-  async queryUserEvents(roomUuid: string, userUuid: string) {
-    return this.classroomStore.api.queryRoomEvents({ roomUuid, userUuid });
+  async queryUserEvents(roomUuid: string, userUuid: string, cmd?: number) {
+    return this.classroomStore.api.queryRoomEvents({ roomUuid, userUuid, cmd });
   }
   @bound
   async queryRecordList(roomUuid: string, nextId?: number) {

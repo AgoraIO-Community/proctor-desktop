@@ -35,6 +35,8 @@
   flex-direction: column;
   justify-content: space-between;
   z-index: 10;
+  background: #8a8a8a1a;
+  border-radius: 14px;
 }
 .fcr-all-videos-tab-controller-prev,
 .fcr-all-videos-tab-controller-next {
@@ -45,6 +47,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  cursor: pointer;
 }
 .fcr-all-videos-tab-controller-info {
   text-align: center;

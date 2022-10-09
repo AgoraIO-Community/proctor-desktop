@@ -70,6 +70,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 0 60px 0 15px;
+  cursor: pointer;
 }
 .fcr-student-detail-tab-replay-bottom-list-item:hover {
   background: rgba(52, 52, 52, 0.4);

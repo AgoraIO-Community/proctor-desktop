@@ -2,7 +2,7 @@ import { useStore } from "@/infra/hooks/ui-store";
 import { Space } from "antd";
 import { observer } from "mobx-react";
 import styled, { css } from "styled-components";
-import { RemoteTrackPlayer } from "../stream/track-player";
+import { RemoteTrackPlayer } from "../../common/stream/track-player";
 
 export const InteractiveVideo = observer(() => {
   const {

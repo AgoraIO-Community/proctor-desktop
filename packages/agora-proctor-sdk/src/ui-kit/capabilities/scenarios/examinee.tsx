@@ -10,9 +10,9 @@ import {
 import { observer } from "mobx-react";
 import { useCallback } from "react";
 import styled from "styled-components";
-import { Content } from "../containers/content";
-import { Sider } from "../containers/sider";
-import { ToastContainer } from "../containers/toast";
+import { Content } from "../containers/examinee/content";
+import { Sider } from "../containers/examinee/sider";
+import { ToastContainer } from "../containers/common/toast";
 import Room from "./room";
 
 export const ExamineeScenario = observer(() => {
