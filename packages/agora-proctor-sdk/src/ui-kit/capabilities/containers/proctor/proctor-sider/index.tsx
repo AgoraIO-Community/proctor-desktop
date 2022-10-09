@@ -154,7 +154,7 @@ export const ProctorSider = observer(() => {
               block
               onClick={startSpeak}
             >
-              {"Speaker"}
+              {transI18n("fcr_room_button_broadcast")}
             </Button>
           ) : (
             <div className="fcr_proctor_sider_info_proctor-actions-video-group">

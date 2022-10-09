@@ -6,8 +6,8 @@ import {
 } from "@/infra/stores/common/type";
 import { Button, Select } from "antd";
 import { observer } from "mobx-react";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { SvgIconEnum, SvgImg } from "~ui-kit";
+import { useCallback, useEffect, useMemo, useState, useRef } from "react";
+import { SvgIconEnum, SvgImg, transI18n } from "~ui-kit";
 import dayjs from "dayjs";
 import {
   StudentHLSVideos,
@@ -34,6 +34,9 @@ export const StudentDetail = observer(
         generateGroupUuid,
       },
     } = useStore();
+    const studentHlsVideosRef = useRef<{
+      seek: (time: number) => void;
+    }>(null);
     const mainDeviceUserUuid = useMemo(() => {
       return generateDeviceUuid(userUuidPrefix, DeviceTypeEnum.Main);
     }, []);
@@ -66,13 +69,14 @@ export const StudentDetail = observer(
     const queryUserAbnormal = async () => {
       const res = await queryUserEvents(
         EduClassroomConfig.shared.sessionInfo.roomUuid,
-        mainDeviceUserUuid
+        mainDeviceUserUuid,
+        1600
       );
-      setUserEvents(res.list);
+      setUserEvents(res.list.sort((a, b) => b.sequence - a.sequence));
     };
     const queryRecords = async () => {
       queryRecordList(roomUuid!).then((res) => {
-        setRecordList(res.list.sort((a, b) => a.ts - b.ts > 0));
+        setRecordList(res.list);
       });
     };
     useEffect(() => {
@@ -147,6 +151,7 @@ export const StudentDetail = observer(
       <div className="fcr-student-detail-tab">
         <div className="fcr-student-detail-tab-replay">
           <StudentHLSVideos
+            ref={studentHlsVideosRef}
             mainDeviceScreenVideo={mainDeviceScreenVideo?.url}
             mainDeviceCameraVideo={mainDeviceCameraVideo?.url}
             subDeviceCameraVideo={subDeviceCameraVideo?.url}
@@ -155,7 +160,9 @@ export const StudentDetail = observer(
           <div className="fcr-student-detail-tab-replay-bottom">
             <div className="fcr-student-detail-tab-replay-bottom-title">
               <Alarm></Alarm>
-              <span>Review and information alarm（{userEvents.length}）</span>
+              <span>
+                {transI18n("fcr_sub_room_label_replay")}（{userEvents.length}）
+              </span>
             </div>
             <div className="fcr-student-detail-tab-replay-bottom-list">
               {userEvents.map((e, index) => {
@@ -163,6 +170,13 @@ export const StudentDetail = observer(
                   <div
                     key={e.ts}
                     className="fcr-student-detail-tab-replay-bottom-list-item"
+                    onClick={() => {
+                      studentHlsVideosRef.current?.seek(
+                        dayjs
+                          .duration(Math.abs(e.ts - startTime), "ms")
+                          .get("s")
+                      );
+                    }}
                   >
                     <div>{Math.abs(index - userEvents.length)}</div>
                     <div>
@@ -172,7 +186,7 @@ export const StudentDetail = observer(
                       <div className="fcr-student-detail-tab-replay-bottom-list-item-info">
                         <div className="fcr-student-detail-tab-replay-bottom-list-item-type">
                           {dayjs
-                            .duration(Math.abs(startTime - e.ts), "ms")
+                            .duration(Math.abs(e.ts - startTime), "ms")
                             .format("mm:ss")}{" "}
                           {e.data?.abnormal?.reason}
                         </div>
@@ -198,11 +212,11 @@ export const StudentDetail = observer(
           />
           <div className="fcr-student-detail-tab-live-bottom">
             <div className="fcr-student-detail-tab-live-bottom-title">
-              Real Time Monitor
+              {transI18n("fcr_sub_room_label_monitor")}
             </div>
             <div className="fcr-student-detail-tab-live-bottom-suspicious">
               <div className="fcr-student-detail-tab-live-bottom-suspicious-title">
-                Report a suspicious behavior
+                {transI18n("fcr_sub_room_label_report_behavior")}
               </div>
               <div className="fcr-student-detail-tab-live-bottom-suspicious-btns">
                 <Select
@@ -215,7 +229,9 @@ export const StudentDetail = observer(
                     "fcr-student-detail-tab-live-bottom-suspicious-select"
                   }
                   size="large"
-                  placeholder={"select one reason..."}
+                  placeholder={transI18n(
+                    "fcr_sub_room_option_report_behavior_default"
+                  )}
                   suffixIcon={<SvgImg type={SvgIconEnum.DROPDOWN}></SvgImg>}
                 >
                   <Select.Option value={"test"}>test</Select.Option>
@@ -226,7 +242,7 @@ export const StudentDetail = observer(
                   type="primary"
                   className="fcr-student-detail-tab-live-bottom-suspicious-submit"
                 >
-                  Submit the suspicious behavior
+                  {transI18n("fcr_sub_room_button_report_behavior_submit")}
                 </Button>
               </div>
             </div>

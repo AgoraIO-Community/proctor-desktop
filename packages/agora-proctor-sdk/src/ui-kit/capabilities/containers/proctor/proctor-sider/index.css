@@ -21,6 +21,8 @@
   font-size: 16px;
   line-height: 19px;
   color: #000000;
+  overflow: hidden;
+  word-break: break-all;
 }
 .fcr_proctor_sider_info_wrap > div {
   margin-bottom: 30px;

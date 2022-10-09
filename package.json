@@ -86,7 +86,7 @@
     "pack:proctor:sdk": "lerna exec --scope=agora-proctor-sdk npm run pack:npm",
     "pack:electron:mac": "lerna exec --scope=agora-proctor-demo npm run pack:mac",
     "pack:electron:win": "lerna exec --scope=agora-proctor-demo npm run pack:win",
-    "build:demo": "lerna exec --scope=agora-proctor-sdk npm run build",
+    "build:demo": "lerna exec --scope=agora-proctor-demo npm run build",
     "ci:build:web": "yarn build:demo",
     "ci:build:electron:win": "yarn release:electron:win",
     "ci:build:electron:mac": "yarn release:electron:mac",

@@ -120,7 +120,9 @@
     "styled-components": "5.2.1",
     "react-color": "^2.19.3",
     "tinycolor2": "1.4.2",
-    "react-infinite-scroll-component": "^6.1.0"
+    "react-infinite-scroll-component": "^6.1.0",
+    "agora-edu-core": "2.7.2",
+    "agora-rte-sdk": "2.7.2"
   },
   "devDependencies": {
     "@types/styled-components": "5.1.26"
