@@ -1,8 +1,8 @@
 import { AgoraEduSDK } from '@/infra/api';
 import { useStore } from '@/infra/hooks/ui-store';
 import { ClassState, EduClassroomConfig } from 'agora-edu-core';
-import { AgoraRteMediaSourceState } from 'agora-rte-sdk';
-import { Button, Modal, Switch } from 'antd';
+import { AgoraRteMediaPublishState, AgoraRteMediaSourceState } from 'agora-rte-sdk';
+import { Button, Switch } from 'antd';
 import md5 from 'js-md5';
 import { observer } from 'mobx-react';
 import { useEffect, useState, useRef, useCallback } from 'react';
@@ -16,6 +16,7 @@ export const ProctorSider = observer(() => {
     streamUIStore: { updateLocalPublishState },
     roomUIStore: { classStatusText, statusTextTip },
     classroomStore: {
+      streamStore: { localCameraStreamUuid, localMicStreamUuid, streamByStreamUuid },
       roomStore: { updateClassState },
       widgetStore: { setActive },
       mediaStore: { localCameraTrackState, localMicTrackState, enableLocalVideo, enableLocalAudio },
@@ -83,16 +84,7 @@ export const ProctorSider = observer(() => {
           </div>
         </div>
         <div className="fcr_proctor_sider_info_btn">
-          {classState === ClassState.beforeClass ? (
-            <Button
-              className="fcr_proctor_sider_info_start"
-              type="primary"
-              block
-              onClick={startExam}
-              size="large">
-              {transI18n('fcr_room_button_exam_start')}
-            </Button>
-          ) : (
+          {classState === ClassState.ongoing ? (
             <Button
               className="fcr_proctor_sider_info_end"
               type="primary"
@@ -100,6 +92,15 @@ export const ProctorSider = observer(() => {
               size="large"
               onClick={endExam}>
               {transI18n('fcr_room_button_exam_end')}
+            </Button>
+          ) : (
+            <Button
+              className="fcr_proctor_sider_info_start"
+              type="primary"
+              block
+              onClick={startExam}
+              size="large">
+              {transI18n('fcr_room_button_exam_start')}
             </Button>
           )}
         </div>
@@ -131,8 +132,12 @@ export const ProctorSider = observer(() => {
         </div>
 
         <div className="fcr_proctor_sider_info_proctor-actions-btn">
-          {localCameraTrackState === AgoraRteMediaSourceState.stopped &&
-          localMicTrackState === AgoraRteMediaSourceState.stopped ? (
+          {(!localMicStreamUuid ||
+            streamByStreamUuid.get(localMicStreamUuid)?.audioState ===
+              AgoraRteMediaPublishState.Unpublished) &&
+          (!localCameraStreamUuid ||
+            streamByStreamUuid.get(localCameraStreamUuid)?.videoState ===
+              AgoraRteMediaPublishState.Unpublished) ? (
             <BroadCastButtonGroup
               cameraOpen={cameraOpen}
               onCameraOpenChange={setCameraOpen}

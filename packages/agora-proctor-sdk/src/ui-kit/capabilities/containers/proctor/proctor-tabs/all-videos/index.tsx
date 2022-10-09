@@ -1,13 +1,13 @@
-import { StudentCard } from "../../student-card";
-import { Carousel } from "antd";
-import "./index.css";
-import { useRef, useEffect, useState } from "react";
-import { debounce } from "lodash";
-import { CarouselRef } from "antd/lib/carousel";
-import { observer } from "mobx-react";
-import { useStore } from "@/infra/hooks/ui-store";
-import { VideosWallLayoutEnum } from "@/infra/stores/common/type";
-import { SvgIconEnum, SvgImg } from "~ui-kit";
+import { StudentCard } from '../../proctor-student-card';
+import { Carousel } from 'antd';
+import './index.css';
+import { useRef, useEffect, useState } from 'react';
+import { debounce } from 'lodash';
+import { CarouselRef } from 'antd/lib/carousel';
+import { observer } from 'mobx-react';
+import { useStore } from '@/infra/hooks/ui-store';
+import { VideosWallLayoutEnum } from '@/infra/stores/common/type';
+import { SvgIconEnum, SvgImg } from '~ui-kit';
 
 export const AllVideos = observer(() => {
   const {
@@ -72,8 +72,7 @@ export const AllVideos = observer(() => {
               verticalSwiping
               infinite={false}
               lazyLoad="ondemand"
-              afterChange={afterCarouselChange}
-            >
+              afterChange={afterCarouselChange}>
               {studentListByPage.reduce((prev, cur, index) => {
                 return prev.concat(
                   <div key={index}>
@@ -81,19 +80,17 @@ export const AllVideos = observer(() => {
                       className={`fcr-all-videos-tab-page-item fcr-all-videos-tab-page-item-${VideosWallLayoutEnum[
                         videosWallLayout
                       ].toLowerCase()}`}
-                      style={{ height: containerHeight }}
-                    >
+                      style={{ height: containerHeight }}>
                       {cur.map((userUuidPrefix) => {
                         return (
                           <StudentCard
                             key={userUuidPrefix}
                             renderVideos={index === currentPage}
-                            userUuidPrefix={userUuidPrefix}
-                          ></StudentCard>
+                            userUuidPrefix={userUuidPrefix}></StudentCard>
                         );
                       })}
                     </div>
-                  </div>
+                  </div>,
                 );
               }, [] as JSX.Element[])}
             </Carousel>
@@ -101,7 +98,7 @@ export const AllVideos = observer(() => {
         </>
       ) : (
         <div className="fcr-all-videos-empty">
-          <img src={require("../../../common/waiting.png")} width={256} />
+          <img src={require('../../../common/waiting.png')} width={256} />
         </div>
       )}
     </div>
