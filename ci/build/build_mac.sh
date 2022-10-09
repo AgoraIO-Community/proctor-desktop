@@ -79,3 +79,35 @@ echo build_time: $build_time
 echo release_version: $release_version
 echo short_version: $short_version
 echo pwd: `pwd`
+
+
+echo "-----install------"
+sh ./scripts/install-apaas-modules.sh
+echo "-----install finished------"
+
+
+echo "------set parameters-----"
+if [ "$Env" = "Prod" ] 
+then
+    REACT_APP_AGORA_APP_SDK_DOMAIN=http://api-solutions-dev.bj2.agoralab.co
+    REACT_APP_AGORA_APP_TOKEN_DOMAIN=http://api-solutions-dev.bj2.agoralab.co   
+    export PROCTORING_DEMO_PUBLISH_PATH=proctoring/test
+else 
+    REACT_APP_AGORA_APP_SDK_DOMAIN=http://api-solutions-dev.bj2.agoralab.co
+    REACT_APP_AGORA_APP_TOKEN_DOMAIN=http://api-solutions-dev.bj2.agoralab.co   
+    export PROCTORING_DEMO_PUBLISH_PATH=proctoring/test
+fi
+echo REACT_APP_AGORA_APP_SDK_DOMAIN:$REACT_APP_AGORA_APP_SDK_DOMAIN
+echo REACT_APP_AGORA_APP_TOKEN_DOMAIN:$REACT_APP_AGORA_APP_TOKEN_DOMAIN
+echo PROCTORING_DEMO_PUBLISH_PATH:$PROCTORING_DEMO_PUBLISH_PATH
+
+
+echo "-----build------"
+REACT_APP_AGORA_APP_SDK_DOMAIN=$REACT_APP_AGORA_APP_SDK_DOMAIN REACT_APP_AGORA_APP_TOKEN_DOMAIN=$REACT_APP_AGORA_APP_TOKEN_DOMAIN yarn ci:build:web
+echo "-----build finished------"
+echo "-----publish started------"
+aws s3 sync ./packages/agora-proctor-demo/build/. s3://agora-adc-artifacts/$PROCTORING_DEMO_PUBLISH_PATH/ --cache-control no-cache
+global_url=https://solutions-apaas.agora.io/$PROCTORING_DEMO_PUBLISH_PATH/index.html
+echo global_url: $global_url
+echo "-----publish success------"
+
