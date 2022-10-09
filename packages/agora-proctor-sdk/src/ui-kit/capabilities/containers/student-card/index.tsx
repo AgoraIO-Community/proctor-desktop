@@ -1,14 +1,25 @@
 import "./index.css";
 import { useEffect, useMemo, useState, useRef } from "react";
-import { VideosWallLayoutEnum } from "@/infra/stores/common/type";
+
+import {
+  UserEvents as userEventsType,
+  VideosWallLayoutEnum,
+  UserAbnormal as UserAbnormalType,
+} from "@/infra/stores/common/type";
 import { useStore } from "@/infra/hooks/ui-store";
+import { Slider } from "antd";
 import {
   RemoteTrackPlayer,
   RemoteTrackPlayerWithFullScreen,
 } from "../stream/track-player";
 import { observer } from "mobx-react";
 import { EduClassroomConfig, EduRoomTypeEnum } from "agora-edu-core";
-import { AgoraRteVideoSourceType } from "agora-rte-sdk";
+import {
+  AgoraRteVideoSourceType,
+  MediaPlayerEvents,
+  StreamMediaPlayer,
+} from "agora-rte-sdk";
+import dayjs from "dayjs";
 import { SvgIconEnum, SvgImg } from "~ui-kit";
 import { DeviceTypeEnum } from "@/infra/api";
 export const StudentCard = observer(
@@ -72,9 +83,7 @@ export const StudentCard = observer(
             <div className="fcr-student-card-actions-chat">
               <SvgImg type={SvgIconEnum.CHAT}></SvgImg>
             </div>
-            <div className="fcr-student-card-actions-warning">
-              <SvgImg type={SvgIconEnum.MESSAGE_NORMAL}></SvgImg>
-            </div>
+            <UserEvents userUuidPrefix={userUuidPrefix}></UserEvents>
           </div>
         </div>
       </div>
@@ -215,44 +224,77 @@ export const StudentHLSVideos = observer(
     mainDeviceCameraVideo?: string;
     subDeviceCameraVideo?: string;
   }) => {
-    const screenContainerRef = useRef(null);
-    const mainCameraContainerRef = useRef(null);
-    const subCameraContainerRef = useRef(null);
-    const {
-      classroomStore: {
-        mediaStore: { setupMediaStream },
-      },
-    } = useStore();
+    const screenContainerRef = useRef<HTMLDivElement>(null);
+    const mainCameraContainerRef = useRef<HTMLDivElement>(null);
+    const subCameraContainerRef = useRef<HTMLDivElement>(null);
+    const playerControlRef = useRef<{
+      screen?: StreamMediaPlayer;
+      mainCamera?: StreamMediaPlayer;
+      subCamera?: StreamMediaPlayer;
+    }>({});
+    const [totalDuration, setTotalDuration] = useState(0);
+    const [currentTime, setCurrentTime] = useState(0);
     useEffect(() => {
-      mainDeviceScreenVideo &&
-        setupMediaStream(
-          mainDeviceScreenVideo,
-          screenContainerRef.current!,
-          false,
-          true,
-          true
+      if (mainDeviceScreenVideo && !playerControlRef.current.screen) {
+        playerControlRef.current.screen = new StreamMediaPlayer(
+          mainDeviceScreenVideo
         );
+        playerControlRef.current.screen.on(
+          MediaPlayerEvents.LevelLoaded,
+          (totalDuration: number) => {
+            setTotalDuration(totalDuration);
+          }
+        );
+        playerControlRef.current.screen.setView(
+          screenContainerRef.current as HTMLDivElement
+        );
+
+        playerControlRef.current.screen.play(true, true);
+        playerControlRef.current.screen.mediaElement?.addEventListener(
+          "timeupdate",
+          (e) => {
+            playerControlRef.current.screen?.mediaElement &&
+              setCurrentTime(
+                playerControlRef.current.screen.mediaElement.currentTime
+              );
+          }
+        );
+      }
     }, [mainDeviceScreenVideo]);
     useEffect(() => {
-      mainDeviceCameraVideo &&
-        setupMediaStream(
-          mainDeviceCameraVideo,
-          mainCameraContainerRef.current!,
-          false,
-          true,
-          true
+      if (mainDeviceCameraVideo) {
+        playerControlRef.current.mainCamera = new StreamMediaPlayer(
+          mainDeviceCameraVideo
         );
+        playerControlRef.current.mainCamera.setView(
+          mainCameraContainerRef.current as HTMLDivElement
+        );
+        playerControlRef.current.mainCamera.play(true, true);
+      }
     }, [mainDeviceCameraVideo]);
     useEffect(() => {
-      subDeviceCameraVideo &&
-        setupMediaStream(
-          subDeviceCameraVideo,
-          subCameraContainerRef.current!,
-          false,
-          true,
-          true
+      if (subDeviceCameraVideo) {
+        playerControlRef.current.subCamera = new StreamMediaPlayer(
+          subDeviceCameraVideo
         );
+        playerControlRef.current.subCamera.setView(
+          mainCameraContainerRef.current as HTMLDivElement
+        );
+        playerControlRef.current.subCamera.play(true, true);
+      }
     }, [subDeviceCameraVideo]);
+    const onSliderChange = (val: number) => {
+      if (playerControlRef.current.screen?.mediaElement) {
+        playerControlRef.current.screen.mediaElement.currentTime = val;
+        setCurrentTime(val);
+      }
+      if (playerControlRef.current.mainCamera?.mediaElement) {
+        playerControlRef.current.mainCamera.mediaElement.currentTime = val;
+      }
+      if (playerControlRef.current.subCamera?.mediaElement) {
+        playerControlRef.current.subCamera.mediaElement.currentTime = val;
+      }
+    };
     return (
       <div
         className={`fcr-student-card-videos ${
@@ -261,6 +303,25 @@ export const StudentHLSVideos = observer(
             : "fcr-student-card-videos-loose"
         }`}
       >
+        <div className="fcr-student-card-videos-progress">
+          <Slider
+            tooltip={{
+              formatter: (val) => {
+                return dayjs.duration(val || 0, "s").format("mm:ss");
+              },
+            }}
+            onChange={onSliderChange}
+            value={currentTime}
+            min={0}
+            max={totalDuration}
+            marks={{
+              0: dayjs.duration(currentTime, "s").format("mm:ss"),
+              [totalDuration]: dayjs
+                .duration(totalDuration, "s")
+                .format("mm:ss"),
+            }}
+          ></Slider>
+        </div>
         <div
           ref={screenContainerRef}
           className="fcr-student-card-videos-screen"
@@ -273,6 +334,58 @@ export const StudentHLSVideos = observer(
           ref={subCameraContainerRef}
           className="fcr-student-card-videos-mobile"
         ></div>
+      </div>
+    );
+  }
+);
+export const UserEvents = observer(
+  ({
+    userUuidPrefix,
+    size = 30,
+  }: {
+    userUuidPrefix: string;
+    size?: number;
+  }) => {
+    const {
+      usersUIStore: { generateDeviceUuid, queryUserEvents },
+      classroomStore: {
+        userStore: { studentList },
+      },
+    } = useStore();
+    const [userEvents, setUserEvents] = useState<
+      userEventsType<{
+        abnormal: UserAbnormalType;
+      }>[]
+    >([]);
+    const queryUserAbnormal = async () => {
+      const res = await queryUserEvents(
+        EduClassroomConfig.shared.sessionInfo.roomUuid,
+        mainDeviceUserUuid
+      );
+      setUserEvents(res.list);
+    };
+    useEffect(() => {
+      queryUserAbnormal();
+    }, []);
+    const mainDeviceUserUuid = generateDeviceUuid(
+      userUuidPrefix,
+      DeviceTypeEnum.Main
+    );
+    const mainDeviceStudent = studentList.get(mainDeviceUserUuid);
+    return (
+      <div className="fcr-student-card-actions-warning">
+        {userEvents.length > 0 && (
+          <div className="fcr-student-card-actions-warning-count">
+            {userEvents.length}
+          </div>
+        )}
+        <SvgImg
+          type={
+            mainDeviceStudent?.userProperties?.get("tags")?.abnormal
+              ? SvgIconEnum.MESSAGE_ACTIVE
+              : SvgIconEnum.MESSAGE_NORMAL
+          }
+        ></SvgImg>
       </div>
     );
   }

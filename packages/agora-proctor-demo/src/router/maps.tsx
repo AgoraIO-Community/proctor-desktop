@@ -1,9 +1,8 @@
 import React from "react";
 import { CreateRoom } from "../pages/create-room";
+import { HomePage } from "../pages/home";
 import { JoinRoom } from "../pages/join-room";
 import { LaunchPage } from "../pages/launch";
-import { Welcome } from "../pages/welcome";
-import { HomeRouteContainer } from "./home";
 import { PageRouter } from "./type";
 
 export type AppRouteComponent = {
@@ -13,16 +12,16 @@ export type AppRouteComponent = {
 };
 
 export const routesMap: Record<string, AppRouteComponent> = {
-  [PageRouter.Index]: {
-    path: "/",
-    component: () => <HomeRouteContainer />,
-    exact: false,
-  },
-  [PageRouter.Welcome]: {
-    path: "/",
-    component: () => <Welcome />,
-    exact: true,
-  },
+  // [PageRouter.Index]: {
+  //   path: "/",
+  //   component: () => <HomeRouteContainer />,
+  //   exact: false,
+  // },
+  // [PageRouter.Welcome]: {
+  //   path: "/",
+  //   component: () => <Welcome />,
+  //   exact: true,
+  // },
   [PageRouter.CreateRoom]: {
     path: "/create-room",
     component: () => <CreateRoom />,
@@ -37,5 +36,9 @@ export const routesMap: Record<string, AppRouteComponent> = {
     path: "/launch",
     component: () => <LaunchPage />,
     exact: true,
+  },
+  [PageRouter.Home]: {
+    path: "/original",
+    component: () => <HomePage />,
   },
 };

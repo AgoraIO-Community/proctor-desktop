@@ -10,12 +10,14 @@ const routes: PageRouter[] = [
   PageRouter.PretestPage,
   PageRouter.Launch,
   PageRouter.Window,
-  PageRouter.Index,
+  // PageRouter.Index,
+  PageRouter.Home,
 ];
 export const RouteContainer = () => {
   const browserCheckIncludes = useMemo(() => {
-    const list = [PageRouter.Index, PageRouter.Welcome, PageRouter.JoinRoom];
-    return list.map((v) => routesMap[v].path);
+    // const list = [PageRouter.Index, PageRouter.Welcome, PageRouter.JoinRoom];
+    // return list.map((v) => routesMap[v].path);
+    return [];
   }, []);
 
   const authIncludes = useMemo(() => {

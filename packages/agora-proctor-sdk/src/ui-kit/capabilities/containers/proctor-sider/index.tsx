@@ -11,9 +11,10 @@ import { LocalTrackPlayer } from "../stream/track-player";
 import "./index.css";
 export const ProctorSider = observer(() => {
   const {
-    navigationBarUIStore: { startClass, classStatusText, classState },
+    navigationBarUIStore: { startClass, classState },
     usersUIStore: { studentListByUserUuidPrefix, filterTag },
     streamUIStore: { updateLocalPublishState, teacherCameraStream },
+    roomUIStore: { classStatusText },
     classroomStore: {
       roomStore: { updateClassState },
       widgetStore: { setActive },

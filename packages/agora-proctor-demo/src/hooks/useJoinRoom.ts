@@ -178,9 +178,12 @@ export const useJoinRoom = () => {
           deviceType: deviceType,
           mediaOptions: {
             web: {
-              codec: webRTCCodec,
+              codec: "h264",
+              mode: "live",
             },
           },
+          examinationUrl:
+            "https://forms.clickup.com/8556478/f/853xy-21947/IM8JKH1HOOF3LDJDEB",
         };
         // this is for DEBUG PURPOSE only. please do not store certificate in client, it's not safe.
         // 此处仅为开发调试使用, token应该通过服务端生成, 请确保不要把证书保存在客户端

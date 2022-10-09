@@ -11,6 +11,7 @@ import { SvgIconEnum, SvgImg, transI18n } from "~ui-kit";
 import { AllVideos } from "../proctor-tabs/all-videos";
 import { StudentDetail } from "../proctor-tabs/student-detail";
 import { UserAbnormal, UserAvatar } from "../student-card";
+import "./index.css";
 export const ProctorContent = observer(() => {
   const {
     layoutUIStore: {

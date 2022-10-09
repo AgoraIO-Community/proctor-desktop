@@ -1,5 +1,5 @@
 import { EduRegion } from "agora-edu-core";
-import { DeviceTypeEnum, LanguageEnum } from "agora-proctor-sdk";
+import { LanguageEnum } from "agora-proctor-sdk";
 import md5 from "js-md5";
 import React, { useEffect, useImperativeHandle, useRef, useState } from "react";
 import { useHistory } from "react-router";
@@ -97,7 +97,6 @@ export const HomePage = () => {
         region: region as EduRegion,
         duration: +30 * 60,
         latencyLevel: 2,
-        deviceType: DeviceTypeEnum.Main,
         mediaOptions: {
           web: {
             codec: "h264",
