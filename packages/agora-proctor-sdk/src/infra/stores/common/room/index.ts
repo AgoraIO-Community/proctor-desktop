@@ -58,16 +58,7 @@ export class RoomUIStore extends EduUIStoreBase {
   }
 
   @bound
-  async joinClassroom(
-    roomUuid: string,
-    roomType?: EduRoomTypeEnum,
-    stream?: {
-      videoState?: AgoraRteMediaPublishState;
-      audioState?: AgoraRteMediaPublishState;
-      videoSourceState?: AgoraRteMediaSourceState;
-      audioSourceState?: AgoraRteMediaSourceState;
-    }
-  ) {
+  async joinClassroom(roomUuid: string, roomType?: EduRoomTypeEnum) {
     if (this.roomSceneByRoomUuid(roomUuid)) {
       if (
         this.roomSceneByRoomUuid(roomUuid)?.roomState.state !==
@@ -90,7 +81,7 @@ export class RoomUIStore extends EduUIStoreBase {
             roomUuid,
             roomType: roomType ? roomType : sessionInfo.roomType,
           };
-          await this.checkIn(sessionInfo, roomScene, stream);
+          await this.checkIn(sessionInfo, roomScene);
           const scene = engine.createAgoraRteScene(roomUuid);
           this.createSceneSubscription(scene);
           roomScene.setScene(scene);
@@ -126,20 +117,10 @@ export class RoomUIStore extends EduUIStoreBase {
     roomScene.setClassroomState(ClassroomState.Connected);
     return roomScene;
   }
-  async checkIn(
-    sessionInfo: EduSessionInfo,
-    roomScene: RoomScene,
-    stream?: {
-      videoState?: AgoraRteMediaPublishState;
-      audioState?: AgoraRteMediaPublishState;
-      videoSourceState?: AgoraRteMediaSourceState;
-      audioSourceState?: AgoraRteMediaSourceState;
-    }
-  ) {
+  async checkIn(sessionInfo: EduSessionInfo, roomScene: RoomScene) {
     const { data, ts } = await this.classroomStore.api.checkIn(
       sessionInfo,
-      undefined,
-      stream
+      undefined
     );
     const {
       state = 0,

@@ -31,7 +31,7 @@ import {
   Injectable,
   Log,
   Logger,
-  RtcState,
+  AGRtcState,
 } from "agora-rte-sdk";
 import to from "await-to-js";
 import { get } from "lodash";
@@ -50,9 +50,9 @@ export class RoomScene {
     roomStateErrorReason: "",
   };
   @observable scene?: AgoraRteScene;
-  @observable rtcState?: Map<AGRtcConnectionType, RtcState> = new Map()
-    .set(AGRtcConnectionType.main, RtcState.Idle)
-    .set(AGRtcConnectionType.sub, RtcState.Idle);
+  @observable rtcState?: Map<AGRtcConnectionType, AGRtcState> = new Map()
+    .set(AGRtcConnectionType.main, AGRtcState.Idle)
+    .set(AGRtcConnectionType.sub, AGRtcState.Idle);
   constructor(private classroomStore: EduClassroomStore) {}
 
   @action.bound
@@ -95,7 +95,7 @@ export class RoomScene {
     );
   }
   @action.bound
-  setRtcState(state: RtcState, connectionType?: AGRtcConnectionType) {
+  setRtcState(state: AGRtcState, connectionType?: AGRtcConnectionType) {
     let connType = connectionType ? connectionType : AGRtcConnectionType.main;
     if (
       connType === AGRtcConnectionType.main &&
@@ -125,7 +125,7 @@ export class RoomScene {
     }
   }
   async leave() {
-    if (this.rtcState?.get(AGRtcConnectionType.sub) !== RtcState.Idle) {
+    if (this.rtcState?.get(AGRtcConnectionType.sub) !== AGRtcState.Idle) {
       this.classroomStore.mediaStore.stopScreenShareCapture();
       await this.scene?.leaveRTC(AGRtcConnectionType.sub);
     }
@@ -365,7 +365,7 @@ class StreamController {
         if (streamUuid && shareStreamToken) {
           if (
             this._roomScene.rtcState?.get(AGRtcConnectionType.sub) ===
-            RtcState.Idle
+            AGRtcState.Idle
           ) {
             this._scene.joinRTC({
               connectionType: AGRtcConnectionType.sub,
@@ -377,7 +377,7 @@ class StreamController {
           // leave rtc if share StreamUuid is no longer in the room
           if (
             this._roomScene.rtcState?.get(AGRtcConnectionType.sub) !==
-            RtcState.Idle
+            AGRtcState.Idle
           ) {
             this._scene.leaveRTC(AGRtcConnectionType.sub);
           }
