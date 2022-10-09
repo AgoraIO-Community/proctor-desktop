@@ -82,7 +82,7 @@ echo pwd: `pwd`
 
 
 echo "-----install------"
-# sh ./scripts/install-apaas-modules.sh
+sh ./scripts/install-apaas-modules.sh
 echo "-----install finished------"
 
 
@@ -97,17 +97,17 @@ echo "------set parameters-----"
 #      REACT_APP_AGORA_APP_TOKEN_DOMAIN=http://api-solutions-dev.bj2.agoralab.co   
 #     export PROCTORING_DEMO_PUBLISH_PATH=proctoring/test
 # fi
-echo REACT_APP_AGORA_APP_SDK_DOMAIN:$REACT_APP_AGORA_APP_SDK_DOMAIN
-echo REACT_APP_AGORA_APP_TOKEN_DOMAIN:$REACT_APP_AGORA_APP_TOKEN_DOMAIN
-echo PROCTORING_DEMO_PUBLISH_PATH:$PROCTORING_DEMO_PUBLISH_PATH
+# echo REACT_APP_AGORA_APP_SDK_DOMAIN:$REACT_APP_AGORA_APP_SDK_DOMAIN
+# echo REACT_APP_AGORA_APP_TOKEN_DOMAIN:$REACT_APP_AGORA_APP_TOKEN_DOMAIN
+# echo PROCTORING_DEMO_PUBLISH_PATH:$PROCTORING_DEMO_PUBLISH_PATH
 
 
 echo "-----build------"
    lerna exec --scope=agora-proctor-demo --  npm run build
 echo "-----build finished------"
-# echo "-----publish started------"
-# aws s3 sync ./packages/agora-proctor-demo/build/. s3://agora-adc-artifacts/$PROCTORING_DEMO_PUBLISH_PATH/ --cache-control no-cache
-# global_url=https://solutions-apaas.agora.io/$PROCTORING_DEMO_PUBLISH_PATH/index.html
-# echo global_url: $global_url
+echo "-----publish started------"
+aws s3 sync ./packages/agora-proctor-demo/build/. s3://agora-adc-artifacts/$PROCTORING_DEMO_PUBLISH_PATH/ --cache-control no-cache
+global_url=https://solutions-apaas.agora.io/$PROCTORING_DEMO_PUBLISH_PATH/index.html
+echo global_url: $global_url
 echo "-----publish success------"
 
