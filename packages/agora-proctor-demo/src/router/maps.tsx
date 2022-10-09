@@ -1,9 +1,11 @@
-import React from "react";
-import { CreateRoom } from "../pages/create-room";
-import { HomePage } from "../pages/home";
-import { JoinRoom } from "../pages/join-room";
-import { LaunchPage } from "../pages/launch";
-import { PageRouter } from "./type";
+import React from 'react';
+import { Welcome } from '../pages/welcome';
+import { CreateRoom } from '../pages/create-room';
+import { HomePage } from '../pages/home';
+import { JoinRoom } from '../pages/join-room';
+import { LaunchPage } from '../pages/launch';
+import { HomeRouteContainer } from './home';
+import { PageRouter } from './type';
 
 export type AppRouteComponent = {
   path: string;
@@ -12,33 +14,33 @@ export type AppRouteComponent = {
 };
 
 export const routesMap: Record<string, AppRouteComponent> = {
-  // [PageRouter.Index]: {
-  //   path: "/",
-  //   component: () => <HomeRouteContainer />,
-  //   exact: false,
-  // },
-  // [PageRouter.Welcome]: {
-  //   path: "/",
-  //   component: () => <Welcome />,
-  //   exact: true,
-  // },
+  [PageRouter.Index]: {
+    path: '/',
+    component: () => <HomeRouteContainer />,
+    exact: false,
+  },
+  [PageRouter.Welcome]: {
+    path: '/',
+    component: () => <Welcome />,
+    exact: true,
+  },
   [PageRouter.CreateRoom]: {
-    path: "/create-room",
+    path: '/create-room',
     component: () => <CreateRoom />,
     exact: true,
   },
   [PageRouter.JoinRoom]: {
-    path: "/join-room",
+    path: '/join-room',
     component: () => <JoinRoom />,
     exact: true,
   },
   [PageRouter.Launch]: {
-    path: "/launch",
+    path: '/launch',
     component: () => <LaunchPage />,
     exact: true,
   },
   [PageRouter.Home]: {
-    path: "/original",
+    path: '/original',
     component: () => <HomePage />,
   },
 };

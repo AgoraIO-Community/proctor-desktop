@@ -1,17 +1,18 @@
-import { useMemo } from "react";
-import { Route, Switch } from "react-router";
-import { HashRouter } from "react-router-dom";
-import { AuthLayout } from "../layout/auth-layout";
-import { BrowserCheckLayout } from "../layout/browser-check-layout";
-import { routesMap } from "./maps";
-import { PageRouter } from "./type";
+import { useMemo } from 'react';
+import { Route, Switch } from 'react-router';
+import { HashRouter } from 'react-router-dom';
+import { AuthLayout } from '../layout/auth-layout';
+import { BrowserCheckLayout } from '../layout/browser-check-layout';
+import { routesMap } from './maps';
+import { PageRouter } from './type';
 
 const routes: PageRouter[] = [
-  PageRouter.PretestPage,
   PageRouter.Launch,
-  PageRouter.Window,
-  // PageRouter.Index,
-  PageRouter.Home,
+
+  PageRouter.Index,
+
+  PageRouter.PretestPage,
+  // PageRouter.Home,
 ];
 export const RouteContainer = () => {
   const browserCheckIncludes = useMemo(() => {

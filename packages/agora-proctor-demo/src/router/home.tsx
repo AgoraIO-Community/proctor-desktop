@@ -1,12 +1,13 @@
-import { Route, Switch, useLocation } from "react-router";
-import { PageAnimation } from "../components/page-animation";
-import { HomeLayout } from "../layout/home-layout";
-import { routesMap } from "./maps";
-import { PageRouter } from "./type";
+import { Route, Switch, useLocation } from 'react-router';
+import { PageAnimation } from '../components/page-animation';
+import { HomeLayout } from '../layout/home-layout';
+import { routesMap } from './maps';
+import { PageRouter } from './type';
 
 const homeRoutes: PageRouter[] = [
-  PageRouter.CreateRoom,
+  PageRouter.Home,
   PageRouter.Welcome,
+  PageRouter.CreateRoom,
   PageRouter.JoinRoom,
 ];
 
