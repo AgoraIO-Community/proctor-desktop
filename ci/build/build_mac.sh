@@ -103,7 +103,7 @@ echo PROCTORING_DEMO_PUBLISH_PATH:$PROCTORING_DEMO_PUBLISH_PATH
 
 
 echo "-----build------"
-cross-env REACT_APP_AGORA_APP_SDK_DOMAIN=$REACT_APP_AGORA_APP_SDK_DOMAIN  REACT_APP_AGORA_APP_TOKEN_DOMAIN=$REACT_APP_AGORA_APP_TOKEN_DOMAIN  yarn ci:build:web
+export REACT_APP_AGORA_APP_SDK_DOMAIN=$REACT_APP_AGORA_APP_SDK_DOMAIN && export REACT_APP_AGORA_APP_TOKEN_DOMAIN=$REACT_APP_AGORA_APP_TOKEN_DOMAIN && yarn ci:build:web
 echo "-----build finished------"
 echo "-----publish started------"
 aws s3 sync ./packages/agora-proctor-demo/build/. s3://agora-adc-artifacts/$PROCTORING_DEMO_PUBLISH_PATH/ --cache-control no-cache
