@@ -95,6 +95,9 @@
   border-radius: 20px;
   padding: 8px;
 }
+.fcr_proctor_sider_info_proctor-actions-video-container-placeholder {
+  height: 130px;
+}
 .fcr_proctor_sider_info_proctor-actions-video-container-active {
   border: 0.5px solid #5765ff;
   border-radius: 20px;
@@ -124,6 +127,11 @@
 .fcr_proctor_sider .fcr_proctor_sider_info_proctor-actions-speaker {
   position: relative;
 }
+.fcr_proctor_sider .fcr_proctor_sider_info_proctor-actions-speaker > button > span {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 .fcr_proctor_sider_info_proctor-actions-speaker-extra {
   display: flex;
   align-items: center;
@@ -149,13 +157,15 @@
   z-index: 1;
   border-top-left-radius: 24px;
   border-top-right-radius: 24px;
+  flex-direction: column;
+  padding-top: 5px;
 }
 .fcr_proctor_sider_info_proctor-actions-speaker-overlay > div {
   display: flex;
   justify-content: space-between;
   align-items: center;
   width: 100%;
-  padding: 0 18px;
+  padding: 3px 18px;
 }
 .fcr_proctor_sider_info_proctor-actions-speaker-overlay > div > div {
   display: flex;
@@ -163,7 +173,7 @@
   font-size: 12px;
 }
 .fcr_proctor_sider_info_proctor-actions-speaker-extra:hover {
-  background: #2a62c5;
+  background: rgba(0, 0, 0, 0.14);
 }
 .fcr_proctor_sider .fcr_proctor_sider_info_proctor-actions-video-left {
   width: 48px;

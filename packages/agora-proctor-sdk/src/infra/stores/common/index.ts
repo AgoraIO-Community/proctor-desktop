@@ -1,25 +1,25 @@
-import { ConvertMediaOptionsConfig } from "@/infra/api";
+import { ConvertMediaOptionsConfig } from '@/infra/api';
 import {
   AGServiceErrorCode,
   EduClassroomConfig,
   EduClassroomStore,
   LeaveReason,
-} from "agora-edu-core";
-import { AGError, AgoraRteLogLevel, Log } from "agora-rte-sdk";
-import { transI18n } from "~ui-kit";
-import { EduUIStoreBase } from "./base";
-import { DeviceSettingUIStore } from "./device-setting/index";
-import { LayoutUIStore } from "./layout";
-import { NavigationBarUIStore } from "./nav-ui";
-import { NotificationUIStore } from "./notification-ui";
-import { PretestUIStore } from "./pretest";
-import { RoomUIStore } from "./room";
-import { EduShareUIStore } from "./share-ui";
-import { StreamUIStore } from "./stream";
-import { StudentViewUIStore } from "./student-view";
-import { SubscriptionUIStore } from "./subscription";
-import { UsersUIStore } from "./users";
-import { WidgetUIStore } from "./widget";
+} from 'agora-edu-core';
+import { AGError, AgoraRteLogLevel, Log } from 'agora-rte-sdk';
+import { transI18n } from '~ui-kit';
+import { EduUIStoreBase } from './base';
+import { DeviceSettingUIStore } from './device-setting/index';
+import { LayoutUIStore } from './layout';
+import { NavigationBarUIStore } from './nav-ui';
+import { NotificationUIStore } from './notification-ui';
+import { PretestUIStore } from './pretest';
+import { RoomUIStore } from './room';
+import { EduShareUIStore } from './share-ui';
+import { StreamUIStore } from './stream';
+import { StudentViewUIStore } from './student-view';
+import { SubscriptionUIStore } from './subscription';
+import { UsersUIStore } from './users';
+import { WidgetUIStore } from './widget';
 @Log.attach({ level: AgoraRteLogLevel.INFO })
 export class EduClassroomUIStore {
   protected _classroomStore: EduClassroomStore;
@@ -43,25 +43,13 @@ export class EduClassroomUIStore {
     this._shareUIStore = new EduShareUIStore();
     this._streamUIStore = new StreamUIStore(store, this.shareUIStore);
     this._pretestUIStore = new PretestUIStore(store, this.shareUIStore);
-    this._deviceSettingUIStore = new DeviceSettingUIStore(
-      store,
-      this.shareUIStore
-    );
-    this._navigationBarUIStore = new NavigationBarUIStore(
-      store,
-      this.shareUIStore
-    );
+    this._deviceSettingUIStore = new DeviceSettingUIStore(store, this.shareUIStore);
+    this._navigationBarUIStore = new NavigationBarUIStore(store, this.shareUIStore);
     this._layoutUIStore = new LayoutUIStore(store, this.shareUIStore);
-    this._notificationUIStore = new NotificationUIStore(
-      store,
-      this.shareUIStore
-    );
+    this._notificationUIStore = new NotificationUIStore(store, this.shareUIStore);
     this._widgetUIStore = new WidgetUIStore(store, this.shareUIStore);
     // this._groupUIStore = new GroupUIStore(store, this.shareUIStore);
-    this._subscriptionUIStore = new SubscriptionUIStore(
-      store,
-      this.shareUIStore
-    );
+    this._subscriptionUIStore = new SubscriptionUIStore(store, this.shareUIStore);
     this._studentViewUIStore = new StudentViewUIStore(store, this.shareUIStore);
     this._usersUIStore = new UsersUIStore(store, this.shareUIStore);
     this._roomUIStore = new RoomUIStore(store, this.shareUIStore);
@@ -129,7 +117,7 @@ export class EduClassroomUIStore {
 
     //initialize ui stores
     Object.getOwnPropertyNames(this).forEach((propertyName) => {
-      if (propertyName.endsWith("UIStore")) {
+      if (propertyName.endsWith('UIStore')) {
         const uiStore = this[propertyName as keyof EduClassroomUIStore];
 
         if (uiStore instanceof EduUIStoreBase) {
@@ -154,21 +142,17 @@ export class EduClassroomUIStore {
     try {
       await joinClassroom();
     } catch (e) {
-      if (
-        AGError.isOf(e as AGError, AGServiceErrorCode.SERV_CANNOT_JOIN_ROOM)
-      ) {
-        return this.classroomStore.connectionStore.leaveClassroom(
-          LeaveReason.kickOut
-        );
+      if (AGError.isOf(e as AGError, AGServiceErrorCode.SERV_CANNOT_JOIN_ROOM)) {
+        return this.classroomStore.connectionStore.leaveClassroom(LeaveReason.kickOut);
       } else {
         return this.classroomStore.connectionStore.leaveClassroomUntil(
           LeaveReason.leave,
           new Promise((resolve) => {
             this.shareUIStore.addGenericErrorDialog(e as AGError, {
               onOK: resolve,
-              okBtnText: transI18n("toast.leave_room"),
+              okBtnText: transI18n('fcr_room_button_leave'),
             });
-          })
+          }),
         );
       }
     }
@@ -176,15 +160,14 @@ export class EduClassroomUIStore {
     // if (EduClassroomConfig.shared.sessionInfo.role === EduRoleTypeEnum.teacher) {
     try {
       const launchLowStreamCameraEncoderConfigurations = (
-        EduClassroomConfig.shared.rteEngineConfig
-          .rtcConfigs as ConvertMediaOptionsConfig
+        EduClassroomConfig.shared.rteEngineConfig.rtcConfigs as ConvertMediaOptionsConfig
       )?.defaultLowStreamCameraEncoderConfigurations;
 
       await this.classroomStore.mediaStore.enableDualStream(true);
 
       await this.classroomStore.mediaStore.setLowStreamParameter(
         launchLowStreamCameraEncoderConfigurations ||
-          EduClassroomConfig.defaultLowStreamParameter()
+          EduClassroomConfig.defaultLowStreamParameter(),
       );
     } catch (e) {
       this.shareUIStore.addGenericErrorDialog(e as AGError);
@@ -203,7 +186,7 @@ export class EduClassroomUIStore {
    */
   destroy() {
     Object.getOwnPropertyNames(this).forEach((propertyName) => {
-      if (propertyName.endsWith("UIStore")) {
+      if (propertyName.endsWith('UIStore')) {
         const uiStore = this[propertyName as keyof EduClassroomUIStore];
 
         if (uiStore instanceof EduUIStoreBase) {

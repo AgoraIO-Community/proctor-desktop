@@ -1,8 +1,8 @@
-import { useStore } from "@/infra/hooks/ui-store";
-import { Space } from "antd";
-import { observer } from "mobx-react";
-import styled, { css } from "styled-components";
-import { RemoteTrackPlayer } from "../../common/stream/track-player";
+import { useStore } from '@/infra/hooks/ui-store';
+import { Space } from 'antd';
+import { observer } from 'mobx-react';
+import styled, { css } from 'styled-components';
+import { RemoteTrackPlayer } from '../../common/stream/track-player';
 
 export const InteractiveVideo = observer(() => {
   const {
@@ -11,13 +11,9 @@ export const InteractiveVideo = observer(() => {
   } = useStore();
   return (
     <Space direction="vertical" size={15}>
-      <StudentPhoto
-        scale={!!teacherCameraStream ? 0.5 : 1}
-        backgroundImage={userAvatar}
-      />
+      <StudentPhoto scale={!!teacherCameraStream ? 0.5 : 1} backgroundImage={userAvatar} />
       {teacherCameraStream &&
-        (!teacherCameraStream?.isCameraMuted ||
-          !teacherCameraStream.isMicMuted) && (
+        (!teacherCameraStream?.isCameraMuted || !teacherCameraStream.isMicMuted) && (
           <TeacherVideo>
             <RemoteTrackPlayer stream={teacherCameraStream.stream} />
           </TeacherVideo>
@@ -54,8 +50,9 @@ const StudentPhoto = styled.div<{ scale?: number; backgroundImage?: string }>`
 `;
 
 const TeacherVideo = styled.div`
-  ${siderVideoBox}
-  ${css`
-    overflow: hidden;
-  `}
+  ${siderVideoBox};
+  overflow: hidden;
+  & video {
+    object-fit: contain !important;
+  }
 `;
