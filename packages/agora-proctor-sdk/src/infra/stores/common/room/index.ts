@@ -174,7 +174,7 @@ export class RoomUIStore extends EduUIStoreBase {
           [
             {
               groupUuid: this.currentGroupUuid,
-              addUsers: [],
+              addUsers: [userUuid],
             },
           ],
           false,
