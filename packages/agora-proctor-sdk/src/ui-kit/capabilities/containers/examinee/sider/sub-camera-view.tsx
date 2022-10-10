@@ -4,6 +4,7 @@ import { AgoraCard } from '@/ui-kit/components/card';
 import { SupervisorView } from '@/ui-kit/components/supervisor-view';
 import { EduClassroomConfig } from 'agora-edu-core';
 import { AgoraRteVideoSourceType } from 'agora-rte-sdk';
+import { observer } from 'mobx-react';
 import { RemoteTrackPlayer } from '../../common/stream/track-player';
 export const SubCameraView = () => {
   return (
@@ -13,7 +14,7 @@ export const SubCameraView = () => {
   );
 };
 
-const SubCamera = () => {
+const SubCamera = observer(() => {
   const { userUuid } = EduClassroomConfig.shared.sessionInfo;
 
   const {
@@ -36,7 +37,7 @@ const SubCamera = () => {
     subDeviceStreamUuid && scene?.streamController?.streamByStreamUuid?.get(subDeviceStreamUuid);
   return (
     <div style={{ height: '133px' }}>
-      {subDeviceStream && <RemoteTrackPlayer stream={subDeviceStream} />}
+      {subDeviceStream && <RemoteTrackPlayer stream={subDeviceStream} fromScene={scene?.scene} />}
     </div>
   );
-};
+});
