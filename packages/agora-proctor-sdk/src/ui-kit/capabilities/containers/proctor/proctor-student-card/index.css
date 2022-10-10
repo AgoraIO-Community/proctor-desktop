@@ -119,6 +119,25 @@
   align-items: center;
   background: #f8faff;
   overflow: hidden;
+  position: relative;
+}
+.fcr-track-player-fullscreen-cover,
+.fcr-track-player-fullscreen-cover-top {
+  width: 100%;
+  height: 80px;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  display: none;
+}
+.fcr-track-player-fullscreen-cover-top {
+  top: -10px;
+  bottom: auto;
+}
+.fcr-student-card-videos-screen:hover .fcr-track-player-fullscreen-cover,
+.fcr-student-card-videos-camera:hover .fcr-track-player-fullscreen-cover,
+.fcr-student-card-videos-mobile:hover .fcr-track-player-fullscreen-cover {
+  display: block;
 }
 .fcr-student-card-user-name {
   padding-left: 10px;

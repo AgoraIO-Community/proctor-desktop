@@ -1,12 +1,13 @@
-import { useStore } from "@/infra/hooks/ui-store";
-import { FlexContainer } from "@/ui-kit/components/container";
-import { Counter } from "@/ui-kit/components/counter";
-import { observer } from "mobx-react";
-import { useCallback } from "react";
-import styled, { css } from "styled-components";
-import { transI18n } from "~ui-kit";
-import { TrackArea } from "../../common/root-box";
-import { WidgetContainer } from "../../common/widget";
+import { useStore } from '@/infra/hooks/ui-store';
+import { FlexContainer } from '@/ui-kit/components/container';
+import { Counter } from '@/ui-kit/components/counter';
+import { ClassState } from 'agora-edu-core';
+import { observer } from 'mobx-react';
+import { useCallback, useEffect } from 'react';
+import styled, { css } from 'styled-components';
+import { transI18n } from '~ui-kit';
+import { TrackArea } from '../../common/root-box';
+import { WidgetContainer } from '../../common/widget';
 
 export const Content = observer(() => {
   const {
@@ -15,7 +16,7 @@ export const Content = observer(() => {
   return (
     <FlexContainer direction="column" gap={13} flex={1}>
       <ScenarioHeader>
-        <img src={require("../../common/logo.png")} width={146} />
+        <img src={require('../../common/logo.png')} width={146} />
       </ScenarioHeader>
       <FlexContainer flex={1}>
         <InitialPanel>
@@ -32,18 +33,28 @@ export const Content = observer(() => {
 
 const ContentProspect = observer(() => {
   const {
-    studentViewUIStore: { counterOpening, beforeClass },
+    classroomStore: {
+      roomStore: {
+        classroomSchedule: { state },
+      },
+    },
+    studentViewUIStore: { counterOpening, setCounterOpening, beforeClass },
   } = useStore();
 
   const handleFinished = useCallback(() => {
-    console.log("finished");
+    setCounterOpening(false);
   }, []);
+  useEffect(() => {
+    if (state === ClassState.ongoing) {
+      setCounterOpening(true);
+    }
+  }, [state]);
   return (
     <>
       {beforeClass && (
         <>
-          <img src={require("../../common/waiting.png")} width={256} />
-          {transI18n("fcr_room_label_wait_teacher_start_exam")}
+          <img src={require('../../common/waiting.png')} width={256} />
+          {transI18n('fcr_room_label_wait_teacher_start_exam')}
         </>
       )}
       {counterOpening && <Counter onFinished={handleFinished} />}

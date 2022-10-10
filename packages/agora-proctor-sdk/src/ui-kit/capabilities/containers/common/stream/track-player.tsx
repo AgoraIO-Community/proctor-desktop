@@ -1,17 +1,10 @@
-import { useStore } from "@/infra/hooks/ui-store";
-import { EduStream } from "agora-edu-core";
-import { AgoraRteScene, AGRenderMode } from "agora-rte-sdk";
-import { observer } from "mobx-react";
-import {
-  CSSProperties,
-  FC,
-  forwardRef,
-  useEffect,
-  useImperativeHandle,
-  useRef,
-} from "react";
-import { SvgIconEnum, SvgImg } from "~ui-kit";
-import "./index.css";
+import { useStore } from '@/infra/hooks/ui-store';
+import { EduStream } from 'agora-edu-core';
+import { AgoraRteScene, AGRenderMode } from 'agora-rte-sdk';
+import { observer } from 'mobx-react';
+import { CSSProperties, FC, forwardRef, useEffect, useImperativeHandle, useRef } from 'react';
+import { SvgIconEnum, SvgImg } from '~ui-kit';
+import './index.css';
 type RemoteTrackPlayerProps = {
   stream: EduStream;
   style?: CSSProperties;
@@ -20,29 +13,21 @@ type RemoteTrackPlayerProps = {
   fromScene?: AgoraRteScene;
 };
 
-type LocalTrackPlayerProps = Omit<RemoteTrackPlayerProps, "stream">;
-export const LocalTrackPlayer: FC<LocalTrackPlayerProps> = observer(
-  ({ style, className }) => {
-    const {
-      streamUIStore: { setupLocalVideo, isMirror },
-    } = useStore();
-    const ref = useRef<HTMLDivElement | null>(null);
+type LocalTrackPlayerProps = Omit<RemoteTrackPlayerProps, 'stream'>;
+export const LocalTrackPlayer: FC<LocalTrackPlayerProps> = observer(({ style, className }) => {
+  const {
+    streamUIStore: { setupLocalVideo, isMirror },
+  } = useStore();
+  const ref = useRef<HTMLDivElement | null>(null);
 
-    useEffect(() => {
-      if (ref.current) {
-        setupLocalVideo(ref.current, isMirror);
-      }
-    }, [isMirror, setupLocalVideo]);
+  useEffect(() => {
+    if (ref.current) {
+      setupLocalVideo(ref.current, isMirror);
+    }
+  }, [isMirror, setupLocalVideo]);
 
-    return (
-      <div
-        style={style}
-        className={`fcr-track-player ${className}`}
-        ref={ref}
-      ></div>
-    );
-  }
-);
+  return <div style={style} className={`fcr-track-player ${className}`} ref={ref}></div>;
+});
 export const RemoteTrackPlayer = observer(
   forwardRef<{ fullScreen: () => void }, RemoteTrackPlayerProps>(
     ({ style, className, stream, mirrorMode = false, fromScene }, ref) => {
@@ -59,43 +44,41 @@ export const RemoteTrackPlayer = observer(
             playerContainerRef.current,
             mirrorMode,
             AGRenderMode.fit,
-            fromScene
+            fromScene,
           );
         }
       }, [mirrorMode, setupRemoteVideo]);
       useImperativeHandle(ref, () => ({
         fullScreen: () => {
-          playerContainerRef.current
-            ?.querySelector("video")
-            ?.requestFullscreen();
+          playerContainerRef.current?.querySelector('video')?.requestFullscreen();
         },
       }));
       return (
         <div
           style={style}
           className={`fcr-track-player ${className}`}
-          ref={playerContainerRef}
-        ></div>
+          ref={playerContainerRef}></div>
       );
-    }
-  )
+    },
+  ),
 );
-
-export const RemoteTrackPlayerWithFullScreen: FC<RemoteTrackPlayerProps> =
+export const RemoteTrackPlayerWithFullScreen: FC<RemoteTrackPlayerProps & { placment?: 'top' }> =
   observer((props) => {
     const playerRef = useRef<{ fullScreen: () => void }>(null);
     return (
       <div className="fcr-track-player-fullscreen">
         <RemoteTrackPlayer {...props} ref={playerRef}></RemoteTrackPlayer>
-        <div className="fcr-track-player-fullscreen-cover">
+        <div
+          className={`fcr-track-player-fullscreen-cover ${
+            props.placment === 'top' ? 'fcr-track-player-fullscreen-cover-top' : ''
+          }`}>
           <SvgImg
-            className={"fcr-track-player-fullscreen-btn"}
+            className={'fcr-track-player-fullscreen-btn'}
             type={SvgIconEnum.VIDEO_FULLSCREEN}
             size={26}
             onClick={() => {
               playerRef.current?.fullScreen();
-            }}
-          ></SvgImg>
+            }}></SvgImg>
         </div>
       </div>
     );

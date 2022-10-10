@@ -86,7 +86,7 @@ export const StudentDetail = observer(({ userUuidPrefix }: { userUuidPrefix: str
     await updateUserTags(EduClassroomConfig.shared.sessionInfo.roomUuid, mainDeviceUserUuid, {
       abnormal: {
         type: 'warining',
-        reason: 'test',
+        reason: abnormal,
       },
     });
     queryUserAbnormal();
@@ -206,10 +206,14 @@ export const StudentDetail = observer(({ userUuidPrefix }: { userUuidPrefix: str
                 size="large"
                 placeholder={transI18n('fcr_sub_room_option_report_behavior_default')}
                 suffixIcon={<SvgImg type={SvgIconEnum.DROPDOWN}></SvgImg>}>
-                <Select.Option value={'test'}>test</Select.Option>
+                <Select.Option value={'ID Verification'}>ID Verification</Select.Option>
+                <Select.Option value={'Mutiple People'}>Mutiple People</Select.Option>
+                <Select.Option value={'Electronic Content'}>Electronic Content</Select.Option>
+                <Select.Option value={'Paperworks'}>Paperworks</Select.Option>
               </Select>
               <Button
                 onClick={submitAbnormal}
+                disabled={!abnormal}
                 size="large"
                 type="primary"
                 className="fcr-student-detail-tab-live-bottom-suspicious-submit">

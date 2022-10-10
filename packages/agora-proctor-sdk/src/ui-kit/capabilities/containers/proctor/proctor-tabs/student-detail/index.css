@@ -60,7 +60,7 @@
 .fcr-student-detail-tab-replay-bottom-list {
   flex: 1;
   padding: 0 12px;
-  overflow: scroll;
+  overflow: auto;
 }
 .fcr-student-detail-tab-replay-bottom-list-item {
   width: 100%;
@@ -82,12 +82,16 @@
   line-height: 25px;
   text-align: center;
   color: #ffffff;
+  width: 20px;
 }
 .fcr-student-detail-tab-replay-bottom-list-item > div:nth-child(2) {
   display: flex;
   color: #fff;
+  flex: 1;
+  padding-left: 80px;
 }
 .fcr-student-detail-tab-replay-bottom-list-item > div:last-child {
+  width: 40px;
 }
 .fcr-student-detail-tab-replay-bottom-list-item-logo {
   background: rgba(52, 52, 52, 0.9);

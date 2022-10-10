@@ -1,5 +1,5 @@
-import { ClassState, LeaveReason } from "agora-edu-core";
-import { bound, Log } from "agora-rte-sdk";
+import { ClassState, LeaveReason } from 'agora-edu-core';
+import { bound, Log } from 'agora-rte-sdk';
 import {
   action,
   computed,
@@ -8,8 +8,8 @@ import {
   observable,
   reaction,
   runInAction,
-} from "mobx";
-import { EduUIStoreBase } from "../base";
+} from 'mobx';
+import { EduUIStoreBase } from '../base';
 
 @Log.attach({ proxyMethods: false })
 export class StudentViewUIStore extends EduUIStoreBase {
@@ -26,27 +26,30 @@ export class StudentViewUIStore extends EduUIStoreBase {
   @observable
   counterOpening = false;
 
+  @action.bound
+  setCounterOpening(open: boolean) {
+    this.counterOpening = open;
+  }
+
   @computed
   get userAvatar() {
-    return typeof this.classroomStore.userStore.localUserProperties ===
-      "undefined"
-      ? ""
-      : this.classroomStore.userStore.localUserProperties.get("avatar");
+    return typeof this.classroomStore.userStore.localUserProperties === 'undefined'
+      ? ''
+      : this.classroomStore.userStore.localUserProperties.get('avatar');
   }
 
   @computed
   get userWarning() {
-    return typeof this.classroomStore.userStore.localUserProperties ===
-      "undefined"
+    return typeof this.classroomStore.userStore.localUserProperties === 'undefined'
       ? {}
-      : this.classroomStore.userStore.localUserProperties.get("warning");
+      : this.classroomStore.userStore.localUserProperties.get('warning');
   }
 
   @computed
   get classRoomState() {
     return this.classroomStore.roomStore.classroomSchedule.state;
   }
-
+  @computed
   get beforeClass() {
     return this.classRoomState === ClassState.beforeClass;
   }
@@ -84,16 +87,16 @@ export class StudentViewUIStore extends EduUIStoreBase {
               this.widgetBlur = false;
             });
           }
-        }
-      )
+        },
+      ),
     );
 
     this._disposers.push(
       computed(() => this.userWarning).observe(({ newValue }) => {
         if (newValue?.message) {
-          this.shareUIStore.addToast(newValue.message, "error");
+          this.shareUIStore.addToast(newValue.message, 'error');
         }
-      })
+      }),
     );
 
     // class is end
@@ -116,8 +119,8 @@ export class StudentViewUIStore extends EduUIStoreBase {
               this.roomClose = true;
             });
           }
-        }
-      )
+        },
+      ),
     );
   }
 
