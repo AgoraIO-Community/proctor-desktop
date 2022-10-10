@@ -43,7 +43,7 @@
       "~hooks": ["./src/infra/hooks"],
       "~hooks/*": ["./src/infra/hooks/*"],
       "agora-chat-widget": ["../agora-chat-widget/src"],
-      "agora-proctor-sdk": ["../agora-proctor-sdk/src"]
+      "agora-proctor-sdk": ["./src/infra/api"]
     }
   },
   "include": ["src"],

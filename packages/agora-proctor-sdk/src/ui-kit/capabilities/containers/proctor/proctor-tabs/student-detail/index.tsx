@@ -71,7 +71,13 @@ export const StudentDetail = observer(({ userUuidPrefix }: { userUuidPrefix: str
       mainDeviceUserUuid,
       1600,
     );
-    setUserEvents(res.list.sort((a, b) => b.sequence - a.sequence));
+    setUserEvents(
+      (
+        res.list as UserEvents<{
+          abnormal: UserAbnormalType;
+        }>[]
+      ).sort((a, b) => b.sequence - a.sequence),
+    );
   };
   const queryRecords = async () => {
     queryRecordList(roomUuid!).then((res) => {
