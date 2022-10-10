@@ -320,32 +320,36 @@ export class RoomUIStore extends EduUIStoreBase {
         },
       ),
     );
-
-    this._disposers.push(
-      computed(() => this.classroomStore.mediaStore.localScreenShareTrackState).observe(
-        ({ newValue, oldValue }) => {
-          const { roomUuid, role } = EduClassroomConfig.shared.sessionInfo;
-          if (
-            (newValue === AgoraRteMediaSourceState.stopped ||
-              newValue === AgoraRteMediaSourceState.error) &&
-            role === EduRoleTypeEnum.student
-          ) {
-            setTimeout(() => {
-              this.leaveClassroom(roomUuid)
-                .then(() => {
-                  this.classroomStore.connectionStore.leaveClassroom(LeaveReason.leave);
-                })
-                .catch((e) => {
-                  this.shareUIStore.addToast('leave classroom error', e);
-                });
-            }, 1000 * 2);
-            Modal.info({
-              content: transI18n('fcr_should_share_your_screen'),
-            });
+    if (EduClassroomConfig.shared.sessionInfo.role === EduRoleTypeEnum.student) {
+      this._disposers.push(
+        computed(() => ({
+          screenShareState: this.classroomStore.mediaStore.localScreenShareTrackState,
+          classRoomState: this.roomSceneByRoomUuid(this.currentGroupUuid)?.roomState.state,
+        })).observe(({ newValue, oldValue }) => {
+          if (newValue.classRoomState === ClassroomState.Connected) {
+            const { roomUuid, role } = EduClassroomConfig.shared.sessionInfo;
+            if (
+              (newValue.screenShareState === AgoraRteMediaSourceState.stopped ||
+                newValue.screenShareState === AgoraRteMediaSourceState.error) &&
+              role === EduRoleTypeEnum.student
+            ) {
+              setTimeout(() => {
+                this.leaveClassroom(roomUuid)
+                  .then(() => {
+                    this.classroomStore.connectionStore.leaveClassroom(LeaveReason.leave);
+                  })
+                  .catch((e) => {
+                    this.shareUIStore.addToast('leave classroom error', e);
+                  });
+              }, 1000 * 2);
+              Modal.info({
+                content: transI18n('fcr_should_share_your_screen'),
+              });
+            }
           }
-        },
-      ),
-    );
+        }),
+      );
+    }
 
     EduEventCenter.shared.onClassroomEvents(this._handleClassroomEvent);
   }
