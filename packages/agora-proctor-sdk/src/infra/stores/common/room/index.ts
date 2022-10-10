@@ -168,12 +168,18 @@ export class RoomUIStore extends EduUIStoreBase {
       Logger.info(`${this.currentGroupUuid} join in`);
       this.addGroup();
     } else {
-      this.classroomStore.groupStore.updateGroupUsers([
-        {
-          groupUuid: this.currentGroupUuid,
-          addUsers: [EduClassroomConfig.shared.sessionInfo.userUuid],
-        },
-      ]);
+      const userUuid = EduClassroomConfig.shared.sessionInfo.userUuid;
+      if (!group.users.find((user) => user.userUuid === userUuid)) {
+        this.classroomStore.groupStore.updateGroupUsers(
+          [
+            {
+              groupUuid: this.currentGroupUuid,
+              addUsers: [],
+            },
+          ],
+          false,
+        );
+      }
     }
   };
   @bound
