@@ -11,7 +11,7 @@ import {
   EduRoomTypeEnum,
   EduSessionInfo,
   LeaveReason,
-} from "agora-edu-core";
+} from 'agora-edu-core';
 import {
   AgoraRteMediaPublishState,
   AgoraRteMediaSourceState,
@@ -19,24 +19,17 @@ import {
   bound,
   Logger,
   retryAttempt,
-} from "agora-rte-sdk";
-import { Modal } from "antd";
-import to from "await-to-js";
-import dayjs from "dayjs";
-import md5 from "js-md5";
-import {
-  action,
-  computed,
-  IReactionDisposer,
-  Lambda,
-  observable,
-  runInAction,
-} from "mobx";
-import { computedFn } from "mobx-utils";
-import { transI18n } from "~ui-kit";
-import { EduUIStoreBase } from "../base";
-import { SceneSubscription, SubscriptionFactory } from "../subscription/room";
-import { RoomScene } from "./struct";
+} from 'agora-rte-sdk';
+import { Modal } from 'antd';
+import to from 'await-to-js';
+import dayjs from 'dayjs';
+import md5 from 'js-md5';
+import { action, computed, IReactionDisposer, Lambda, observable, runInAction } from 'mobx';
+import { computedFn } from 'mobx-utils';
+import { transI18n } from '~ui-kit';
+import { EduUIStoreBase } from '../base';
+import { SceneSubscription, SubscriptionFactory } from '../subscription/room';
+import { RoomScene } from './struct';
 
 export class RoomUIStore extends EduUIStoreBase {
   private _sceneSubscriptions: Map<string, SceneSubscription> = new Map<
@@ -60,10 +53,7 @@ export class RoomUIStore extends EduUIStoreBase {
   @bound
   async joinClassroom(roomUuid: string, roomType?: EduRoomTypeEnum) {
     if (this.roomSceneByRoomUuid(roomUuid)) {
-      if (
-        this.roomSceneByRoomUuid(roomUuid)?.roomState.state !==
-        ClassroomState.Connected
-      ) {
+      if (this.roomSceneByRoomUuid(roomUuid)?.roomState.state !== ClassroomState.Connected) {
         return;
       }
     }
@@ -89,7 +79,7 @@ export class RoomUIStore extends EduUIStoreBase {
           await scene.joinScene({
             userName: sessionInfo.userName,
             userRole: EduRole2RteRole(sessionInfo.roomType, sessionInfo.role),
-            streamId: "0",
+            streamId: '0',
           });
           runInAction(() => {
             this.roomScenes.set(roomUuid, roomScene);
@@ -103,14 +93,14 @@ export class RoomUIStore extends EduUIStoreBase {
           return true;
         })
         .abort(() => {})
-        .exec()
+        .exec(),
     );
 
     if (error) {
       roomScene.setClassroomState(ClassroomState.Idle);
       return EduErrorCenter.shared.handleThrowableError(
         AGEduErrorCode.EDU_ERR_JOIN_CLASSROOM_FAIL,
-        error
+        error,
       );
     }
 
@@ -118,19 +108,8 @@ export class RoomUIStore extends EduUIStoreBase {
     return roomScene;
   }
   async checkIn(sessionInfo: EduSessionInfo, roomScene: RoomScene) {
-    const { data, ts } = await this.classroomStore.api.checkIn(
-      sessionInfo,
-      undefined
-    );
-    const {
-      state = 0,
-      startTime,
-      duration,
-      closeDelay = 0,
-      rtcRegion,
-      rtmRegion,
-      vid,
-    } = data;
+    const { data, ts } = await this.classroomStore.api.checkIn(sessionInfo, undefined);
+    const { state = 0, startTime, duration, closeDelay = 0, rtcRegion, rtmRegion, vid } = data;
     EduClassroomConfig.shared.rteEngineConfig.setRtcRegion(rtcRegion);
     EduClassroomConfig.shared.rteEngineConfig.setRtmRegion(rtmRegion);
     roomScene.setCheckInData({
@@ -157,7 +136,7 @@ export class RoomUIStore extends EduUIStoreBase {
    */
   get currentGroupUuid() {
     const { userUuid, roomUuid } = EduClassroomConfig.shared.sessionInfo;
-    const userUuidPrefix = userUuid.split("-")[0];
+    const userUuidPrefix = userUuid.split('-')[0];
     return md5(`${roomUuid}-${userUuidPrefix}`);
   }
 
@@ -168,7 +147,7 @@ export class RoomUIStore extends EduUIStoreBase {
   addGroup() {
     const { userUuid } = EduClassroomConfig.shared.sessionInfo;
     const newUsers = { userUuid };
-    const userUuidPrefix = userUuid.split("-")[0];
+    const userUuidPrefix = userUuid.split('-')[0];
 
     this.classroomStore.groupStore.addGroups(
       [
@@ -178,18 +157,23 @@ export class RoomUIStore extends EduUIStoreBase {
           users: [newUsers],
         },
       ],
-      false
+      false,
     );
   }
 
   private _checkUserRoomState = () => {
-    const group = this.classroomStore.groupStore.groupDetails.get(
-      this.currentGroupUuid
-    );
+    const group = this.classroomStore.groupStore.groupDetails.get(this.currentGroupUuid);
 
     if (!group) {
       Logger.info(`${this.currentGroupUuid} join in`);
       this.addGroup();
+    } else {
+      this.classroomStore.groupStore.updateGroupUsers([
+        {
+          groupUuid: this.currentGroupUuid,
+          addUsers: [EduClassroomConfig.shared.sessionInfo.userUuid],
+        },
+      ]);
     }
   };
   @bound
@@ -200,10 +184,7 @@ export class RoomUIStore extends EduUIStoreBase {
   @bound
   private async _handleClassroomEvent(type: AgoraEduClassroomEvent, args: any) {
     if (type === AgoraEduClassroomEvent.JoinSubRoom) {
-      const roomScene = await this.joinClassroom(
-        this.currentGroupUuid,
-        EduRoomTypeEnum.RoomGroup
-      );
+      const roomScene = await this.joinClassroom(this.currentGroupUuid, EduRoomTypeEnum.RoomGroup);
       if (roomScene) {
         await roomScene.scene?.joinRTC();
         this.classroomStore.streamStore.updateLocalPublishState(
@@ -211,7 +192,7 @@ export class RoomUIStore extends EduUIStoreBase {
             videoState: AgoraRteMediaPublishState.Published,
             audioState: AgoraRteMediaPublishState.Published,
           },
-          roomScene.scene
+          roomScene.scene,
         );
       }
     }
@@ -265,7 +246,7 @@ export class RoomUIStore extends EduUIStoreBase {
                     this.calibratedTime +
                     this.classroomSchedule.startTime
                 : this.calibratedTime - this.classroomSchedule.startTime,
-              0
+              0,
             );
           }
           break;
@@ -274,10 +255,7 @@ export class RoomUIStore extends EduUIStoreBase {
             this.classroomSchedule.startTime !== undefined &&
             this.classroomSchedule.duration !== undefined
           ) {
-            duration = Math.max(
-              this.calibratedTime - this.classroomSchedule.startTime,
-              0
-            );
+            duration = Math.max(this.calibratedTime - this.classroomSchedule.startTime, 0);
           }
           break;
       }
@@ -286,13 +264,13 @@ export class RoomUIStore extends EduUIStoreBase {
   }
 
   formatCountDown = (time: number) => {
-    const classDuration = dayjs.duration(time, "ms");
-    return classDuration.format("mm:ss");
+    const classDuration = dayjs.duration(time, 'ms');
+    return classDuration.format('mm:ss');
   };
 
   @computed
   get formatStartTime() {
-    return dayjs(this.classroomSchedule.startTime).format("HH:mm");
+    return dayjs(this.classroomSchedule.startTime).format('HH:mm');
   }
   /**
    * 教室状态文字
@@ -320,9 +298,9 @@ export class RoomUIStore extends EduUIStoreBase {
   @computed
   get statusTextTip() {
     if (this.classState === ClassState.beforeClass) {
-      return transI18n("fcr_room_label_start_time");
+      return transI18n('fcr_room_label_start_time');
     } else {
-      return transI18n("fcr_room_label_time_remaining");
+      return transI18n('fcr_room_label_time_remaining');
     }
   }
   /** Hooks */
@@ -333,36 +311,34 @@ export class RoomUIStore extends EduUIStoreBase {
           if (!oldValue?.size) {
             this._addGroupDetailsChange();
           }
-        }
-      )
+        },
+      ),
     );
 
     this._disposers.push(
-      computed(
-        () => this.classroomStore.mediaStore.localScreenShareTrackState
-      ).observe(({ newValue, oldValue }) => {
-        const { roomUuid, role } = EduClassroomConfig.shared.sessionInfo;
-        if (
-          (newValue === AgoraRteMediaSourceState.stopped ||
-            newValue === AgoraRteMediaSourceState.error) &&
-          role === EduRoleTypeEnum.student
-        ) {
-          setTimeout(() => {
-            this.leaveClassroom(roomUuid)
-              .then(() => {
-                this.classroomStore.connectionStore.leaveClassroom(
-                  LeaveReason.leave
-                );
-              })
-              .catch((e) => {
-                this.shareUIStore.addToast("leave classroom error", e);
-              });
-          }, 1000 * 2);
-          Modal.info({
-            content: transI18n("fcr_should_share_your_screen"),
-          });
-        }
-      })
+      computed(() => this.classroomStore.mediaStore.localScreenShareTrackState).observe(
+        ({ newValue, oldValue }) => {
+          const { roomUuid, role } = EduClassroomConfig.shared.sessionInfo;
+          if (
+            (newValue === AgoraRteMediaSourceState.stopped ||
+              newValue === AgoraRteMediaSourceState.error) &&
+            role === EduRoleTypeEnum.student
+          ) {
+            setTimeout(() => {
+              this.leaveClassroom(roomUuid)
+                .then(() => {
+                  this.classroomStore.connectionStore.leaveClassroom(LeaveReason.leave);
+                })
+                .catch((e) => {
+                  this.shareUIStore.addToast('leave classroom error', e);
+                });
+            }, 1000 * 2);
+            Modal.info({
+              content: transI18n('fcr_should_share_your_screen'),
+            });
+          }
+        },
+      ),
     );
 
     EduEventCenter.shared.onClassroomEvents(this._handleClassroomEvent);
