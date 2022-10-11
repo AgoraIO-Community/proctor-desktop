@@ -87,6 +87,13 @@
         userRole,
         courseWareList: [],
         recordOptions,
+        mediaOptions: {
+          web: {
+            codec: 'h264',
+            mode: 'live',
+          },
+        },
+        examinationUrl: 'https://forms.clickup.com/8556478/f/853xy-21947/IM8JKH1HOOF3LDJDEB',
         listener: (evt, args) => {
           console.log('connected to classroom', evt, args);
           if (evt === 1) {

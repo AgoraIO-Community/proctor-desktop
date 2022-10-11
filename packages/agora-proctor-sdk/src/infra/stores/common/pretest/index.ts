@@ -8,29 +8,23 @@ import {
   EduClassroomConfig,
   EduErrorCenter,
   EduEventCenter,
-} from "agora-edu-core";
-import {
-  AGError,
-  AGErrorWrapper,
-  AgoraRteMediaSourceState,
-  bound,
-  Logger,
-} from "agora-rte-sdk";
-import { action, computed, Lambda, observable, runInAction } from "mobx";
-import { computedFn } from "mobx-utils";
-import { v4 as uuidv4 } from "uuid";
-import { transI18n } from "~ui-kit";
-import { EduUIStoreBase } from "../base";
-import { CameraPlaceholderType, DeviceStateChangedReason } from "../type";
-import { extractFileExt, fileExt2ContentType, supportedTypes } from "./help";
+} from 'agora-edu-core';
+import { AGError, AGErrorWrapper, AgoraRteMediaSourceState, bound, Logger } from 'agora-rte-sdk';
+import { action, computed, Lambda, observable, runInAction } from 'mobx';
+import { computedFn } from 'mobx-utils';
+import { v4 as uuidv4 } from 'uuid';
+import { transI18n } from '~ui-kit';
+import { EduUIStoreBase } from '../base';
+import { CameraPlaceholderType, DeviceStateChangedReason } from '../type';
+import { extractFileExt, fileExt2ContentType, supportedTypes } from './help';
 
 export type PretestToast = {
   id: string;
-  type: "video" | "audio_recording" | "audio_playback" | "error";
+  type: 'video' | 'audio_recording' | 'audio_playback' | 'error';
   info: string;
 };
 
-type AddToastArgs = Omit<PretestToast, "id">;
+type AddToastArgs = Omit<PretestToast, 'id'>;
 
 export enum EnumStep {
   one = 0,
@@ -44,31 +38,31 @@ export class PretestUIStore extends EduUIStoreBase {
 
   onInstall() {
     // 处理视频设备变动
-    const videoDisposer = computed(
-      () => this.classroomStore.mediaStore.videoCameraDevices
-    ).observe(({ newValue, oldValue }) => {
-      // 避免初始化阶段触发新设备的弹窗通知
-      if (oldValue && oldValue.length > 1) {
-        if (newValue.length > oldValue.length) {
-          this.addToast({
-            type: "video",
-            info: DeviceStateChangedReason.newDeviceDetected,
-          });
+    const videoDisposer = computed(() => this.classroomStore.mediaStore.videoCameraDevices).observe(
+      ({ newValue, oldValue }) => {
+        // 避免初始化阶段触发新设备的弹窗通知
+        if (oldValue && oldValue.length > 1) {
+          if (newValue.length > oldValue.length) {
+            this.addToast({
+              type: 'video',
+              info: DeviceStateChangedReason.newDeviceDetected,
+            });
+          }
         }
-      }
-    });
+      },
+    );
 
     this._disposers.add(videoDisposer);
 
     // 处理录音设备变动
     const audioRecordingDisposer = computed(
-      () => this.classroomStore.mediaStore.audioRecordingDevices
+      () => this.classroomStore.mediaStore.audioRecordingDevices,
     ).observe(({ newValue, oldValue }) => {
       // 避免初始化阶段触发新设备的弹窗通知
       if (oldValue && oldValue.length > 1) {
         if (newValue.length > oldValue.length) {
           this.addToast({
-            type: "audio_recording",
+            type: 'audio_recording',
             info: DeviceStateChangedReason.newDeviceDetected,
           });
         }
@@ -79,33 +73,30 @@ export class PretestUIStore extends EduUIStoreBase {
 
     // 处理扬声器设备变动
     const playbackDisposer = computed(
-      () => this.classroomStore.mediaStore.audioPlaybackDevices
+      () => this.classroomStore.mediaStore.audioPlaybackDevices,
     ).observe(({ newValue, oldValue }) => {
       // 避免初始化阶段触发新设备的弹窗通知
       if (oldValue && oldValue.length > 0) {
         if (newValue.length > oldValue.length) {
           this.addToast({
-            type: "audio_playback",
+            type: 'audio_playback',
             info: DeviceStateChangedReason.newDeviceDetected,
           });
         }
       }
     });
     this._disposers.add(
-      computed(
-        () => this.classroomStore.connectionStore.classroomState
-      ).observe(({ oldValue, newValue }) => {
-        if (
-          oldValue === ClassroomState.Connecting &&
-          newValue === ClassroomState.Connected
-        ) {
-          Logger.info(`newvalue ${newValue}, oldvalue ${oldValue}`);
-          const userUuid = EduClassroomConfig.shared.sessionInfo.userUuid;
-          this.classroomStore.userStore.updateUserProperties([
-            { userUuid, properties: { avatar: this.avatarUrl } },
-          ]);
-        }
-      })
+      computed(() => this.classroomStore.connectionStore.classroomState).observe(
+        ({ oldValue, newValue }) => {
+          if (oldValue === ClassroomState.Connecting && newValue === ClassroomState.Connected) {
+            Logger.info(`newvalue ${newValue}, oldvalue ${oldValue}`);
+            const userUuid = EduClassroomConfig.shared.sessionInfo.userUuid;
+            this.classroomStore.userStore.updateUserProperties([
+              { userUuid, properties: { avatar: this.avatarUrl } },
+            ]);
+          }
+        },
+      ),
     );
 
     EduEventCenter.shared.onClassroomEvents(this._handleInteractionEvents);
@@ -120,19 +111,19 @@ export class PretestUIStore extends EduUIStoreBase {
     switch (type) {
       case AgoraEduClassroomEvent.CurrentCamUnplugged:
         this.addToast({
-          type: "error",
+          type: 'error',
           info: DeviceStateChangedReason.cameraUnplugged,
         });
         break;
       case AgoraEduClassroomEvent.CurrentMicUnplugged:
         this.addToast({
-          type: "error",
+          type: 'error',
           info: DeviceStateChangedReason.micUnplugged,
         });
         break;
       case AgoraEduClassroomEvent.CurrentSpeakerUnplugged:
         this.addToast({
-          type: "error",
+          type: 'error',
           info: DeviceStateChangedReason.playbackUnplugged,
         });
         break;
@@ -160,16 +151,16 @@ export class PretestUIStore extends EduUIStoreBase {
   /**
    * 当前步骤
    */
-  @observable currentStep: number = EnumStep["one"];
+  @observable currentStep: number = EnumStep['one'];
 
-  @observable snapshotImage: string = "";
+  @observable snapshotImage: string = '';
 
   @observable snapshotImageProcess: boolean = false; // 默认头像没有进度
 
   @observable _snapshotImageFile?: File;
 
   /** 快照 */
-  @observable avatarUrl: string = "";
+  @observable avatarUrl: string = '';
 
   /**
    * 视频消息 Toast 列表
@@ -177,7 +168,7 @@ export class PretestUIStore extends EduUIStoreBase {
    */
   @computed
   get videoToastQueue() {
-    return this.toastQueue.filter((t) => t.type === "video");
+    return this.toastQueue.filter((t) => t.type === 'video');
   }
 
   /**
@@ -186,7 +177,7 @@ export class PretestUIStore extends EduUIStoreBase {
    */
   @computed
   get audioPlaybackToastQueue() {
-    return this.toastQueue.filter((t) => t.type === "audio_playback");
+    return this.toastQueue.filter((t) => t.type === 'audio_playback');
   }
 
   /**
@@ -195,7 +186,7 @@ export class PretestUIStore extends EduUIStoreBase {
    */
   @computed
   get audioRecordingToastQueue() {
-    return this.toastQueue.filter((t) => t.type === "audio_recording");
+    return this.toastQueue.filter((t) => t.type === 'audio_recording');
   }
 
   /**
@@ -204,7 +195,7 @@ export class PretestUIStore extends EduUIStoreBase {
    */
   @computed
   get errorToastQueue() {
-    return this.toastQueue.filter((t) => t.type === "error");
+    return this.toastQueue.filter((t) => t.type === 'error');
   }
 
   /**
@@ -213,10 +204,7 @@ export class PretestUIStore extends EduUIStoreBase {
    */
   @computed get cameraDevicesList() {
     return this.classroomStore.mediaStore.videoCameraDevices.map((item) => ({
-      label:
-        item.deviceid === DEVICE_DISABLE
-          ? transI18n("disabled")
-          : item.devicename,
+      label: item.deviceid === DEVICE_DISABLE ? transI18n('disabled') : item.devicename,
       value: item.deviceid,
     }));
   }
@@ -227,10 +215,7 @@ export class PretestUIStore extends EduUIStoreBase {
    */
   @computed get recordingDevicesList() {
     return this.classroomStore.mediaStore.audioRecordingDevices.map((item) => ({
-      label:
-        item.deviceid === DEVICE_DISABLE
-          ? transI18n("disabled")
-          : item.devicename,
+      label: item.deviceid === DEVICE_DISABLE ? transI18n('disabled') : item.devicename,
       value: item.deviceid,
     }));
   }
@@ -240,17 +225,16 @@ export class PretestUIStore extends EduUIStoreBase {
    * @returns
    */
   @computed get playbackDevicesList() {
-    const playbackDevicesList =
-      this.classroomStore.mediaStore.audioPlaybackDevices.map((item) => ({
-        label: item.devicename,
-        value: item.deviceid,
-      }));
+    const playbackDevicesList = this.classroomStore.mediaStore.audioPlaybackDevices.map((item) => ({
+      label: item.devicename,
+      value: item.deviceid,
+    }));
     return playbackDevicesList.length
       ? playbackDevicesList
       : [
           {
             label: transI18n(`media.default`),
-            value: "default",
+            value: 'default',
           },
         ];
   }
@@ -260,7 +244,7 @@ export class PretestUIStore extends EduUIStoreBase {
    * @returns
    */
   @computed get currentCameraDeviceId(): string {
-    return this.classroomStore.mediaStore.cameraDeviceId ?? "";
+    return this.classroomStore.mediaStore.cameraDeviceId ?? '';
   }
 
   /**
@@ -268,7 +252,7 @@ export class PretestUIStore extends EduUIStoreBase {
    * @returns
    */
   @computed get currentRecordingDeviceId(): string {
-    return this.classroomStore.mediaStore.recordingDeviceId ?? "";
+    return this.classroomStore.mediaStore.recordingDeviceId ?? '';
   }
 
   /**
@@ -276,7 +260,7 @@ export class PretestUIStore extends EduUIStoreBase {
    * @returns
    */
   @computed get currentPlaybackDeviceId(): string {
-    return this.classroomStore.mediaStore.playbackDeviceId ?? "default";
+    return this.classroomStore.mediaStore.playbackDeviceId ?? 'default';
   }
 
   /**
@@ -336,7 +320,7 @@ export class PretestUIStore extends EduUIStoreBase {
    * @returns Icon 类型
    */
   @computed get localMicIconType() {
-    return this.localMicOff ? "microphone-off" : "microphone-on";
+    return this.localMicOff ? 'microphone-off' : 'microphone-on';
   }
 
   /**
@@ -393,9 +377,7 @@ export class PretestUIStore extends EduUIStoreBase {
    */
   @computed
   get whiteningValue() {
-    return Math.ceil(
-      this.classroomStore.mediaStore.beautyEffectOptions.lighteningLevel * 100
-    );
+    return Math.ceil(this.classroomStore.mediaStore.beautyEffectOptions.lighteningLevel * 100);
   }
 
   /**
@@ -404,9 +386,7 @@ export class PretestUIStore extends EduUIStoreBase {
    */
   @computed
   get ruddyValue() {
-    return Math.ceil(
-      this.classroomStore.mediaStore.beautyEffectOptions.rednessLevel * 100
-    );
+    return Math.ceil(this.classroomStore.mediaStore.beautyEffectOptions.rednessLevel * 100);
   }
 
   /**
@@ -415,9 +395,7 @@ export class PretestUIStore extends EduUIStoreBase {
    */
   @computed
   get buffingValue() {
-    return Math.ceil(
-      this.classroomStore.mediaStore.beautyEffectOptions.smoothnessLevel * 100
-    );
+    return Math.ceil(this.classroomStore.mediaStore.beautyEffectOptions.smoothnessLevel * 100);
   }
 
   /**
@@ -438,11 +416,8 @@ export class PretestUIStore extends EduUIStoreBase {
 
   @computed
   get headerStep() {
-    if (
-      this.currentStep === EnumStep["three"] ||
-      this.currentStep === EnumStep["finished"]
-    ) {
-      return EnumStep["three"];
+    if (this.currentStep === EnumStep['three'] || this.currentStep === EnumStep['finished']) {
+      return EnumStep['three'];
     }
     return this.currentStep;
   }
@@ -466,28 +441,21 @@ export class PretestUIStore extends EduUIStoreBase {
   @computed
   get isMediaReady() {
     return (
-      (this.classroomStore.mediaStore.localCameraTrackState ===
-        AgoraRteMediaSourceState.started ||
+      (this.classroomStore.mediaStore.localCameraTrackState === AgoraRteMediaSourceState.started ||
         this.classroomStore.mediaStore.localCameraTrackState ===
           AgoraRteMediaSourceState.starting) &&
-      (this.classroomStore.mediaStore.localMicTrackState ===
-        AgoraRteMediaSourceState.started ||
-        this.classroomStore.mediaStore.localMicTrackState ===
-          AgoraRteMediaSourceState.starting)
+      (this.classroomStore.mediaStore.localMicTrackState === AgoraRteMediaSourceState.started ||
+        this.classroomStore.mediaStore.localMicTrackState === AgoraRteMediaSourceState.starting)
     );
   }
 
   @computed
   get stepupStates() {
     return [
-      this.classroomStore.mediaStore.localCameraTrackState ===
-        AgoraRteMediaSourceState.started ||
-        this.classroomStore.mediaStore.localCameraTrackState ===
-          AgoraRteMediaSourceState.starting,
-      this.classroomStore.mediaStore.localMicTrackState ===
-        AgoraRteMediaSourceState.started ||
-        this.classroomStore.mediaStore.localMicTrackState ===
-          AgoraRteMediaSourceState.starting,
+      this.classroomStore.mediaStore.localCameraTrackState === AgoraRteMediaSourceState.started ||
+        this.classroomStore.mediaStore.localCameraTrackState === AgoraRteMediaSourceState.starting,
+      this.classroomStore.mediaStore.localMicTrackState === AgoraRteMediaSourceState.started ||
+        this.classroomStore.mediaStore.localMicTrackState === AgoraRteMediaSourceState.starting,
       this.snapshotImage,
       this.isScreenSharing,
     ];
@@ -499,8 +467,7 @@ export class PretestUIStore extends EduUIStoreBase {
   @computed
   get rightBtnDisable() {
     if (this.currentStep === 0) return !this.isMediaReady;
-    if (this.currentStep === 1)
-      return !this.snapshotImage && !this.snapshotImageProcess;
+    if (this.currentStep === 1) return !this.snapshotImage && !this.snapshotImageProcess;
     if (this.currentStep === 2) return !this.isScreenSharing;
     if (this.currentStep === 3) return this.stepupStates.every((item) => !item);
   }
@@ -508,11 +475,9 @@ export class PretestUIStore extends EduUIStoreBase {
   @computed
   get rightBtnText() {
     if (this.currentStep === 0 || this.currentStep === 1)
-      return transI18n("fcr_exam_prep_button_next_step");
-    if (this.currentStep === 2)
-      return transI18n("fcr_exam_prep_button_confirm_sharing");
-    if (this.currentStep === 3)
-      return transI18n("fcr_exam_prep_button_join_exam");
+      return transI18n('fcr_exam_prep_button_next_step');
+    if (this.currentStep === 2) return transI18n('fcr_exam_prep_button_confirm_sharing');
+    if (this.currentStep === 3) return transI18n('fcr_exam_prep_button_join_exam');
   }
 
   /**
@@ -520,8 +485,8 @@ export class PretestUIStore extends EduUIStoreBase {
    */
   activeBeautyTypeIcon = computedFn((item) =>
     this.activeBeautyType === item.id
-      ? { icon: item.icon, color: "#fff" }
-      : { icon: item.icon, color: "rgba(255,255,255,.5)" }
+      ? { icon: item.icon, color: '#fff' }
+      : { icon: item.icon, color: 'rgba(255,255,255,.5)' },
   );
 
   /**
@@ -724,8 +689,8 @@ export class PretestUIStore extends EduUIStoreBase {
   @bound
   private _backToLoginPage() {
     // back to login page
-    console.log("back to login page");
-    window.location.replace("/");
+    console.log('back to login page');
+    window.location.replace('/');
   }
   @bound
   handleClose() {
@@ -735,11 +700,11 @@ export class PretestUIStore extends EduUIStoreBase {
   @action
   handlePersonalAvatar = async () => {
     if (!this._snapshotImageFile) {
-      return Promise.reject("has not image file");
+      return Promise.reject('has not image file');
     }
     let fileData = await this.uploadPersonalResource(this._snapshotImageFile);
     if (!fileData?.url) {
-      return Promise.reject("upload image error");
+      return Promise.reject('upload image error');
     }
     runInAction(() => {
       this.avatarUrl = fileData?.url as string;
@@ -752,7 +717,7 @@ export class PretestUIStore extends EduUIStoreBase {
   @action.bound
   async setNextStep(okCallback: () => void) {
     try {
-      if (this.currentStep === EnumStep["two"] && this._snapshotImageFile) {
+      if (this.currentStep === EnumStep['two'] && this._snapshotImageFile) {
         runInAction(() => {
           this.snapshotImageProcess = true;
         });
@@ -763,7 +728,7 @@ export class PretestUIStore extends EduUIStoreBase {
         });
       }
       let currentStep = this.currentStep + 1;
-      if (currentStep > EnumStep["finished"]) {
+      if (currentStep > EnumStep['finished']) {
         // finish
         okCallback();
         return;
@@ -790,37 +755,34 @@ export class PretestUIStore extends EduUIStoreBase {
         return this.shareUIStore.addGenericErrorDialog(
           AGErrorWrapper(
             AGEduErrorCode.EDU_ERR_UPLOAD_FAILED_NO_FILE_EXT,
-            new Error(`no file ext`)
-          )
+            new Error(`no file ext`),
+          ),
         );
       }
 
       ext = ext.toLowerCase();
 
-      const resourceUuid =
-        await this.classroomStore.cloudDriveStore.calcResourceUuid(file);
+      const resourceUuid = await this.classroomStore.cloudDriveStore.calcResourceUuid(file);
 
       if (!supportedTypes.includes(ext)) {
         this.classroomStore.cloudDriveStore.updateProgress(
           resourceUuid,
           undefined,
-          CloudDriveResourceUploadStatus.Failed
+          CloudDriveResourceUploadStatus.Failed,
         );
         return EduErrorCenter.shared.handleNonThrowableError(
           AGEduErrorCode.EDU_ERR_INVALID_CLOUD_RESOURCE,
-          new Error(`unsupported file type ${ext}`)
+          new Error(`unsupported file type ${ext}`),
         );
       }
       const contentType = fileExt2ContentType(ext);
 
-      const data =
-        await this.classroomStore.cloudDriveStore.uploadPersonalResource(
-          file,
-          resourceUuid,
-          ext,
-          contentType,
-          false
-        );
+      const data = await this.classroomStore.cloudDriveStore.uploadPersonalResource(
+        file,
+        resourceUuid,
+        ext,
+        contentType,
+      );
 
       return data;
     } catch (e) {
@@ -846,18 +808,13 @@ export class PretestUIStore extends EduUIStoreBase {
   @bound
   async getSnapshot() {
     const { userUuid, roomUuid } = EduClassroomConfig.shared.sessionInfo;
-    let imageData =
-      this.classroomStore.mediaStore.mediaControl.getCurrentFrameData(
-        "",
-        "",
-        true
-      );
-    const canvas = document.createElement("canvas");
+    let imageData = this.classroomStore.mediaStore.mediaControl.getCurrentFrameData('', '', true);
+    const canvas = document.createElement('canvas');
     canvas.width = imageData.width;
     canvas.height = imageData.height;
-    const canvasCtx = canvas.getContext("2d") as CanvasRenderingContext2D;
+    const canvasCtx = canvas.getContext('2d') as CanvasRenderingContext2D;
     canvasCtx.putImageData(imageData, 0, 0);
-    const base64 = canvas.toDataURL("image/jpeg", 1.0);
+    const base64 = canvas.toDataURL('image/jpeg', 1.0);
     const imageBlob = await new Promise((res, rej) => {
       canvas.toBlob((blob) => {
         res(blob);
@@ -865,10 +822,7 @@ export class PretestUIStore extends EduUIStoreBase {
     });
     if (imageBlob) {
       runInAction(() => {
-        this._snapshotImageFile = new File(
-          [imageBlob as BlobPart],
-          `${userUuid}${roomUuid}.jpeg`
-        );
+        this._snapshotImageFile = new File([imageBlob as BlobPart], `${userUuid}${roomUuid}.jpeg`);
       });
     }
 
@@ -878,10 +832,7 @@ export class PretestUIStore extends EduUIStoreBase {
   @bound
   startLocalScreenShare() {
     if (!this.classroomStore.mediaStore.hasScreenSharePermission()) {
-      this.shareUIStore.addToast(
-        transI18n("toast2.screen_permission_denied"),
-        "warning"
-      );
+      this.shareUIStore.addToast(transI18n('toast2.screen_permission_denied'), 'warning');
     }
 
     return this.classroomStore.mediaStore.startScreenShareCapture();

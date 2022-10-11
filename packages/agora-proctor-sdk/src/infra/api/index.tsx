@@ -1,4 +1,4 @@
-import { Scenarios } from "@/ui-kit/capabilities/scenarios";
+import { Scenarios } from '@/ui-kit/capabilities/scenarios';
 import {
   AgoraEduClassroomEvent,
   EduClassroomConfig,
@@ -7,19 +7,18 @@ import {
   EduRegion,
   EduRoleTypeEnum,
   EduRoomServiceTypeEnum,
-  EduRoomSubtypeEnum,
   EduRoomTypeEnum,
   Platform,
-} from "agora-edu-core";
-import { FcrWebviewWidget } from "agora-plugin-gallery";
-import { ApiBase } from "agora-rte-sdk";
-import dayjs from "dayjs";
-import duration from "dayjs/plugin/duration";
-import { render, unmountComponentAtNode } from "react-dom";
-import { FcrTheme } from "~ui-kit";
-import { EduContext } from "../contexts";
+} from 'agora-edu-core';
+import { FcrWebviewWidget } from 'agora-plugin-gallery';
+import { ApiBase } from 'agora-rte-sdk';
+import dayjs from 'dayjs';
+import duration from 'dayjs/plugin/duration';
+import { render, unmountComponentAtNode } from 'react-dom';
+import { FcrTheme } from '~ui-kit';
+import { EduContext } from '../contexts';
 
-import { FcrMultiThemeMode, FcrUIConfig } from "../types/config";
+import { FcrMultiThemeMode, FcrUIConfig } from '../types/config';
 import {
   applyTheme,
   loadGeneratedFiles,
@@ -28,11 +27,11 @@ import {
   supportedRoomTypes,
   themes,
   uiConfigs,
-} from "../utils/config-loader";
+} from '../utils/config-loader';
 
-import "antd/dist/antd.css";
-import "./polyfills";
-import { Providers } from "./providers";
+import 'antd/dist/antd.css';
+import './polyfills';
+import { Providers } from './providers';
 import {
   AgoraWidgetBase,
   BoardWindowAnimationOptions,
@@ -41,15 +40,15 @@ import {
   LaunchMediaOptions,
   LaunchOption,
   LaunchWindowOption,
-} from "./type";
+} from './type';
 
-export * from "./type";
+export * from './type';
 export class AgoraEduSDK {
   private static _config: any = {};
   private static _widgets: Record<string, typeof AgoraWidgetBase> = {};
   private static _boardWindowAnimationOptions: BoardWindowAnimationOptions = {};
   private static _language: string;
-  private static _appId = "";
+  private static _appId = '';
   private static _uiConfig: FcrUIConfig;
   private static _theme: FcrTheme;
   private static _shareUrl: string;
@@ -59,20 +58,18 @@ export class AgoraEduSDK {
 
   private static _convertRegion(region: string): EduRegion {
     switch (region) {
-      case "CN":
+      case 'CN':
         return EduRegion.CN;
-      case "AS":
+      case 'AS':
         return EduRegion.AP;
-      case "EU":
+      case 'EU':
         return EduRegion.EU;
-      case "NA":
+      case 'NA':
         return EduRegion.NA;
     }
     return region as EduRegion;
   }
-  private static _convertMediaOptions(
-    opts?: LaunchMediaOptions
-  ): ConvertMediaOptionsConfig {
+  private static _convertMediaOptions(opts?: LaunchMediaOptions): ConvertMediaOptionsConfig {
     const config: ConvertMediaOptionsConfig = {};
     if (opts) {
       const {
@@ -104,7 +101,7 @@ export class AgoraEduSDK {
           ...lowStreamCameraEncoderConfiguration,
         };
       }
-      if (typeof channelProfile !== "undefined") {
+      if (typeof channelProfile !== 'undefined') {
         config.channelProfile = channelProfile;
       }
       if (web) {
@@ -136,7 +133,7 @@ export class AgoraEduSDK {
 
   static getLoadedScenes() {
     return supportedRoomTypes.map((roomType) => {
-      const name = uiConfigs[roomType].name ?? "";
+      const name = uiConfigs[roomType].name ?? '';
 
       return {
         name,
@@ -161,7 +158,7 @@ export class AgoraEduSDK {
   }
 
   static get language() {
-    return this._language || "en";
+    return this._language || 'en';
   }
 
   static get uiConfig() {
@@ -179,11 +176,10 @@ export class AgoraEduSDK {
     return this._examinationUrl;
   }
   private static _validateOptions(option: LaunchOption) {
-    const isInvalid = (value: string) =>
-      value === undefined || value === null || value === "";
+    const isInvalid = (value: string) => value === undefined || value === null || value === '';
 
     if (!option) {
-      throw new Error("AgoraEduSDK: LaunchOption is required!");
+      throw new Error('AgoraEduSDK: LaunchOption is required!');
     } else if (
       ![
         EduRoleTypeEnum.assistant,
@@ -194,7 +190,7 @@ export class AgoraEduSDK {
         EduRoleTypeEnum.observer,
       ].includes(option.roleType)
     ) {
-      throw new Error("AgoraEduSDK: Invalid roleType!");
+      throw new Error('AgoraEduSDK: Invalid roleType!');
     } else if (
       ![
         EduRoomTypeEnum.Room1v1Class,
@@ -203,15 +199,15 @@ export class AgoraEduSDK {
         EduRoomTypeEnum.RoomProctor,
       ].includes(option.roomType)
     ) {
-      throw new Error("AgoraEduSDK: Invalid roomType!");
+      throw new Error('AgoraEduSDK: Invalid roomType!');
     } else if (isInvalid(option.userName)) {
-      throw new Error("AgoraEduSDK: userName is required");
+      throw new Error('AgoraEduSDK: userName is required');
     } else if (isInvalid(option.userUuid)) {
-      throw new Error("AgoraEduSDK: userUuid is required");
+      throw new Error('AgoraEduSDK: userUuid is required');
     } else if (isInvalid(option.roomName)) {
-      throw new Error("AgoraEduSDK: roomName is required");
+      throw new Error('AgoraEduSDK: roomName is required');
     } else if (isInvalid(option.roomUuid)) {
-      throw new Error("AgoraEduSDK: roomUuid is required");
+      throw new Error('AgoraEduSDK: roomUuid is required');
     }
   }
 
@@ -228,7 +224,6 @@ export class AgoraEduSDK {
       userUuid,
       userName,
       roleType,
-      roomSubtype = EduRoomSubtypeEnum.Standard,
       roomServiceType = EduRoomServiceTypeEnum.LiveStandard,
       rtmToken,
       roomUuid,
@@ -250,7 +245,6 @@ export class AgoraEduSDK {
       roomUuid,
       roomName,
       roomType,
-      roomSubtype,
       roomServiceType,
       duration,
       flexProperties: {},
@@ -258,8 +252,8 @@ export class AgoraEduSDK {
       startTime,
     };
 
-    this._shareUrl = shareUrl || "";
-    this._examinationUrl = examinationUrl || "";
+    this._shareUrl = shareUrl || '';
+    this._examinationUrl = examinationUrl || '';
     this._language = option.language;
 
     this._widgets = {
@@ -270,7 +264,7 @@ export class AgoraEduSDK {
     const config = new EduClassroomConfig(
       this._appId,
       sessionInfo,
-      option.recordUrl || "",
+      option.recordUrl || '',
       {
         region: this.region,
         rtcConfigs: {
@@ -286,17 +280,15 @@ export class AgoraEduSDK {
           openCameraDeviceAfterLaunch: pretest,
           openRecordingDeviceAfterLaunch: pretest,
         },
-        recordRetryTimeout ? { recordRetryTimeout } : {}
-      )
+        recordRetryTimeout ? { recordRetryTimeout } : {},
+      ),
     );
 
     if (this._config.host) {
       config.host = this._config.host;
     }
 
-    config.ignoreUrlRegionPrefix = ["dev", "pre"].some((v) =>
-      config.host.includes(v)
-    );
+    config.ignoreUrlRegionPrefix = ['dev', 'pre'].some((v) => config.host.includes(v));
 
     if (recordOptions) {
       this._boardWindowAnimationOptions = recordOptions;
@@ -316,18 +308,10 @@ export class AgoraEduSDK {
     this._selectUITheme(themeMode, option.roomType);
     applyTheme(this._theme);
     render(
-      <Providers
-        language={option.language}
-        uiConfig={this.uiConfig}
-        theme={this.theme}
-      >
-        <Scenarios
-          pretest={pretest}
-          roomType={sessionInfo.roomType}
-          roomSubtype={sessionInfo.roomSubtype}
-        />
+      <Providers language={option.language} uiConfig={this.uiConfig} theme={this.theme}>
+        <Scenarios pretest={pretest} roomType={sessionInfo.roomType} />
       </Providers>,
-      dom
+      dom,
     );
   }
 
@@ -347,14 +331,10 @@ export class AgoraEduSDK {
     applyTheme(this._theme);
 
     render(
-      <Providers
-        language={option.language}
-        uiConfig={this.uiConfig}
-        theme={this.theme}
-      >
+      <Providers language={option.language} uiConfig={this.uiConfig} theme={this.theme}>
         {Component && <Component {...option.args} />}
       </Providers>,
-      dom
+      dom,
     );
 
     return () => {
@@ -362,13 +342,10 @@ export class AgoraEduSDK {
     };
   }
 
-  private static _selectUITheme(
-    uiMode: FcrMultiThemeMode,
-    roomType: EduRoomTypeEnum
-  ) {
+  private static _selectUITheme(uiMode: FcrMultiThemeMode, roomType: EduRoomTypeEnum) {
     const themeMode = uiMode ?? FcrMultiThemeMode.light;
     // this._uiConfig = uiConfigs[roomType];
-    this._theme = themes["default"][themeMode];
+    this._theme = themes['default'][themeMode];
   }
 
   static setRecordReady() {
@@ -378,11 +355,11 @@ export class AgoraEduSDK {
       appId,
     } = EduClassroomConfig.shared;
     const pathPrefix = `${
-      ignoreUrlRegionPrefix ? "" : "/" + region.toLowerCase()
+      ignoreUrlRegionPrefix ? '' : '/' + region.toLowerCase()
     }/edu/apps/${appId}`;
     new ApiBase().fetch({
       path: `/v2/rooms/${roomUuid}/records/ready`,
-      method: "PUT",
+      method: 'PUT',
       pathPrefix,
     });
   }

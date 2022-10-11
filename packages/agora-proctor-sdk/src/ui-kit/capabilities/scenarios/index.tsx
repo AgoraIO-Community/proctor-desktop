@@ -1,22 +1,16 @@
-import "antd/dist/antd.css"; // or 'antd/dist/antd.less'
+import 'antd/dist/antd.css'; // or 'antd/dist/antd.less'
 
-import { useStore } from "@/infra/hooks/ui-store";
-import {
-  EduClassroomConfig,
-  EduRoleTypeEnum,
-  EduRoomSubtypeEnum,
-  EduRoomTypeEnum,
-} from "agora-edu-core";
-import { observer } from "mobx-react";
-import { useLayoutEffect, useState } from "react";
-import { PretestContainer } from "@/ui-kit/capabilities/containers/common/pretest";
-import { ExamineeScenario } from "./examinee";
-import { ProctorScenario } from "./proctor";
+import { useStore } from '@/infra/hooks/ui-store';
+import { EduClassroomConfig, EduRoleTypeEnum, EduRoomTypeEnum } from 'agora-edu-core';
+import { observer } from 'mobx-react';
+import { useLayoutEffect, useState } from 'react';
+import { PretestContainer } from '@/ui-kit/capabilities/containers/common/pretest';
+import { ExamineeScenario } from './examinee';
+import { ProctorScenario } from './proctor';
 
 export type ScenariosProps = {
   pretest: boolean;
   roomType: EduRoomTypeEnum;
-  roomSubtype: EduRoomSubtypeEnum;
 };
 
 export const Scenarios: React.FC<ScenariosProps> = observer(({ pretest }) => {

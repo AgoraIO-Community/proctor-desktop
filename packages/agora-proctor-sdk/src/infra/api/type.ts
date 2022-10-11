@@ -2,69 +2,65 @@ import {
   AgoraEduClassroomEvent,
   EduRoleTypeEnum,
   EduRoomServiceTypeEnum,
-  EduRoomSubtypeEnum,
   EduRoomTypeEnum,
   EduRtcConfig,
   Platform,
-} from "agora-edu-core";
-import { EduVideoEncoderConfiguration, MediaOptions } from "agora-rte-sdk";
-import { AgoraWidgetBase } from "../stores/common/widget/widget-base";
-import { FcrMultiThemeMode } from "../types/config";
+} from 'agora-edu-core';
+import { AGVideoEncoderConfiguration, AGMediaOptions } from 'agora-rte-sdk';
+import { AgoraWidgetBase } from '../stores/common/widget/widget-base';
+import { FcrMultiThemeMode } from '../types/config';
 
 export type AgoraRegion = Uppercase<AgoraRegionString>;
 
 export const regionMap = {
-  AP: "sg",
-  CN: "cn-hz",
-  EU: "gb-lon",
-  NA: "us-sv",
+  AP: 'sg',
+  CN: 'cn-hz',
+  EU: 'gb-lon',
+  NA: 'us-sv',
 } as const;
 
-export type AgoraRegionString = "cn" | "ap" | "na" | "eu";
+export type AgoraRegionString = 'cn' | 'ap' | 'na' | 'eu';
 
-export type ListenerCallback = (
-  evt: AgoraEduClassroomEvent,
-  ...args: any[]
-) => void;
+export type ListenerCallback = (evt: AgoraEduClassroomEvent, ...args: any[]) => void;
 
 export enum WindowID {
-  Main = "main",
-  RemoteControlBar = "remote-control-bar",
+  Main = 'main',
+  RemoteControlBar = 'remote-control-bar',
 }
 
 export enum DeviceTypeEnum {
-  Main = "main",
-  Sub = "sub",
+  Main = 'main',
+  Sub = 'sub',
 }
 
-export type LanguageEnum = "en" | "zh";
+export type LanguageEnum = 'en' | 'zh';
 export type TranslateEnum =
-  | ""
-  | "auto"
-  | "zh-CHS"
-  | "en"
-  | "ja"
-  | "ko"
-  | "fr"
-  | "es"
-  | "pt"
-  | "it"
-  | "ru"
-  | "vi"
-  | "de"
-  | "ar";
+  | ''
+  | 'auto'
+  | 'zh-CHS'
+  | 'en'
+  | 'ja'
+  | 'ko'
+  | 'fr'
+  | 'es'
+  | 'pt'
+  | 'it'
+  | 'ru'
+  | 'vi'
+  | 'de'
+  | 'ar';
 
 export type ConfigParams = {
   appId: string;
   region?: string;
 };
 
-export type LaunchMediaOptions = MediaOptions & {
-  lowStreamCameraEncoderConfiguration?: EduVideoEncoderConfiguration;
+export type LaunchMediaOptions = AGMediaOptions & {
+  lowStreamCameraEncoderConfiguration?: AGVideoEncoderConfiguration;
 };
 
 export type ConvertMediaOptionsConfig = EduRtcConfig & {
-  defaultLowStreamCameraEncoderConfigurations?: EduVideoEncoderConfiguration;
+  defaultLowStreamCameraEncoderConfigurations?: AGVideoEncoderConfiguration;
 };
 
 /**
@@ -76,7 +72,6 @@ export type LaunchOption = {
   roomUuid: string; // 房间uuid
   roleType: EduRoleTypeEnum; // 角色
   roomType: EduRoomTypeEnum; // 房间类型
-  roomSubtype?: EduRoomSubtypeEnum; // 房间子类型
   roomServiceType?: EduRoomServiceTypeEnum; // 房间服务类型
   roomName: string; // 房间名称
   listener: ListenerCallback; // launch状态
@@ -109,18 +104,15 @@ export type LaunchWindowOption = {
   uiMode: FcrMultiThemeMode;
 };
 
-export {
-  AgoraExtensionRoomEvent,
-  AgoraExtensionWidgetEvent,
-} from "../protocol/events";
-export { AgoraWidgetTrackMode } from "../stores/common/widget/type";
-export { AgoraWidgetBase } from "../stores/common/widget/widget-base";
+export { AgoraExtensionRoomEvent, AgoraExtensionWidgetEvent } from '../protocol/events';
+export { AgoraWidgetTrackMode } from '../stores/common/widget/type';
+export { AgoraWidgetBase } from '../stores/common/widget/widget-base';
 export type {
   AgoraMultiInstanceWidget,
   AgoraTrackSyncedWidget,
   AgoraWidgetLifecycle,
   AgoraWidgetRenderable,
-} from "../stores/common/widget/widget-base";
+} from '../stores/common/widget/widget-base';
 
 export type BoardWindowAnimationOptions = {
   minFPS?: number;

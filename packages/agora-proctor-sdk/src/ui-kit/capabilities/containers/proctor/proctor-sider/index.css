@@ -112,8 +112,7 @@
   display: flex;
   justify-content: space-between;
 }
-.fcr_proctor_sider .fcr_proctor_sider_info_proctor-actions-video-left,
-.fcr_proctor_sider .fcr_proctor_sider_info_proctor-actions-video-right,
+
 .fcr_proctor_sider .fcr_proctor_sider_info_proctor-actions-speaker > button {
   height: 40px;
   line-height: 40px;
@@ -131,6 +130,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  padding-right: 30px;
 }
 .fcr_proctor_sider_info_proctor-actions-speaker-extra {
   display: flex;
