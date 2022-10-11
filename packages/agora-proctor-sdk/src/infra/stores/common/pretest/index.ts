@@ -8,6 +8,7 @@ import {
   EduClassroomConfig,
   EduErrorCenter,
   EduEventCenter,
+  LeaveReason,
 } from 'agora-edu-core';
 import { AGError, AGErrorWrapper, AgoraRteMediaSourceState, bound, Logger } from 'agora-rte-sdk';
 import { action, computed, Lambda, observable, runInAction } from 'mobx';
@@ -688,9 +689,7 @@ export class PretestUIStore extends EduUIStoreBase {
 
   @bound
   private _backToLoginPage() {
-    // back to login page
-    console.log('back to login page');
-    window.location.replace('/');
+    EduEventCenter.shared.emitClasroomEvents(AgoraEduClassroomEvent.Destroyed, LeaveReason.leave);
   }
   @bound
   handleClose() {
