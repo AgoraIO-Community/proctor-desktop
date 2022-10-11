@@ -86,44 +86,42 @@ sh ./scripts/install-apaas-modules.sh
 echo "-----install finished------"
 
 
-echo "------set parameters-----"
 
 if ["$record" = " "]
-then
-    if [ "$Env" = "Prod" ] 
-        then
-            REACT_APP_AGORA_APP_SDK_DOMAIN=http://api-solutions-dev.bj2.agoralab.co
-            REACT_APP_AGORA_APP_TOKEN_DOMAIN=http://api-solutions-dev.bj2.agoralab.co   
-            export PROCTORING_DEMO_PUBLISH_PATH=proctoring/test
-        else 
-            REACT_APP_AGORA_APP_SDK_DOMAIN=http://api-solutions-dev.bj2.agoralab.co
-            REACT_APP_AGORA_APP_TOKEN_DOMAIN=http://api-solutions-dev.bj2.agoralab.co   
-            export PROCTORING_DEMO_PUBLISH_PATH=proctoring/test
-        fi
-            # echo REACT_APP_AGORA_APP_SDK_DOMAIN:$REACT_APP_AGORA_APP_SDK_DOMAIN
-            # echo REACT_APP_AGORA_APP_TOKEN_DOMAIN:$REACT_APP_AGORA_APP_TOKEN_DOMAIN
-            # echo PROCTORING_DEMO_PUBLISH_PATH:$PROCTORING_DEMO_PUBLISH_PATH
+    then
+        if [ "$Env" = "Prod" ] 
+            then
+                REACT_APP_AGORA_APP_SDK_DOMAIN=http://api-solutions-dev.bj2.agoralab.co
+                REACT_APP_AGORA_APP_TOKEN_DOMAIN=http://api-solutions-dev.bj2.agoralab.co   
+                export PROCTORING_DEMO_PUBLISH_PATH=proctoring/test
+            else 
+                REACT_APP_AGORA_APP_SDK_DOMAIN=http://api-solutions-dev.bj2.agoralab.co
+                REACT_APP_AGORA_APP_TOKEN_DOMAIN=http://api-solutions-dev.bj2.agoralab.co   
+                export PROCTORING_DEMO_PUBLISH_PATH=proctoring/test
+                # echo REACT_APP_AGORA_APP_SDK_DOMAIN:$REACT_APP_AGORA_APP_SDK_DOMAIN
+                # echo REACT_APP_AGORA_APP_TOKEN_DOMAIN:$REACT_APP_AGORA_APP_TOKEN_DOMAIN
+                # echo PROCTORING_DEMO_PUBLISH_PATH:$PROCTORING_DEMO_PUBLISH_PATH
+                echo "-----build------"
+                yarn ci:build:web
+                echo "-----build finished------"
+                echo "-----publish started------"
+                aws s3 sync ./packages/agora-proctor-demo/build/. s3://agora-adc-artifacts/$PROCTORING_DEMO_PUBLISH_PATH/ --cache-control no-cache
+                global_url=https://solutions-apaas.agora.io/$PROCTORING_DEMO_PUBLISH_PATH/index.html
+                echo global_url: $global_url
+                echo "-----publish success------"
+            fi
+                
+    else 
+            
             echo "-----build------"
-            yarn ci:build:web
+            yarn release:classroom:sdk
             echo "-----build finished------"
-            echo "-----publish started------"
-            aws s3 sync ./packages/agora-proctor-demo/build/. s3://agora-adc-artifacts/$PROCTORING_DEMO_PUBLISH_PATH/ --cache-control no-cache
-            global_url=https://solutions-apaas.agora.io/$PROCTORING_DEMO_PUBLISH_PATH/index.html
-            echo global_url: $global_url
-            echo "-----publish success------"
-else 
-        echo "-----install------"
-        sh ./scripts/install-apaas-modules.sh
-        echo "-----install finished------"
-        echo "-----build------"
-        yarn release:classroom:sdk
-        echo "-----build finished------"
-        mkdir -p record_temp
-        cp templates/record_page_test.html ./record_temp/record_page_test.html || true
-        url=https://agora-adc-artifacts.s3.cn-north-1.amazonaws.com.cn/apaas/proctor/record/test/$record/record_page_test.html
-        echo $url
-        aws s3 sync ./record_temp/. s3://agora-adc-artifacts/apaas/proctor/record/test/$record
-fi
+            mkdir -p record_temp
+            cp templates/record_page_test.html ./record_temp/record_page_test.html || true
+            url=https://agora-adc-artifacts.s3.cn-north-1.amazonaws.com.cn/apaas/proctor/record/test/$record/record_page_test.html
+            echo $url
+            aws s3 sync ./record_temp/. s3://agora-adc-artifacts/apaas/proctor/record/test/$record
+    fi
     
 
 
