@@ -87,7 +87,7 @@ echo "-----install finished------"
 
 
 
-if ["$record" = " "]
+if ["$record" = ""]
     then
         if [ "$Env" = "Prod" ] 
             then
