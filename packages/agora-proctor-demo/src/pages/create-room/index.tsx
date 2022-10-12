@@ -208,6 +208,7 @@ export const CreateRoom = observer(() => {
             watermark,
             hostingScene,
             serviceType: sType,
+            examinationUrl: 'https://forms.clickup.com/8556478/f/853xy-21947/IM8JKH1HOOF3LDJDEB',
           },
         })
         .then(() => {

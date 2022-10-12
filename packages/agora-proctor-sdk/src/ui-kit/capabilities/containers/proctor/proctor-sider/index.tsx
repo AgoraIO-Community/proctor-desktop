@@ -3,7 +3,6 @@ import { useStore } from '@/infra/hooks/ui-store';
 import { ClassState, DEVICE_DISABLE, EduClassroomConfig } from 'agora-edu-core';
 import { AgoraRteMediaPublishState, AgoraRteMediaSourceState } from 'agora-rte-sdk';
 import { Button, Switch } from 'antd';
-import md5 from 'js-md5';
 import { observer } from 'mobx-react';
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { SvgIconEnum, SvgImg, transI18n } from '~ui-kit';
@@ -11,28 +10,17 @@ import { LocalTrackPlayer } from '../../common/stream/track-player';
 import './index.css';
 export const ProctorSider = observer(() => {
   const {
-    navigationBarUIStore: { startClass, classState },
+    navigationBarUIStore: {startClass, classState },
     usersUIStore: { studentListByUserUuidPrefix, filterTag },
-    streamUIStore: { updateLocalPublishState },
     roomUIStore: { classStatusText, statusTextTip },
+
     classroomStore: {
       streamStore: { localCameraStreamUuid, localMicStreamUuid, streamByStreamUuid },
       roomStore: { updateClassState },
-      widgetStore: { setActive },
-      mediaStore: { localCameraTrackState, localMicTrackState, enableLocalVideo, enableLocalAudio },
+      mediaStore: { localCameraTrackState, localMicTrackState },
     },
   } = useStore();
-  const [cameraOpen, setCameraOpen] = useState(true);
 
-  const startExam = async () => {
-    await setActive('webView' + '-' + md5(AgoraEduSDK.examinationUrl), {
-      position: { xaxis: 0, yaxis: 0 },
-      extra: {
-        webViewUrl: encodeURIComponent(AgoraEduSDK.examinationUrl),
-      },
-    });
-    await startClass();
-  };
   const endExam = async () => {
     updateClassState(ClassState.afterClass);
   };
@@ -83,7 +71,7 @@ export const ProctorSider = observer(() => {
               className="fcr_proctor_sider_info_start"
               type="primary"
               block
-              onClick={startExam}
+              onClick={startClass}
               size="large">
               {transI18n('fcr_room_button_exam_start')}
             </Button>
