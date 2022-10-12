@@ -55,7 +55,6 @@ const ContentProspect = observer(() => {
       setCounterOpening(true);
     }
   }, [classTimeDuration, state, counterOpening]);
-  console.log(classTimeDuration, 'classTimeDuration');
   return (
     <>
       {beforeClass && !counterOpening && (
