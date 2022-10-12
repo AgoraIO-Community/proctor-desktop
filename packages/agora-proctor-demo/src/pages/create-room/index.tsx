@@ -1,7 +1,7 @@
-import { EduRoomServiceTypeEnum, EduRoomTypeEnum } from "agora-edu-core";
-import dayjs, { Dayjs } from "dayjs";
-import { observer } from "mobx-react";
-import { useCallback, useMemo, useState } from "react";
+import { EduRoomServiceTypeEnum, EduRoomTypeEnum } from 'agora-edu-core';
+import dayjs, { Dayjs } from 'dayjs';
+import { observer } from 'mobx-react';
+import { useCallback, useMemo, useState } from 'react';
 import {
   ADatePicker,
   ADatePickerProps,
@@ -12,34 +12,34 @@ import {
   ATimePicker,
   useAForm,
   useI18n,
-} from "~ui-kit";
-import { RoomAPI } from "../../api/room";
-import watermarkIcon from "../../assets/fcr_watermark.svg";
-import cdnIcon from "../../assets/service-type/fcr_cdn.svg";
-import premiumIcon from "../../assets/service-type/fcr_premium.svg";
-import standardIcon from "../../assets/service-type/fcr_standard.svg";
-import { RadioIcon } from "../../components/radio-icon";
-import { RoomTypeCard } from "../../components/room-type-card";
-import { useHistoryBack, useHomeStore } from "../../hooks";
-import { useLoading } from "../../hooks/useLoading";
-import { NavFooter, NavPageLayout } from "../../layout/nav-page-layout";
-import "./index.css";
-import { RadioCard } from "./radio-card";
+} from '~ui-kit';
+import { RoomAPI } from '../../api/room';
+import watermarkIcon from '../../assets/fcr_watermark.svg';
+import cdnIcon from '../../assets/service-type/fcr_cdn.svg';
+import premiumIcon from '../../assets/service-type/fcr_premium.svg';
+import standardIcon from '../../assets/service-type/fcr_standard.svg';
+import { RadioIcon } from '../../components/radio-icon';
+import { RoomTypeCard } from '../../components/room-type-card';
+import { useHistoryBack, useHomeStore } from '../../hooks';
+import { useLoading } from '../../hooks/useLoading';
+import { NavFooter, NavPageLayout } from '../../layout/nav-page-layout';
+import './index.css';
+import { RadioCard } from './radio-card';
 
 const weekday = {
-  0: "fcr_create_option_timeselector_Sun",
-  1: "fcr_create_option_timeselector_Mon",
-  2: "fcr_create_option_timeselector_Tue",
-  3: "fcr_create_option_timeselector_Wed",
-  4: "fcr_create_option_timeselector_Thu",
-  5: "fcr_create_option_timeselector_Fri",
-  6: "fcr_create_option_timeselector_Sat",
+  0: 'fcr_create_option_timeselector_Sun',
+  1: 'fcr_create_option_timeselector_Mon',
+  2: 'fcr_create_option_timeselector_Tue',
+  3: 'fcr_create_option_timeselector_Wed',
+  4: 'fcr_create_option_timeselector_Thu',
+  5: 'fcr_create_option_timeselector_Fri',
+  6: 'fcr_create_option_timeselector_Sat',
 };
 
-const TimeFormat = "HH:mm";
+const TimeFormat = 'HH:mm';
 
 const computeEndTime = (date: Dayjs) => {
-  return date.add(30, "minute");
+  return date.add(30, 'minute');
 };
 
 type CreateFormValue = {
@@ -54,52 +54,52 @@ export const CreateRoom = observer(() => {
   const historyBackHandle = useHistoryBack();
   const transI18n = useI18n();
 
-  const customFormat: ADatePickerProps["format"] = (value) =>
-    `${value.format("YYYY-MM-DD")}  |  ${transI18n(weekday[value.day()])}`;
+  const customFormat: ADatePickerProps['format'] = (value) =>
+    `${value.format('YYYY-MM-DD')}  |  ${transI18n(weekday[value.day()])}`;
 
   const roomTypeOptions = [
     {
-      label: transI18n("fcr_h5create_label_online_proctoring"),
-      description: transI18n("fcr_create_label_online_proctoring_description"),
+      label: transI18n('fcr_h5create_label_online_proctoring'),
+      description: transI18n('fcr_create_label_online_proctoring_description'),
       value: EduRoomTypeEnum.RoomProctor,
-      className: "card-purple",
+      className: 'card-purple',
     },
     {
-      label: transI18n("fcr_h5create_label_1on1"),
-      description: transI18n("fcr_create_label_1on1_description"),
+      label: transI18n('fcr_h5create_label_1on1'),
+      description: transI18n('fcr_create_label_1on1_description'),
       value: EduRoomTypeEnum.Room1v1Class,
-      className: "card-purple",
+      className: 'card-purple',
     },
     {
-      label: transI18n("fcr_h5create_label_small_classroom"),
-      description: transI18n("fcr_create_label_smallclassroom_description"),
+      label: transI18n('fcr_h5create_label_small_classroom'),
+      description: transI18n('fcr_create_label_smallclassroom_description'),
       value: EduRoomTypeEnum.RoomSmallClass,
-      className: "card-red",
+      className: 'card-red',
     },
     {
-      label: transI18n("fcr_h5create_label_lecture_hall"),
-      description: transI18n("fcr_create_label_lecturehall_description"),
+      label: transI18n('fcr_h5create_label_lecture_hall'),
+      description: transI18n('fcr_create_label_lecturehall_description'),
       value: EduRoomTypeEnum.RoomBigClass,
-      className: "card-green",
+      className: 'card-green',
     },
   ];
 
   const serviceTypeOptions = [
     {
-      label: transI18n("fcr_create_label_servicetype_RTC"),
-      description: transI18n("fcr_create_label_latency_RTC"),
+      label: transI18n('fcr_create_label_servicetype_RTC'),
+      description: transI18n('fcr_create_label_latency_RTC'),
       value: EduRoomServiceTypeEnum.LivePremium,
       icon: <img src={premiumIcon} />,
     },
     {
-      label: transI18n("fcr_create_label_servicetype_Standard"),
-      description: transI18n("fcr_create_label_latency_Standard"),
+      label: transI18n('fcr_create_label_servicetype_Standard'),
+      description: transI18n('fcr_create_label_latency_Standard'),
       value: EduRoomServiceTypeEnum.LiveStandard,
       icon: <img src={standardIcon} />,
     },
     {
-      label: transI18n("fcr_create_label_servicetype_CDN"),
-      description: transI18n("fcr_create_label_latency_CDN"),
+      label: transI18n('fcr_create_label_servicetype_CDN'),
+      description: transI18n('fcr_create_label_latency_CDN'),
       value: EduRoomServiceTypeEnum.Fusion,
       icon: <img src={cdnIcon} />,
     },
@@ -111,9 +111,9 @@ export const CreateRoom = observer(() => {
   const [livePlayback, setLivePlayback] = useState(false);
   const [useCurrentTime, setUseCurrentTime] = useState(true);
   const [dateTimeValidate, setDateTimeValidate] = useState({
-    validateStatus: "success",
-    help: "",
-    tip: "",
+    validateStatus: 'success',
+    help: '',
+    tip: '',
   });
   const [form] = useAForm<CreateFormValue>();
   const { setLoading } = useLoading();
@@ -121,10 +121,10 @@ export const CreateRoom = observer(() => {
   const initialValues: CreateFormValue = useMemo(() => {
     const date = dayjs();
     return {
-      name: "",
+      name: '',
       date: date,
       time: date,
-      link: "",
+      link: '',
     };
   }, []);
 
@@ -133,11 +133,11 @@ export const CreateRoom = observer(() => {
   });
 
   const getFormDateTime = useCallback(() => {
-    const time: Dayjs = form.getFieldValue("time");
-    const date: Dayjs = form.getFieldValue("date");
-    time.set("year", date.year());
-    time.set("month", date.month());
-    time.set("date", date.date());
+    const time: Dayjs = form.getFieldValue('time');
+    const date: Dayjs = form.getFieldValue('date');
+    time.set('year', date.year());
+    time.set('month', date.month());
+    time.set('date', date.date());
     return time;
   }, [form]);
 
@@ -148,13 +148,13 @@ export const CreateRoom = observer(() => {
     }
     const dateTime = getFormDateTime();
     if (dateTime.isAfter(dayjs())) {
-      setDateTimeValidate({ validateStatus: "success", help: "", tip: "" });
+      setDateTimeValidate({ validateStatus: 'success', help: '', tip: '' });
       return true;
     }
     setDateTimeValidate({
-      validateStatus: "error",
-      help: "",
-      tip: transI18n("fcr_create_tips_starttime"),
+      validateStatus: 'error',
+      help: '',
+      tip: transI18n('fcr_create_tips_starttime'),
     });
     return false;
   }, [useCurrentTime, getFormDateTime]);
@@ -172,7 +172,7 @@ export const CreateRoom = observer(() => {
         recomputeEndTime();
       }
     },
-    [checkFormDateTimeIsAfterNow]
+    [checkFormDateTimeIsAfterNow],
   );
 
   const onSubmit = () => {
@@ -184,13 +184,12 @@ export const CreateRoom = observer(() => {
       const { date, time, name, link } = data;
       let dateTime = dayjs();
       if (!useCurrentTime) {
-        time.set("year", date.year());
-        time.set("month", date.month());
-        time.set("date", date.date());
+        time.set('year', date.year());
+        time.set('month', date.month());
+        time.set('date', date.date());
         dateTime = time;
       }
-      const isHostingScene =
-        livePlayback && roomType === EduRoomTypeEnum.RoomBigClass;
+      const isHostingScene = livePlayback && roomType === EduRoomTypeEnum.RoomBigClass;
       const hostingScene = isHostingScene
         ? {
             videoURL: link,
@@ -198,9 +197,7 @@ export const CreateRoom = observer(() => {
             finishType: 0,
           }
         : undefined;
-      const sType = isHostingScene
-        ? EduRoomServiceTypeEnum.HostingScene
-        : serviceType;
+      const sType = isHostingScene ? EduRoomServiceTypeEnum.HostingScene : serviceType;
       RoomAPI.shared
         .create({
           roomName: name,
@@ -215,17 +212,17 @@ export const CreateRoom = observer(() => {
         })
         .then(() => {
           homeStore.addRoomListToast({
-            id: "create_room_success",
-            type: "success",
-            desc: transI18n("fcr_create_tips_create_success"),
+            id: 'create_room_success',
+            type: 'success',
+            desc: transI18n('fcr_create_tips_create_success'),
           });
           setTimeout(() => {
-            homeStore.removeRoomListToast("create_room_success");
+            homeStore.removeRoomListToast('create_room_success');
           }, 2500);
           historyBackHandle();
         })
         .catch(() => {
-          aMessage.error(transI18n("fcr_create_tips_create_failed"));
+          aMessage.error(transI18n('fcr_create_tips_create_failed'));
         })
         .finally(() => {
           setLoading(false);
@@ -235,44 +232,41 @@ export const CreateRoom = observer(() => {
 
   return (
     <NavPageLayout
-      title={transI18n("fcr_create_label_create_classroom")}
+      title={transI18n('fcr_create_label_create_classroom')}
       className="create-room"
       footer={
         <NavFooter
-          okText={transI18n("fcr_create_button_create")}
-          cancelText={transI18n("fcr_create_button_cancel")}
+          okText={transI18n('fcr_create_button_create')}
+          cancelText={transI18n('fcr_create_button_cancel')}
           onOk={onSubmit}
           onCancel={historyBackHandle}
         />
-      }
-    >
+      }>
       <AForm<CreateFormValue>
         className="create-form header-blank footer-blank"
         form={form}
-        initialValues={initialValues}
-      >
+        initialValues={initialValues}>
         {/* 课程名称 */}
         <div className="form-item">
-          <div className="label">{transI18n("fcr_create_label_room_name")}</div>
+          <div className="label">{transI18n('fcr_create_label_room_name')}</div>
           <AFormItem
             name="name"
             rules={[
               {
                 required: true,
-                message: transI18n("fcr_create_label_room_name_empty"),
+                message: transI18n('fcr_create_label_room_name_empty'),
               },
               {
                 pattern: /^([a-zA-Z0-9_\u4e00-\u9fa5]{0,50})$/,
-                message: transI18n("fcr_create_room_tips_name_rule"),
+                message: transI18n('fcr_create_room_tips_name_rule'),
               },
-            ]}
-          >
+            ]}>
             <AInput
               maxLength={50}
               showCount={{
                 formatter: (args) => (args.maxLength || 50) - args.count,
               }}
-              placeholder={transI18n("fcr_create_tips_room_name")}
+              placeholder={transI18n('fcr_create_tips_room_name')}
               className="create-input"
             />
           </AFormItem>
@@ -280,24 +274,18 @@ export const CreateRoom = observer(() => {
         {/* 课程时间 */}
         <div className="form-item flex">
           <div className="start-time">
-            <div className="label">
-              {transI18n("fcr_create_label_starttime")}
-            </div>
+            <div className="label">{transI18n('fcr_create_label_starttime')}</div>
             <AFormItem
               name="date"
-              rules={[{ required: true, message: "Please select date!" }]}
-              {...dateTimeValidate}
-            >
+              rules={[{ required: true, message: 'Please select date!' }]}
+              {...dateTimeValidate}>
               <ADatePicker
                 className="start-date-picker"
                 format={customFormat}
                 allowClear={false}
                 disabledDate={(current) => {
-                  const now = dayjs()
-                    .set("hour", 0)
-                    .set("minute", 0)
-                    .set("second", 0);
-                  return !dayjs(current).isBetween(now, now.add(7, "day"));
+                  const now = dayjs().set('hour', 0).set('minute', 0).set('second', 0);
+                  return !dayjs(current).isBetween(now, now.add(7, 'day'));
                 }}
                 onChange={dateTimeOnChange}
               />
@@ -305,9 +293,8 @@ export const CreateRoom = observer(() => {
             <div className="relative inline-block">
               <AFormItem
                 name="time"
-                rules={[{ required: true, message: "Please select time!" }]}
-                {...dateTimeValidate}
-              >
+                rules={[{ required: true, message: 'Please select time!' }]}
+                {...dateTimeValidate}>
                 <ATimePicker
                   className="start-time-picker"
                   format={TimeFormat}
@@ -318,24 +305,24 @@ export const CreateRoom = observer(() => {
                   onChange={dateTimeOnChange}
                 />
               </AFormItem>
-              <div className={`current-time ${useCurrentTime ? "" : "hidden"}`}>
-                {transI18n("fcr_create_room_current_time")}
+              <div className={`current-time ${useCurrentTime ? '' : 'hidden'}`}>
+                {transI18n('fcr_create_room_current_time')}
               </div>
             </div>
             <div className="tip">{dateTimeValidate.tip}</div>
           </div>
           <div className="gap-symbol" />
           <div className="end-time">
-            <div className="label">{transI18n("fcr_create_label_endtime")}</div>
+            <div className="label">{transI18n('fcr_create_label_endtime')}</div>
             <div className="end-time-picker">
               {endTime}
-              <span>{transI18n("fcr_create_label_defaulttime")}</span>
+              <span>{transI18n('fcr_create_label_defaulttime')}</span>
             </div>
           </div>
         </div>
         {/* 班型 */}
         <div className="form-item item-mb">
-          <div className="label">{transI18n("fcr_create_label_classmode")}</div>
+          <div className="label">{transI18n('fcr_create_label_classmode')}</div>
           <div className="room-type">
             {roomTypeOptions.map((v) => {
               return (
@@ -356,9 +343,7 @@ export const CreateRoom = observer(() => {
         {/* 服务类型 */}
         {roomType === EduRoomTypeEnum.RoomBigClass ? (
           <div className="form-item item-mb ">
-            <div className="label">
-              {transI18n("fcr_create_label_latency_type")}
-            </div>
+            <div className="label">{transI18n('fcr_create_label_latency_type')}</div>
             <div className="service-type">
               {serviceTypeOptions.map((v) => {
                 return (
@@ -380,31 +365,30 @@ export const CreateRoom = observer(() => {
         {/* 更多设置 */}
         <div className="form-item item-mb more-settings">
           <div className="label">
-            {transI18n("fcr_create_label_moresettings")}
+            {transI18n('fcr_create_label_moresettings')}
             <span
-              className={`expand ${showMore ? "hidden" : ""}`}
+              className={`expand ${showMore ? 'hidden' : ''}`}
               onClick={() => {
                 setShowMore((pre) => !pre);
-              }}
-            >
-              {transI18n("fcr_create_more_settings_expand")}
+              }}>
+              {transI18n('fcr_create_more_settings_expand')}
             </span>
           </div>
-          <div className={`settings ${!showMore ? "hidden" : ""}`}>
+          <div className={`settings ${!showMore ? 'hidden' : ''}`}>
             <div className="setting-item">
               <div className="title">
                 <div className="security-prefix-icon" />
-                {transI18n("fcr_create_label_security")}
+                {transI18n('fcr_create_label_security')}
               </div>
               <div className="content">
                 {/* 水印 */}
                 <RadioCard
-                  className={"watermark-card"}
+                  className={'watermark-card'}
                   onClick={() => {
                     setWatermark((pre) => !pre);
                   }}
                   checked={watermark}
-                  label={transI18n("fcr_create_label_watermark")}
+                  label={transI18n('fcr_create_label_watermark')}
                   icon={<img src={watermarkIcon}></img>}
                 />
               </div>
@@ -413,7 +397,7 @@ export const CreateRoom = observer(() => {
               <div className="setting-item">
                 <div className="title">
                   <div className="live-playback-prefix-icon" />
-                  {transI18n("fcr_create_label_playback")}
+                  {transI18n('fcr_create_label_playback')}
                 </div>
                 <div className="content">
                   {/* 伪直播 */}
@@ -422,28 +406,24 @@ export const CreateRoom = observer(() => {
                       className="header"
                       onClick={() => {
                         setLivePlayback((pre) => !pre);
-                      }}
-                    >
+                      }}>
                       <span className="flex-1">
-                        {transI18n("fcr_create_label_playback_description")}
+                        {transI18n('fcr_create_label_playback_description')}
                       </span>
                       <RadioIcon checked={livePlayback} />
                     </div>
-                    <div className={`link ${!livePlayback ? "hidden" : ""}`}>
+                    <div className={`link ${!livePlayback ? 'hidden' : ''}`}>
                       <div className="link-label">
-                        {transI18n("fcr_create_label_playback_link")}
+                        {transI18n('fcr_create_label_playback_link')}
                       </div>
                       <AFormItem
                         name="link"
                         rules={[
                           {
                             required: livePlayback,
-                            message: transI18n(
-                              "fcr_create_tips_room_playback_link"
-                            ),
+                            message: transI18n('fcr_create_tips_room_playback_link'),
                           },
-                        ]}
-                      >
+                        ]}>
                         <AInput />
                       </AFormItem>
                     </div>
