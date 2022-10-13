@@ -316,6 +316,8 @@ export const UserEvents = observer(
         EduClassroomConfig.shared.sessionInfo.roomUuid,
         mainDeviceUserUuid,
         1600,
+        'tags',
+        'abnormal',
       );
       setUserEvents(res.list);
     };
@@ -405,9 +407,12 @@ export const UserFocus = observer(
     const focus: React.MouseEventHandler = async (e) => {
       e.preventDefault();
       e.stopPropagation();
-      await updateUserTags(EduClassroomConfig.shared.sessionInfo.roomUuid, mainDeviceUserUuid, {
-        focus: mainDeviceStudent?.userProperties?.get('tags')?.focus === 1 ? 0 : 1,
-      });
+      await updateUserTags(
+        'focus',
+        mainDeviceStudent?.userProperties?.get('tags')?.focus === 1 ? 0 : 1,
+        EduClassroomConfig.shared.sessionInfo.roomUuid,
+        mainDeviceUserUuid,
+      );
     };
     return (
       <div

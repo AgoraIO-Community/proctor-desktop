@@ -70,6 +70,8 @@ export const StudentDetail = observer(({ userUuidPrefix }: { userUuidPrefix: str
       EduClassroomConfig.shared.sessionInfo.roomUuid,
       mainDeviceUserUuid,
       1600,
+      'tags',
+      'abnormal',
     );
     setUserEvents(
       (
@@ -89,12 +91,15 @@ export const StudentDetail = observer(({ userUuidPrefix }: { userUuidPrefix: str
     queryRecords();
   }, []);
   const submitAbnormal = useCallback(async () => {
-    await updateUserTags(EduClassroomConfig.shared.sessionInfo.roomUuid, mainDeviceUserUuid, {
-      abnormal: {
+    await updateUserTags(
+      'abnormal',
+      {
         type: 'warining',
         reason: abnormal,
       },
-    });
+      EduClassroomConfig.shared.sessionInfo.roomUuid,
+      mainDeviceUserUuid,
+    );
     queryUserAbnormal();
   }, [abnormal]);
 
