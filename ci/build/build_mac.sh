@@ -120,6 +120,7 @@ if ["$record" = ""]
             echo "-----build finished------"
             mkdir -p record_temp
             cp templates/record_page_test.html ./record_temp/record_page_test.html || true
+            cp packages/agora-classroom-sdk/lib/* ./record_temp/. || true
             url=https://agora-adc-artifacts.s3.cn-north-1.amazonaws.com.cn/apaas/proctor/record/test/$record/record_page_test.html
             echo $url
             aws s3 sync ./record_temp/. s3://agora-adc-artifacts/apaas/proctor/record/test/$record
