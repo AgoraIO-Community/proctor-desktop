@@ -88,6 +88,7 @@ echo "-----install finished------"
 
 
 if ["$record" = ""]
+
     then
         if [ "$Env" = "Prod" ] 
             then
@@ -115,6 +116,7 @@ if ["$record" = ""]
             
             echo "-----build------"
             yarn release:proctor:sdk
+
             echo "-----build finished------"
             mkdir -p record_temp
             cp templates/record_page_test.html ./record_temp/record_page_test.html || true
