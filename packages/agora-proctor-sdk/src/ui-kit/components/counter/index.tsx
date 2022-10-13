@@ -1,5 +1,5 @@
-import { FC, useEffect, useRef, useState } from "react";
-import styled, { keyframes } from "styled-components";
+import { FC, useEffect, useRef, useState } from 'react';
+import styled, { keyframes } from 'styled-components';
 
 interface counterProps {
   onFinished?: () => void;
@@ -18,7 +18,7 @@ export const Counter: FC<counterProps> = ({ onFinished }) => {
   }, []);
 
   useEffect(() => {
-    if (counter <= 1) {
+    if (counter <= 0) {
       timeRef.current && clearInterval(timeRef.current);
       onFinished && onFinished();
     }

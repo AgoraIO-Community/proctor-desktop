@@ -33,6 +33,7 @@ export const Content = observer(() => {
 
 const ContentProspect = observer(() => {
   const {
+    navigationBarUIStore: { classTimeDuration },
     classroomStore: {
       roomStore: {
         classroomSchedule: { state },
@@ -45,13 +46,18 @@ const ContentProspect = observer(() => {
     setCounterOpening(false);
   }, []);
   useEffect(() => {
-    if (state === ClassState.ongoing) {
+    if (
+      state === ClassState.beforeClass &&
+      classTimeDuration &&
+      classTimeDuration < 5000 &&
+      !counterOpening
+    ) {
       setCounterOpening(true);
     }
-  }, [state]);
+  }, [classTimeDuration, state, counterOpening]);
   return (
     <>
-      {beforeClass && (
+      {beforeClass && !counterOpening && (
         <>
           <img src={require('../../common/waiting.png')} width={256} />
           {transI18n('fcr_room_label_wait_teacher_start_exam')}

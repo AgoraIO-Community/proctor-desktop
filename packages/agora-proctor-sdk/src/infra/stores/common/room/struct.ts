@@ -12,7 +12,7 @@ import {
   EduRoleTypeEnum,
   EduStream,
   RteRole2EduRole,
-} from "agora-edu-core";
+} from 'agora-edu-core';
 import {
   AGError,
   AgoraRteAudioSourceType,
@@ -32,10 +32,10 @@ import {
   Log,
   Logger,
   AGRtcState,
-} from "agora-rte-sdk";
-import to from "await-to-js";
-import { get } from "lodash";
-import { action, computed, observable, reaction, runInAction } from "mobx";
+} from 'agora-rte-sdk';
+import to from 'await-to-js';
+import { get } from 'lodash';
+import { action, computed, observable, reaction, runInAction } from 'mobx';
 
 export class RoomScene {
   protected logger!: Injectable.Logger;
@@ -47,7 +47,7 @@ export class RoomScene {
     roomStateErrorReason: string;
   } = {
     state: ClassroomState.Idle,
-    roomStateErrorReason: "",
+    roomStateErrorReason: '',
   };
   @observable scene?: AgoraRteScene;
   @observable rtcState?: Map<AGRtcConnectionType, AGRtcState> = new Map()
@@ -73,26 +73,19 @@ export class RoomScene {
   @action.bound
   setScene(scene: AgoraRteScene) {
     this.scene = scene;
-    this.streamController = new StreamController(
-      scene,
-      this.classroomStore,
-      this
-    );
+    this.streamController = new StreamController(scene, this.classroomStore, this);
     //listen to rte state change
     scene.on(
       AgoraRteEventType.RteConnectionStateChanged,
       (state: AgoraRteConnectionState, reason?: string) => {
         this.setClassroomState(this._getClassroomState(state), reason);
-      }
+      },
     );
 
     //listen to rtc state change
-    scene.on(
-      AgoraRteEventType.RtcConnectionStateChanged,
-      (state, connectionType) => {
-        this.setRtcState(state, connectionType);
-      }
-    );
+    scene.on(AgoraRteEventType.RtcConnectionStateChanged, (state, connectionType) => {
+      this.setRtcState(state, connectionType);
+    });
   }
   @action.bound
   setRtcState(state: AGRtcState, connectionType?: AGRtcConnectionType) {
@@ -104,7 +97,7 @@ export class RoomScene {
       EduEventCenter.shared.emitClasroomEvents(
         AgoraEduClassroomEvent.RTCStateChanged,
         state,
-        this.scene?.sceneId
+        this.scene?.sceneId,
       );
     }
     // this.logger.debug(`${connectionType}] rtc state changed to ${state}`);
@@ -131,15 +124,12 @@ export class RoomScene {
     }
     let [err] = await to(this?.scene?.leaveRTC() || Promise.resolve());
     err &&
-      EduErrorCenter.shared.handleNonThrowableError(
-        AGEduErrorCode.EDU_ERR_LEAVE_RTC_FAIL,
-        err
-      );
+      EduErrorCenter.shared.handleNonThrowableError(AGEduErrorCode.EDU_ERR_LEAVE_RTC_FAIL, err);
     [err] = await to(this?.scene?.leaveScene() || Promise.resolve());
     err &&
       EduErrorCenter.shared.handleNonThrowableError(
         AGEduErrorCode.EDU_ERR_LEAVE_CLASSROOM_FAIL,
-        err
+        err,
       );
   }
 }
@@ -160,7 +150,7 @@ class StreamController {
     userStreamRegistry: new Map(),
     streamVolumes: new Map(),
     shareStreamTokens: new Map(),
-    screenShareStreamUuid: "",
+    screenShareStreamUuid: '',
   };
   /**
    * 本地视频 stream id
@@ -237,18 +227,29 @@ class StreamController {
   @computed
   get screenShareTokenAccessor() {
     return {
-      streamUuid: this.dataStore.screenShareStreamUuid,
+      streamUuid: this.screenShareStreamUuid,
       shareStreamToken: this.shareStreamToken,
     };
   }
   @computed get shareStreamToken() {
-    let streamUuid = this.dataStore.screenShareStreamUuid;
+    let streamUuid = this.screenShareStreamUuid;
 
     if (!streamUuid) {
       return undefined;
     }
 
     return this.dataStore.shareStreamTokens.get(streamUuid);
+  }
+  @computed get screenShareStreamUuid() {
+    const userUuid = EduClassroomConfig.shared.sessionInfo.userUuid;
+    const streams = this.streamByUserUuid.get(userUuid);
+    const screenShareStream = Array.from(this.streamByStreamUuid.values()).find((stream) => {
+      return (
+        streams?.has(stream.streamUuid) &&
+        stream.videoSourceType === AgoraRteVideoSourceType.ScreenShare
+      );
+    });
+    return screenShareStream?.streamUuid;
   }
   @computed get streamByStreamUuid() {
     return this.dataStore.streamByStreamUuid;
@@ -259,15 +260,10 @@ class StreamController {
   async joinRTC(options?: AgoraRteSceneJoinRTCOptions) {
     //join rtc
     let [err] = await to(this._scene?.joinRTC(options) || Promise.resolve());
-    err &&
-      EduErrorCenter.shared.handleThrowableError(
-        AGEduErrorCode.EDU_ERR_JOIN_RTC_FAIL,
-        err
-      );
+    err && EduErrorCenter.shared.handleThrowableError(AGEduErrorCode.EDU_ERR_JOIN_RTC_FAIL, err);
   }
   private _enableLocalAudio = (value: boolean) => {
-    const track =
-      this._classroomStore.mediaStore.mediaControl.createMicrophoneAudioTrack();
+    const track = this._classroomStore.mediaStore.mediaControl.createMicrophoneAudioTrack();
     if (value) {
       track.start();
     } else {
@@ -275,8 +271,7 @@ class StreamController {
     }
   };
   private _enableLocalVideo = (value: boolean) => {
-    const track =
-      this._classroomStore.mediaStore.mediaControl.createCameraVideoTrack();
+    const track = this._classroomStore.mediaStore.mediaControl.createCameraVideoTrack();
     if (value) {
       track.start();
     } else {
@@ -287,36 +282,20 @@ class StreamController {
   constructor(
     private _scene: AgoraRteScene,
     private _classroomStore: EduClassroomStore,
-    private _roomScene: RoomScene
+    private _roomScene: RoomScene,
   ) {
     this._scene.on(AgoraRteEventType.AudioVolumes, this._updateStreamVolumes);
     this._scene.on(AgoraRteEventType.LocalStreamAdded, this._addLocalStream);
-    this._scene.on(
-      AgoraRteEventType.LocalStreamRemove,
-      this._removeLocalStream
-    );
-    this._scene.on(
-      AgoraRteEventType.LocalStreamUpdate,
-      this._updateLocalStream
-    );
+    this._scene.on(AgoraRteEventType.LocalStreamRemove, this._removeLocalStream);
+    this._scene.on(AgoraRteEventType.LocalStreamUpdate, this._updateLocalStream);
     this._scene.on(AgoraRteEventType.RemoteStreamAdded, this._addRemoteStream);
-    this._scene.on(
-      AgoraRteEventType.RemoteStreamRemove,
-      this._removeRemoteStream
-    );
-    this._scene.on(
-      AgoraRteEventType.RemoteStreamUpdate,
-      this._updateRemoteStream
-    );
-    this._scene.on(
-      AgoraRteEventType.RoomPropertyUpdated,
-      this._handleRoomPropertiesChange
-    );
+    this._scene.on(AgoraRteEventType.RemoteStreamRemove, this._removeRemoteStream);
+    this._scene.on(AgoraRteEventType.RemoteStreamUpdate, this._updateRemoteStream);
+    this._scene.on(AgoraRteEventType.RoomPropertyUpdated, this._handleRoomPropertiesChange);
     reaction(
       () => this.micAccessors,
       () => {
-        const { recordingDeviceId, mediaControl } =
-          this._classroomStore.mediaStore;
+        const { recordingDeviceId, mediaControl } = this._classroomStore.mediaStore;
         if (this._roomScene.roomState.state === ClassroomState.Idle) {
           // if idle, e.g. pretest
           if (recordingDeviceId && recordingDeviceId !== DEVICE_DISABLE) {
@@ -327,9 +306,7 @@ class StreamController {
             //if no device selected, disable device
             this._enableLocalAudio(false);
           }
-        } else if (
-          this._roomScene.roomState.state === ClassroomState.Connected
-        ) {
+        } else if (this._roomScene.roomState.state === ClassroomState.Connected) {
           // once connected, should follow stream
           if (!this.localMicStreamUuid) {
             // if no local stream
@@ -345,7 +322,7 @@ class StreamController {
             }
           }
         }
-      }
+      },
     );
     reaction(
       () => this.screenShareStateAccessor,
@@ -355,18 +332,16 @@ class StreamController {
           //only set state when classroom is connected, the state will also be refreshed when classroom state become connected
           this.dataStore.stateKeeper?.setShareScreenState(trackState);
         }
-      }
+      },
     );
     reaction(
       () => this.screenShareTokenAccessor,
       (value) => {
         const { streamUuid, shareStreamToken } = value;
+        console.log(streamUuid, shareStreamToken, 'shareStreamToken');
 
         if (streamUuid && shareStreamToken) {
-          if (
-            this._roomScene.rtcState?.get(AGRtcConnectionType.sub) ===
-            AGRtcState.Idle
-          ) {
+          if (this._roomScene.rtcState?.get(AGRtcConnectionType.sub) === AGRtcState.Idle) {
             this._scene.joinRTC({
               connectionType: AGRtcConnectionType.sub,
               streamUuid,
@@ -375,22 +350,16 @@ class StreamController {
           }
         } else {
           // leave rtc if share StreamUuid is no longer in the room
-          if (
-            this._roomScene.rtcState?.get(AGRtcConnectionType.sub) !==
-            AGRtcState.Idle
-          ) {
+          if (this._roomScene.rtcState?.get(AGRtcConnectionType.sub) !== AGRtcState.Idle) {
             this._scene.leaveRTC(AGRtcConnectionType.sub);
           }
         }
-      }
+      },
     );
     this.dataStore.stateKeeper = new ShareStreamStateKeeper(
       async (targetState: AgoraRteMediaSourceState) => {
         if (targetState === AgoraRteMediaSourceState.started) {
-          const {
-            rtcToken,
-            streamUuid,
-          }: { rtcToken: string; streamUuid: string } =
+          const { rtcToken, streamUuid }: { rtcToken: string; streamUuid: string } =
             await this.publishScreenShare();
           runInAction(() => {
             this.dataStore.shareStreamTokens.set(streamUuid, rtcToken);
@@ -404,13 +373,12 @@ class StreamController {
             this.dataStore.shareStreamTokens.clear();
           });
         }
-      }
+      },
     );
     reaction(
       () => this.cameraAccessors,
       () => {
-        const { cameraDeviceId, mediaControl } =
-          this._classroomStore.mediaStore;
+        const { cameraDeviceId, mediaControl } = this._classroomStore.mediaStore;
         if (this._roomScene.roomState.state === ClassroomState.Idle) {
           // if idle, e.g. pretest
           if (cameraDeviceId && cameraDeviceId !== DEVICE_DISABLE) {
@@ -421,9 +389,7 @@ class StreamController {
             //if no device selected, disable device
             this._enableLocalVideo(false);
           }
-        } else if (
-          this._roomScene.roomState.state === ClassroomState.Connected
-        ) {
+        } else if (this._roomScene.roomState.state === ClassroomState.Connected) {
           // once connected, should follow stream
           if (!this.localCameraStreamUuid) {
             // if no local stream
@@ -439,7 +405,7 @@ class StreamController {
             }
           }
         }
-      }
+      },
     );
   }
   @action.bound
@@ -447,11 +413,11 @@ class StreamController {
     changedRoomProperties: string[],
     roomProperties: any,
     operator: any,
-    cause: any
+    cause: any,
   ) {
     changedRoomProperties.forEach((key) => {
-      if (key === "screen") {
-        const screenData = get(roomProperties, "screen");
+      if (key === 'screen') {
+        const screenData = get(roomProperties, 'screen');
         if (screenData.state === 1) {
           this.dataStore.screenShareStreamUuid = screenData.streamUuid;
         }
@@ -463,15 +429,15 @@ class StreamController {
   async publishScreenShare() {
     const sessionInfo = EduClassroomConfig.shared.sessionInfo;
     try {
-      let res = await this._classroomStore.api.startShareScreen(
+      let res = await this._classroomStore.api.publishScreenShareStream(
         this._scene.sceneId,
-        sessionInfo.userUuid
+        sessionInfo.userUuid,
       );
       return res;
     } catch (e) {
       EduErrorCenter.shared.handleThrowableError(
         AGEduErrorCode.EDU_ERR_MEDIA_START_SCREENSHARE_FAIL,
-        e as Error
+        e as Error,
       );
     }
   }
@@ -479,18 +445,16 @@ class StreamController {
   async unpublishScreenShare() {
     const sessionInfo = EduClassroomConfig.shared.sessionInfo;
     try {
-      let res = await this._classroomStore.api.stopShareScreen(
+      let res = await this._classroomStore.api.publishScreenShareStream(
         this._scene.sceneId,
-        sessionInfo.userUuid
+        sessionInfo.userUuid,
       );
       return res;
     } catch (e) {
-      if (
-        !AGError.isOf(e as AGError, AGServiceErrorCode.SERV_SCREEN_NOT_SHARED)
-      ) {
+      if (!AGError.isOf(e as AGError, AGServiceErrorCode.SERV_SCREEN_NOT_SHARED)) {
         EduErrorCenter.shared.handleThrowableError(
           AGEduErrorCode.EDU_ERR_MEDIA_STOP_SCREENSHARE_FAIL,
-          e as Error
+          e as Error,
         );
       }
     }
@@ -525,7 +489,7 @@ class StreamController {
 
   @action.bound
   private _addLocalStream(streams: AgoraStream[]) {
-    console.info("Scene Id:", this._scene.sceneId, "Add localStreams", streams);
+    console.info('Scene Id:', this._scene.sceneId, 'Add localStreams', streams);
     streams.forEach((stream) => {
       const eduStream = new EduStream(stream);
       this.dataStore.streamByStreamUuid.set(stream.streamUuid, eduStream);
@@ -537,24 +501,13 @@ class StreamController {
   private _removeLocalStream(streams: AgoraStream[]) {
     streams.forEach((stream) => {
       this.dataStore.streamByStreamUuid.delete(stream.streamUuid);
-      this._removeStreamFromUserSet(
-        stream.streamUuid,
-        stream.fromUser.userUuid
-      );
+      this._removeStreamFromUserSet(stream.streamUuid, stream.fromUser.userUuid);
       this.dataStore.userStreamRegistry.delete(stream.fromUser.userUuid);
     });
   }
   @action.bound
-  private _updateLocalStream(
-    streams: AgoraStream[],
-    operator?: AgoraRteOperator
-  ) {
-    console.info(
-      "Scene Id:",
-      this._scene.sceneId,
-      "Update localStreams",
-      streams
-    );
+  private _updateLocalStream(streams: AgoraStream[], operator?: AgoraRteOperator) {
+    console.info('Scene Id:', this._scene.sceneId, 'Update localStreams', streams);
     streams.forEach((stream) => {
       if (operator) {
         const { sessionInfo } = EduClassroomConfig.shared;
@@ -562,30 +515,23 @@ class StreamController {
         const eduRole = RteRole2EduRole(sessionInfo.roomType, role);
 
         // do not process if it's myself
-        if (
-          userUuid !== sessionInfo.userUuid &&
-          eduRole === EduRoleTypeEnum.teacher
-        ) {
-          let oldStream = this.dataStore.streamByStreamUuid.get(
-            stream.streamUuid
-          );
+        if (userUuid !== sessionInfo.userUuid && eduRole === EduRoleTypeEnum.teacher) {
+          let oldStream = this.dataStore.streamByStreamUuid.get(stream.streamUuid);
           if (!oldStream) {
-            Logger.warn(
-              `stream ${stream.streamUuid} not found when updating local stream`
-            );
+            Logger.warn(`stream ${stream.streamUuid} not found when updating local stream`);
           } else {
             if (oldStream.audioState !== stream.audioState) {
               EduEventCenter.shared.emitClasroomEvents(
                 stream.audioState === AgoraRteMediaPublishState.Published
                   ? AgoraEduClassroomEvent.TeacherTurnOnMyMic
-                  : AgoraEduClassroomEvent.TeacherTurnOffMyMic
+                  : AgoraEduClassroomEvent.TeacherTurnOffMyMic,
               );
             }
             if (oldStream.videoState !== stream.videoState) {
               EduEventCenter.shared.emitClasroomEvents(
                 stream.videoState === AgoraRteMediaPublishState.Published
                   ? AgoraEduClassroomEvent.TeacherTurnOnMyCam
-                  : AgoraEduClassroomEvent.TeacherTurnOffMyCam
+                  : AgoraEduClassroomEvent.TeacherTurnOffMyCam,
               );
             }
           }
@@ -611,10 +557,7 @@ class StreamController {
   private _removeRemoteStream(streams: AgoraStream[]) {
     streams.forEach((stream) => {
       this.dataStore.streamByStreamUuid.delete(stream.streamUuid);
-      this._removeStreamFromUserSet(
-        stream.streamUuid,
-        stream.fromUser.userUuid
-      );
+      this._removeStreamFromUserSet(stream.streamUuid, stream.fromUser.userUuid);
       this.dataStore.userStreamRegistry.delete(stream.fromUser.userUuid);
     });
   }
@@ -633,16 +576,12 @@ export class ShareStreamStateKeeper extends AgoraRteThread {
   private _timer?: any;
   private _cancelTimer?: () => void;
   private _timeout = 500;
-  private _currentState: AgoraRteMediaSourceState =
-    AgoraRteMediaSourceState.stopped;
-  private _targetState: AgoraRteMediaSourceState =
-    AgoraRteMediaSourceState.stopped;
+  private _currentState: AgoraRteMediaSourceState = AgoraRteMediaSourceState.stopped;
+  private _targetState: AgoraRteMediaSourceState = AgoraRteMediaSourceState.stopped;
 
   syncTo: (targetState: AgoraRteMediaSourceState) => Promise<void>;
 
-  constructor(
-    syncTo: (targetState: AgoraRteMediaSourceState) => Promise<void>
-  ) {
+  constructor(syncTo: (targetState: AgoraRteMediaSourceState) => Promise<void>) {
     super();
     this.syncTo = syncTo;
   }
@@ -657,9 +596,7 @@ export class ShareStreamStateKeeper extends AgoraRteThread {
       }
 
       if (!this.syncTo) {
-        this.logger.warn(
-          `no syncTo handler found, screen share state sync will not be possible`
-        );
+        this.logger.warn(`no syncTo handler found, screen share state sync will not be possible`);
         break;
       }
 
