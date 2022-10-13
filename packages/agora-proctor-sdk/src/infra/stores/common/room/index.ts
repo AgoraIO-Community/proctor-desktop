@@ -1,4 +1,4 @@
-import { ConvertMediaOptionsConfig } from '@/infra/api';
+import { AgoraEduSDK, ConvertMediaOptionsConfig } from '@/infra/api';
 import {
   AGEduErrorCode,
   AgoraEduClassroomEvent,
@@ -343,7 +343,10 @@ export class RoomUIStore extends EduUIStoreBase {
         },
       ),
     );
-    if (EduClassroomConfig.shared.sessionInfo.role === EduRoleTypeEnum.student) {
+    if (
+      EduClassroomConfig.shared.sessionInfo.role === EduRoleTypeEnum.student &&
+      AgoraEduSDK.checkStudentScreenShareState
+    ) {
       this._disposers.push(
         computed(() => ({
           screenShareState: this.classroomStore.mediaStore.localScreenShareTrackState,
