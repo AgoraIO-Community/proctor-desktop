@@ -50,7 +50,7 @@ export class RoomScene {
     roomStateErrorReason: '',
   };
   @observable scene?: AgoraRteScene;
-  @observable rtcState?: Map<AGRtcConnectionType, AGRtcState> = new Map()
+  @observable rtcState: Map<AGRtcConnectionType, AGRtcState> = new Map()
     .set(AGRtcConnectionType.main, AGRtcState.Idle)
     .set(AGRtcConnectionType.sub, AGRtcState.Idle);
   constructor(private classroomStore: EduClassroomStore) {}
@@ -84,16 +84,14 @@ export class RoomScene {
 
     //listen to rtc state change
     scene.on(AgoraRteEventType.RtcConnectionStateChanged, (state, connectionType) => {
+      console.log(scene, state, connectionType, 'connectionStateChanged');
       this.setRtcState(state, connectionType);
     });
   }
   @action.bound
   setRtcState(state: AGRtcState, connectionType?: AGRtcConnectionType) {
     let connType = connectionType ? connectionType : AGRtcConnectionType.main;
-    if (
-      connType === AGRtcConnectionType.main &&
-      this.rtcState?.get(AGRtcConnectionType.main) !== state
-    ) {
+    if (connType === AGRtcConnectionType.main && this.rtcState.get(connType) !== state) {
       EduEventCenter.shared.emitClasroomEvents(
         AgoraEduClassroomEvent.RTCStateChanged,
         state,
@@ -101,7 +99,7 @@ export class RoomScene {
       );
     }
     // this.logger.debug(`${connectionType}] rtc state changed to ${state}`);
-    this.rtcState?.set(connType, state);
+    this.rtcState.set(connType, state);
   }
   private _getClassroomState(state: AgoraRteConnectionState): ClassroomState {
     switch (state) {
@@ -445,7 +443,7 @@ class StreamController {
   async unpublishScreenShare() {
     const sessionInfo = EduClassroomConfig.shared.sessionInfo;
     try {
-      let res = await this._classroomStore.api.publishScreenShareStream(
+      let res = await this._classroomStore.api.unPublishScreenShareStream(
         this._scene.sceneId,
         sessionInfo.userUuid,
       );

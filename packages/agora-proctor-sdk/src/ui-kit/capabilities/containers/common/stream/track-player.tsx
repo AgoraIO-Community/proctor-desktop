@@ -1,8 +1,16 @@
 import { useStore } from '@/infra/hooks/ui-store';
 import { EduStream } from 'agora-edu-core';
-import { AgoraRteScene, AGRenderMode } from 'agora-rte-sdk';
+import { AgoraRteRemoteStreamType, AgoraRteScene, AGRenderMode } from 'agora-rte-sdk';
 import { observer } from 'mobx-react';
-import { CSSProperties, FC, forwardRef, useEffect, useImperativeHandle, useRef } from 'react';
+import {
+  CSSProperties,
+  FC,
+  forwardRef,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from 'react';
 import { SvgIconEnum, SvgImg } from '~ui-kit';
 import './index.css';
 type RemoteTrackPlayerProps = {
@@ -33,10 +41,29 @@ export const RemoteTrackPlayer = observer(
     ({ style, className, stream, mirrorMode = false, fromScene }, ref) => {
       const {
         classroomStore: {
-          streamStore: { setupRemoteVideo },
+          streamStore: { setupRemoteVideo, muteRemoteAudioStream, setRemoteVideoStreamType },
         },
       } = useStore();
+      const [isFullScreen, setIsFullScreen] = useState(false);
       const playerContainerRef = useRef<HTMLDivElement | null>(null);
+      useEffect(() => {
+        if (isFullScreen) {
+          setRemoteVideoStreamType(
+            stream.streamUuid,
+            AgoraRteRemoteStreamType.HIGH_STREAM,
+            fromScene,
+          );
+          muteRemoteAudioStream(stream, false, fromScene);
+        } else {
+          setRemoteVideoStreamType(
+            stream.streamUuid,
+            AgoraRteRemoteStreamType.LOW_STREAM,
+            fromScene,
+          );
+
+          muteRemoteAudioStream(stream, true, fromScene);
+        }
+      }, [isFullScreen, fromScene, stream]);
       useEffect(() => {
         if (playerContainerRef.current) {
           setupRemoteVideo(
@@ -48,9 +75,20 @@ export const RemoteTrackPlayer = observer(
           );
         }
       }, [mirrorMode, setupRemoteVideo]);
+      const handleFullScreenChange = (e: Event) => {
+        if (document.fullscreenElement === null) {
+          setIsFullScreen(false);
+          e.target?.removeEventListener('fullscreenchange', handleFullScreenChange);
+        }
+      };
       useImperativeHandle(ref, () => ({
-        fullScreen: () => {
-          playerContainerRef.current?.querySelector('video')?.requestFullscreen();
+        fullScreen: async () => {
+          const mediaElement = playerContainerRef.current?.querySelector('video');
+          if (mediaElement) {
+            await mediaElement.requestFullscreen();
+            mediaElement.addEventListener('fullscreenchange', handleFullScreenChange);
+            setIsFullScreen(true);
+          }
         },
       }));
       return (

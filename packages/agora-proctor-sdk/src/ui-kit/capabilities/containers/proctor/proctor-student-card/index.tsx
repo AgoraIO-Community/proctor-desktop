@@ -14,7 +14,12 @@ import {
 } from '../../common/stream/track-player';
 import { observer } from 'mobx-react';
 import { EduClassroomConfig, EduRoomTypeEnum } from 'agora-edu-core';
-import { AgoraRteVideoSourceType } from 'agora-rte-sdk';
+import {
+  AgoraRteMediaSourceState,
+  AgoraRteVideoSourceType,
+  AGRtcConnectionType,
+  AGRtcState,
+} from 'agora-rte-sdk';
 import dayjs from 'dayjs';
 import { SvgIconEnum, SvgImg, transI18n } from '~ui-kit';
 import { DeviceTypeEnum } from '@/infra/api';
@@ -145,6 +150,9 @@ export const StudentVideos = observer(
       () => (showFullscreen ? RemoteTrackPlayerWithFullScreen : RemoteTrackPlayer),
       [showFullscreen],
     );
+    const rtcConnected = useMemo(() => {
+      return scene?.rtcState.get(AGRtcConnectionType.main) === AGRtcState.Connected;
+    }, [scene?.rtcState.get(AGRtcConnectionType.main)]);
     return (
       <div
         className={`fcr-student-card-videos ${
@@ -153,14 +161,18 @@ export const StudentVideos = observer(
             : 'fcr-student-card-videos-loose'
         }`}>
         <div className="fcr-student-card-videos-screen">
-          {screenShareStream ? (
+          {rtcConnected &&
+          screenShareStream &&
+          screenShareStream.videoSourceState === AgoraRteMediaSourceState.started ? (
             <Player fromScene={scene?.scene} stream={screenShareStream}></Player>
           ) : (
             <SvgImg type={SvgIconEnum.NO_VIDEO}></SvgImg>
           )}
         </div>
         <div className="fcr-student-card-videos-camera">
-          {mainDeviceCameraStream ? (
+          {rtcConnected &&
+          mainDeviceCameraStream &&
+          mainDeviceCameraStream.videoSourceState === AgoraRteMediaSourceState.started ? (
             <Player
               placment="top"
               fromScene={scene?.scene}
@@ -170,7 +182,9 @@ export const StudentVideos = observer(
           )}
         </div>
         <div className="fcr-student-card-videos-mobile">
-          {subDeviceStream ? (
+          {rtcConnected &&
+          subDeviceStream &&
+          subDeviceStream.videoSourceState === AgoraRteMediaSourceState.started ? (
             <Player placment="top" fromScene={scene?.scene} stream={subDeviceStream}></Player>
           ) : (
             <SvgImg type={SvgIconEnum.NO_VIDEO}></SvgImg>

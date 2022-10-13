@@ -1,3 +1,4 @@
+import { ConvertMediaOptionsConfig } from '@/infra/api';
 import {
   AGEduErrorCode,
   AgoraEduClassroomEvent,
@@ -13,9 +14,11 @@ import {
   LeaveReason,
 } from 'agora-edu-core';
 import {
+  AGError,
   AgoraRteMediaPublishState,
   AgoraRteMediaSourceState,
   AgoraRteScene,
+  AGRtcConnectionType,
   bound,
   Logger,
   retryAttempt,
@@ -191,6 +194,26 @@ export class RoomUIStore extends EduUIStoreBase {
   private async _handleClassroomEvent(type: AgoraEduClassroomEvent, args: any) {
     if (type === AgoraEduClassroomEvent.JoinSubRoom) {
       const roomScene = await this.joinClassroom(this.currentGroupUuid, EduRoomTypeEnum.RoomGroup);
+      try {
+        const launchLowStreamCameraEncoderConfigurations = (
+          EduClassroomConfig.shared.rteEngineConfig.rtcConfigs as ConvertMediaOptionsConfig
+        )?.defaultLowStreamCameraEncoderConfigurations;
+
+        await this.classroomStore.mediaStore.enableDualStream(
+          true,
+          AGRtcConnectionType.main,
+          roomScene?.scene,
+        );
+
+        await this.classroomStore.mediaStore.setLowStreamParameter(
+          launchLowStreamCameraEncoderConfigurations ||
+            EduClassroomConfig.defaultLowStreamParameter(),
+          AGRtcConnectionType.main,
+          roomScene?.scene,
+        );
+      } catch (e) {
+        this.shareUIStore.addGenericErrorDialog(e as AGError);
+      }
       if (roomScene) {
         await roomScene.scene?.joinRTC();
         this.classroomStore.streamStore.updateLocalPublishState(
