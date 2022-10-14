@@ -1,18 +1,19 @@
-import { useStore } from "@/infra/hooks/ui-store";
-import styled from "styled-components";
-import cameraImage from "../assets/camera.png";
-import microphoneImage from "../assets/microphone.png";
-import photoImage from "../assets/photo.png";
-import screenShareImage from "../assets/screen-share.png";
+import { useStore } from '@/infra/hooks/ui-store';
+import { observer } from 'mobx-react';
+import styled from 'styled-components';
+import cameraImage from '../assets/camera.png';
+import microphoneImage from '../assets/microphone.png';
+import photoImage from '../assets/photo.png';
+import screenShareImage from '../assets/screen-share.png';
 
 const STEPS = [
-  { text: "webCam", image: cameraImage },
-  { text: "Microphone", image: microphoneImage },
-  { text: "Photo", image: photoImage },
-  { text: "Screen Share", image: screenShareImage },
+  { text: 'webCam', image: cameraImage },
+  { text: 'Microphone', image: microphoneImage },
+  { text: 'Photo', image: photoImage },
+  { text: 'Screen Share', image: screenShareImage },
 ];
 
-export const Conclusion = () => {
+export const Conclusion = observer(() => {
   const {
     pretestUIStore: { stepupStates },
   } = useStore();
@@ -20,20 +21,15 @@ export const Conclusion = () => {
     <Container>
       {STEPS.map((step, index) => (
         <Item key={step.text}>
-          <ItemImg
-            src={step.image}
-            width="80px"
-            height="80px"
-            alt={step.text}
-          />
+          <ItemImg src={step.image} width="80px" height="80px" alt={step.text} />
           <ItemText>
-            {stepupStates[index] ? "√" : "x"} {step.text}
+            {stepupStates[index] ? '√' : 'x'} {step.text}
           </ItemText>
         </Item>
       ))}
     </Container>
   );
-};
+});
 
 const Container = styled.div`
   display: flex;
