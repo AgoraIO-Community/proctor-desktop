@@ -10,8 +10,8 @@ import { LocalTrackPlayer } from '../../common/stream/track-player';
 import './index.css';
 export const ProctorSider = observer(() => {
   const {
-    navigationBarUIStore: {startClass, classState },
-    usersUIStore: { studentListByUserUuidPrefix, filterTag },
+    navigationBarUIStore: { startClass, classState },
+    usersUIStore: { studentListByUserUuidPrefix, filterTag, generateShortUserName },
     roomUIStore: { classStatusText, statusTextTip },
 
     classroomStore: {
@@ -96,7 +96,9 @@ export const ProctorSider = observer(() => {
                 {localCameraTrackState === AgoraRteMediaSourceState.started ? (
                   <LocalTrackPlayer></LocalTrackPlayer>
                 ) : (
-                  <div className="fcr_proctor_sider_info_proctor-actions-video-placeholder">MY</div>
+                  <div className="fcr_proctor_sider_info_proctor-actions-video-placeholder">
+                    {generateShortUserName(EduClassroomConfig.shared.sessionInfo.userName)}
+                  </div>
                 )}
               </div>
             </div>
@@ -215,7 +217,7 @@ const BroadCastButtonGroup = ({ isBroadCasting }: { isBroadCasting: boolean }) =
               <div>
                 <div>
                   <SvgImg type={SvgIconEnum.CAMERA_ON} colors={{ iconPrimary: '#000' }}></SvgImg>
-                  <span>Camera</span>
+                  <span>{transI18n('fcr_exam_prep_label_camera')}</span>
                 </div>
 
                 <Switch
@@ -229,8 +231,10 @@ const BroadCastButtonGroup = ({ isBroadCasting }: { isBroadCasting: boolean }) =
               </div>
               <div>
                 <div>
-                  <SvgImg type={SvgIconEnum.CAMERA_ON} colors={{ iconPrimary: '#000' }}></SvgImg>
-                  <span>Mic</span>
+                  <SvgImg
+                    type={SvgIconEnum.MICROPHONE_ON}
+                    colors={{ iconPrimary: '#000' }}></SvgImg>
+                  <span>{transI18n('fcr_exam_prep_label_microphone')}</span>
                 </div>
 
                 <Switch

@@ -1,42 +1,39 @@
-import { DeviceTypeEnum } from "@/infra/api";
-import { EduClassroomConfig, EduUserStruct } from "agora-edu-core";
-import { bound } from "agora-rte-sdk";
-import md5 from "js-md5";
-import { action, computed, observable } from "mobx";
-import { computedFn } from "mobx-utils";
-import { EduUIStoreBase } from "./base";
-import { StudentFilterTag, VideosWallLayoutEnum } from "./type";
+import { DeviceTypeEnum } from '@/infra/api';
+import { EduClassroomConfig, EduUserStruct } from 'agora-edu-core';
+import { bound } from 'agora-rte-sdk';
+import md5 from 'js-md5';
+import { action, computed, observable } from 'mobx';
+import { computedFn } from 'mobx-utils';
+import { EduUIStoreBase } from './base';
+import { StudentFilterTag, VideosWallLayoutEnum } from './type';
 
 export class UsersUIStore extends EduUIStoreBase {
-  @observable videosWallLayout: VideosWallLayoutEnum =
-    VideosWallLayoutEnum.Compact;
+  @observable videosWallLayout: VideosWallLayoutEnum = VideosWallLayoutEnum.Compact;
   @observable currentPageIndex = 0;
   @observable filterTag: StudentFilterTag = StudentFilterTag.All;
   @computed
   get totalPage() {
-    return Math.ceil(
-      this.studentListByUserUuidPrefix(this.filterTag).size /
-        this.videosWallLayout
-    );
+    return Math.ceil(this.studentListByUserUuidPrefix(this.filterTag).size / this.videosWallLayout);
   }
 
   @computed get studentListByPage() {
-    return Array.from(
-      this.studentListByUserUuidPrefix(this.filterTag).entries()
-    ).reduce((prev, cur, index) => {
-      const [userUuidPrefix] = cur;
-      if (index % this.videosWallLayout === 0) {
-        prev.push([userUuidPrefix]);
-      } else {
-        prev[Math.floor(index / this.videosWallLayout)].push(userUuidPrefix);
-      }
-      return prev;
-    }, [] as string[][]);
+    return Array.from(this.studentListByUserUuidPrefix(this.filterTag).entries()).reduce(
+      (prev, cur, index) => {
+        const [userUuidPrefix] = cur;
+        if (index % this.videosWallLayout === 0) {
+          prev.push([userUuidPrefix]);
+        } else {
+          prev[Math.floor(index / this.videosWallLayout)].push(userUuidPrefix);
+        }
+        return prev;
+      },
+      [] as string[][],
+    );
   }
   studentListByUserUuidPrefix = computedFn((filterTag: StudentFilterTag) => {
     const studentList: Map<string, string> = new Map();
     this.studentWithGroup(filterTag).forEach((groupUuid, userUuid) => {
-      const userUuidPrefix = userUuid.split("-")[0];
+      const userUuidPrefix = userUuid.split('-')[0];
       if (!studentList.get(userUuidPrefix)) {
         studentList.set(userUuidPrefix, groupUuid);
       }
@@ -47,12 +44,10 @@ export class UsersUIStore extends EduUIStoreBase {
     const studentList: Map<string, string> = new Map();
 
     this.studentsFilterByTag(filterTag).forEach((user, userUuid) => {
-      this.classroomStore.groupStore.groupDetails.forEach(
-        (group, groupUuid) => {
-          if (!!group.users.find((user) => user.userUuid === userUuid))
-            studentList.set(userUuid, groupUuid);
-        }
-      );
+      this.classroomStore.groupStore.groupDetails.forEach((group, groupUuid) => {
+        if (!!group.users.find((user) => user.userUuid === userUuid))
+          studentList.set(userUuid, groupUuid);
+      });
     });
 
     return studentList;
@@ -66,7 +61,7 @@ export class UsersUIStore extends EduUIStoreBase {
         const studentList: Map<string, EduUserStruct> = new Map();
 
         this.classroomStore.userStore.studentList.forEach((user) => {
-          if (user.userProperties?.get("tags")?.focus === 1) {
+          if (user.userProperties?.get('tags')?.focus === 1) {
             studentList.set(user.userUuid, user);
           }
         });
@@ -76,7 +71,7 @@ export class UsersUIStore extends EduUIStoreBase {
         const studentList: Map<string, EduUserStruct> = new Map();
 
         this.classroomStore.userStore.studentList.forEach((user) => {
-          if (!!user.userProperties?.get("tags")?.abnormal) {
+          if (!!user.userProperties?.get('tags')?.abnormal) {
             studentList.set(user.userUuid, user);
           }
         });
@@ -103,16 +98,24 @@ export class UsersUIStore extends EduUIStoreBase {
     this.filterTag = filterTag;
   }
   @bound
-  async updateUserTags(
-    roomUuid: string,
-    userUuid: string,
-    tags: Record<any, any>
-  ) {
-    return this.classroomStore.api.updateUserTags({ roomUuid, userUuid, tags });
+  async updateUserTags(key: string, data: any, roomUuid: string, userUuid: string) {
+    return this.classroomStore.api.updateUserTags({ roomUuid, userUuid, key, data });
   }
   @bound
-  async queryUserEvents(roomUuid: string, userUuid: string, cmd?: number) {
-    return this.classroomStore.api.queryRoomEvents({ roomUuid, userUuid, cmd });
+  async queryUserEvents(
+    roomUuid: string,
+    userUuid: string,
+    cmd?: number,
+    causeDataFilterKeys?: string,
+    causeDataFilterValues?: string,
+  ) {
+    return this.classroomStore.api.queryRoomEvents({
+      roomUuid,
+      userUuid,
+      cmd,
+      causeDataFilterKeys,
+      causeDataFilterValues,
+    });
   }
   @bound
   async queryRecordList(roomUuid: string, nextId?: number) {
@@ -124,6 +127,15 @@ export class UsersUIStore extends EduUIStoreBase {
   }
   generateDeviceUuid(userUuidPrefix: string, deviceType: DeviceTypeEnum) {
     return `${userUuidPrefix}-${deviceType}`;
+  }
+  generateShortUserName(name: string) {
+    const names = name.split(' ');
+    const [firstWord] = names;
+    const lastWord = names[names.length - 1];
+    const firstLetter = firstWord.split('')[0];
+    const secondLetter =
+      names.length > 1 ? lastWord.split('')[0] : lastWord.length > 1 ? lastWord.split('')[1] : '';
+    return `${firstLetter}${secondLetter}`.toUpperCase();
   }
   onInstall() {}
   onDestroy() {}

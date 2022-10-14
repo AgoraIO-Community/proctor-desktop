@@ -34,11 +34,6 @@ export const Content = observer(() => {
 const ContentProspect = observer(() => {
   const {
     navigationBarUIStore: { classTimeDuration },
-    classroomStore: {
-      roomStore: {
-        classroomSchedule: { state },
-      },
-    },
     studentViewUIStore: { counterOpening, setCounterOpening, beforeClass },
   } = useStore();
 
@@ -46,15 +41,10 @@ const ContentProspect = observer(() => {
     setCounterOpening(false);
   }, []);
   useEffect(() => {
-    if (
-      state === ClassState.beforeClass &&
-      classTimeDuration &&
-      classTimeDuration < 5000 &&
-      !counterOpening
-    ) {
+    if (beforeClass && classTimeDuration && classTimeDuration < 5000 && !counterOpening) {
       setCounterOpening(true);
     }
-  }, [classTimeDuration, state, counterOpening]);
+  }, [classTimeDuration, counterOpening, beforeClass]);
   return (
     <>
       {beforeClass && !counterOpening && (

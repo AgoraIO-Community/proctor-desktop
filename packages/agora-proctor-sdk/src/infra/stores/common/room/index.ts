@@ -1,3 +1,4 @@
+import { AgoraEduSDK, ConvertMediaOptionsConfig } from '@/infra/api';
 import {
   AGEduErrorCode,
   AgoraEduClassroomEvent,
@@ -13,9 +14,11 @@ import {
   LeaveReason,
 } from 'agora-edu-core';
 import {
+  AGError,
   AgoraRteMediaPublishState,
   AgoraRteMediaSourceState,
   AgoraRteScene,
+  AGRtcConnectionType,
   bound,
   Logger,
   retryAttempt,
@@ -51,7 +54,16 @@ export class RoomUIStore extends EduUIStoreBase {
   }
 
   @bound
-  async joinClassroom(roomUuid: string, roomType?: EduRoomTypeEnum) {
+  async joinClassroom(
+    roomUuid: string,
+    roomType?: EduRoomTypeEnum,
+    stream?: {
+      videoState?: AgoraRteMediaPublishState | undefined;
+      audioState?: AgoraRteMediaPublishState | undefined;
+      videoSourceState?: AgoraRteMediaSourceState | undefined;
+      audioSourceState?: AgoraRteMediaSourceState | undefined;
+    },
+  ) {
     if (this.roomSceneByRoomUuid(roomUuid)) {
       if (this.roomSceneByRoomUuid(roomUuid)?.roomState.state !== ClassroomState.Connected) {
         return;
@@ -71,7 +83,7 @@ export class RoomUIStore extends EduUIStoreBase {
             roomUuid,
             roomType: roomType ? roomType : sessionInfo.roomType,
           };
-          await this.checkIn(sessionInfo, roomScene);
+          await this.checkIn(sessionInfo, roomScene, stream);
           const scene = engine.createAgoraRteScene(roomUuid);
           this.createSceneSubscription(scene);
           roomScene.setScene(scene);
@@ -107,8 +119,17 @@ export class RoomUIStore extends EduUIStoreBase {
     roomScene.setClassroomState(ClassroomState.Connected);
     return roomScene;
   }
-  async checkIn(sessionInfo: EduSessionInfo, roomScene: RoomScene) {
-    const { data, ts } = await this.classroomStore.api.checkIn(sessionInfo, undefined);
+  async checkIn(
+    sessionInfo: EduSessionInfo,
+    roomScene: RoomScene,
+    stream?: {
+      videoState?: AgoraRteMediaPublishState | undefined;
+      audioState?: AgoraRteMediaPublishState | undefined;
+      videoSourceState?: AgoraRteMediaSourceState | undefined;
+      audioSourceState?: AgoraRteMediaSourceState | undefined;
+    },
+  ) {
+    const { data, ts } = await this.classroomStore.api.checkIn(sessionInfo, undefined, stream);
     const { state = 0, startTime, duration, closeDelay = 0, rtcRegion, rtmRegion, vid } = data;
     EduClassroomConfig.shared.rteEngineConfig.setRtcRegion(rtcRegion);
     EduClassroomConfig.shared.rteEngineConfig.setRtmRegion(rtmRegion);
@@ -191,6 +212,26 @@ export class RoomUIStore extends EduUIStoreBase {
   private async _handleClassroomEvent(type: AgoraEduClassroomEvent, args: any) {
     if (type === AgoraEduClassroomEvent.JoinSubRoom) {
       const roomScene = await this.joinClassroom(this.currentGroupUuid, EduRoomTypeEnum.RoomGroup);
+      try {
+        const launchLowStreamCameraEncoderConfigurations = (
+          EduClassroomConfig.shared.rteEngineConfig.rtcConfigs as ConvertMediaOptionsConfig
+        )?.defaultLowStreamCameraEncoderConfigurations;
+
+        await this.classroomStore.mediaStore.enableDualStream(
+          true,
+          AGRtcConnectionType.main,
+          roomScene?.scene,
+        );
+
+        await this.classroomStore.mediaStore.setLowStreamParameter(
+          launchLowStreamCameraEncoderConfigurations ||
+            EduClassroomConfig.defaultLowStreamParameter(),
+          AGRtcConnectionType.main,
+          roomScene?.scene,
+        );
+      } catch (e) {
+        this.shareUIStore.addGenericErrorDialog(e as AGError);
+      }
       if (roomScene) {
         await roomScene.scene?.joinRTC();
         this.classroomStore.streamStore.updateLocalPublishState(
@@ -320,7 +361,10 @@ export class RoomUIStore extends EduUIStoreBase {
         },
       ),
     );
-    if (EduClassroomConfig.shared.sessionInfo.role === EduRoleTypeEnum.student) {
+    if (
+      EduClassroomConfig.shared.sessionInfo.role === EduRoleTypeEnum.student &&
+      AgoraEduSDK.checkStudentScreenShareState
+    ) {
       this._disposers.push(
         computed(() => ({
           screenShareState: this.classroomStore.mediaStore.localScreenShareTrackState,

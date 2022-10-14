@@ -90,7 +90,7 @@ export type LaunchOption = {
   recordRetryTimeout?: number; // 录制重试间隔
   uiMode?: FcrMultiThemeMode;
   shareUrl?: string; // 分享URL
-  examinationUrl: string;
+  checkStudentScreenShareState?: boolean;
 };
 
 /**
