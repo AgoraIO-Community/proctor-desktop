@@ -76,6 +76,9 @@
   background: rgba(52, 52, 52, 0.4);
   backdrop-filter: blur(25px);
 }
+.fcr-student-detail-tab-replay-bottom-list-item-active {
+  background: #357bf6;
+}
 .fcr-student-detail-tab-replay-bottom-list-item > div:first-child {
   font-weight: 800;
   font-size: 20px;
@@ -162,6 +165,9 @@
 }
 .fcr-student-detail-tab-live-bottom-suspicious-select .ant-select-arrow {
   margin-top: -10px;
+}
+.fcr-student-detail-tab-live-bottom-suspicious-select .ant-select-item {
+  color: #bdbec6;
 }
 .fcr-student-detail-tab-live-bottom-suspicious-select-popup
   .ant-select-item-option-active:not(.ant-select-item-option-disabled) {

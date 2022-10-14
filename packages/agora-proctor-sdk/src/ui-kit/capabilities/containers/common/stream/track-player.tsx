@@ -19,6 +19,7 @@ type RemoteTrackPlayerProps = {
   className?: string;
   mirrorMode?: boolean;
   fromScene?: AgoraRteScene;
+  subscribeLowStream?: boolean;
 };
 
 type LocalTrackPlayerProps = Omit<RemoteTrackPlayerProps, 'stream'>;
@@ -38,7 +39,10 @@ export const LocalTrackPlayer: FC<LocalTrackPlayerProps> = observer(({ style, cl
 });
 export const RemoteTrackPlayer = observer(
   forwardRef<{ fullScreen: () => void }, RemoteTrackPlayerProps>(
-    ({ style, className, stream, mirrorMode = false, fromScene }, ref) => {
+    (
+      { style, className, stream, mirrorMode = true, fromScene, subscribeLowStream = true },
+      ref,
+    ) => {
       const {
         classroomStore: {
           streamStore: { setupRemoteVideo, muteRemoteAudioStream, setRemoteVideoStreamType },
@@ -47,6 +51,7 @@ export const RemoteTrackPlayer = observer(
       const [isFullScreen, setIsFullScreen] = useState(false);
       const playerContainerRef = useRef<HTMLDivElement | null>(null);
       useEffect(() => {
+        if (!subscribeLowStream) return;
         if (isFullScreen) {
           setRemoteVideoStreamType(
             stream.streamUuid,
@@ -63,7 +68,7 @@ export const RemoteTrackPlayer = observer(
 
           muteRemoteAudioStream(stream, true, fromScene);
         }
-      }, [isFullScreen, fromScene, stream]);
+      }, [isFullScreen, fromScene, stream, subscribeLowStream]);
       useEffect(() => {
         if (playerContainerRef.current) {
           setupRemoteVideo(

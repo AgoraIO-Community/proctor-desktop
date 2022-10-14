@@ -54,7 +54,16 @@ export class RoomUIStore extends EduUIStoreBase {
   }
 
   @bound
-  async joinClassroom(roomUuid: string, roomType?: EduRoomTypeEnum) {
+  async joinClassroom(
+    roomUuid: string,
+    roomType?: EduRoomTypeEnum,
+    stream?: {
+      videoState?: AgoraRteMediaPublishState | undefined;
+      audioState?: AgoraRteMediaPublishState | undefined;
+      videoSourceState?: AgoraRteMediaSourceState | undefined;
+      audioSourceState?: AgoraRteMediaSourceState | undefined;
+    },
+  ) {
     if (this.roomSceneByRoomUuid(roomUuid)) {
       if (this.roomSceneByRoomUuid(roomUuid)?.roomState.state !== ClassroomState.Connected) {
         return;
@@ -74,7 +83,7 @@ export class RoomUIStore extends EduUIStoreBase {
             roomUuid,
             roomType: roomType ? roomType : sessionInfo.roomType,
           };
-          await this.checkIn(sessionInfo, roomScene);
+          await this.checkIn(sessionInfo, roomScene, stream);
           const scene = engine.createAgoraRteScene(roomUuid);
           this.createSceneSubscription(scene);
           roomScene.setScene(scene);
@@ -110,8 +119,17 @@ export class RoomUIStore extends EduUIStoreBase {
     roomScene.setClassroomState(ClassroomState.Connected);
     return roomScene;
   }
-  async checkIn(sessionInfo: EduSessionInfo, roomScene: RoomScene) {
-    const { data, ts } = await this.classroomStore.api.checkIn(sessionInfo, undefined);
+  async checkIn(
+    sessionInfo: EduSessionInfo,
+    roomScene: RoomScene,
+    stream?: {
+      videoState?: AgoraRteMediaPublishState | undefined;
+      audioState?: AgoraRteMediaPublishState | undefined;
+      videoSourceState?: AgoraRteMediaSourceState | undefined;
+      audioSourceState?: AgoraRteMediaSourceState | undefined;
+    },
+  ) {
+    const { data, ts } = await this.classroomStore.api.checkIn(sessionInfo, undefined, stream);
     const { state = 0, startTime, duration, closeDelay = 0, rtcRegion, rtmRegion, vid } = data;
     EduClassroomConfig.shared.rteEngineConfig.setRtcRegion(rtcRegion);
     EduClassroomConfig.shared.rteEngineConfig.setRtmRegion(rtmRegion);

@@ -141,7 +141,9 @@ export const StudentDetail = observer(({ userUuidPrefix }: { userUuidPrefix: str
       ) === i.streamUuid
     );
   });
-
+  const onUserEventClick = (ts: number) => {
+    studentHlsVideosRef.current?.seek(dayjs.duration(Math.abs(ts - startTime), 'ms').get('s'));
+  };
   return (
     <div className="fcr-student-detail-tab">
       <div className="fcr-student-detail-tab-replay">
@@ -159,39 +161,10 @@ export const StudentDetail = observer(({ userUuidPrefix }: { userUuidPrefix: str
               {transI18n('fcr_sub_room_label_replay')}（{userEvents.length}）
             </span>
           </div>
-          <div className="fcr-student-detail-tab-replay-bottom-list">
-            {userEvents.map((e, index) => {
-              return (
-                <div
-                  key={e.ts}
-                  className="fcr-student-detail-tab-replay-bottom-list-item"
-                  onClick={() => {
-                    studentHlsVideosRef.current?.seek(
-                      dayjs.duration(Math.abs(e.ts - startTime), 'ms').get('s'),
-                    );
-                  }}>
-                  <div>{Math.abs(index - userEvents.length)}</div>
-                  <div>
-                    <div className="fcr-student-detail-tab-replay-bottom-list-item-logo">
-                      <SvgImg type={SvgIconEnum.AI} size={36}></SvgImg>
-                    </div>
-                    <div className="fcr-student-detail-tab-replay-bottom-list-item-info">
-                      <div className="fcr-student-detail-tab-replay-bottom-list-item-type">
-                        {dayjs.duration(Math.abs(e.ts - startTime), 'ms').format('mm:ss')}{' '}
-                        {e.data?.abnormal?.reason}
-                      </div>
-                      <div className="fcr-student-detail-tab-replay-bottom-list-item-desc">
-                        Description From AI
-                      </div>
-                    </div>
-                  </div>
-                  <div>
-                    <SvgImg type={SvgIconEnum.REPLAY} size={35}></SvgImg>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+          <UserEventsList
+            userEvents={userEvents}
+            startTime={startTime}
+            onEventClick={onUserEventClick}></UserEventsList>
         </div>
       </div>
       <div className="fcr-student-detail-tab-live">
@@ -254,3 +227,56 @@ export const Alarm = () => {
     </div>
   );
 };
+export const UserEventsList = observer(
+  ({
+    userEvents,
+    onEventClick,
+    startTime,
+  }: {
+    startTime: number;
+    userEvents: UserEvents<{
+      abnormal: UserAbnormalType;
+    }>[];
+    onEventClick: (timestamp: number) => void;
+  }) => {
+    const [currentEvent, setCurrentEvent] = useState(-1);
+    return (
+      <div className="fcr-student-detail-tab-replay-bottom-list">
+        {userEvents.map((e, index) => {
+          return (
+            <div
+              key={e.ts}
+              className={`fcr-student-detail-tab-replay-bottom-list-item ${
+                currentEvent === e.sequence
+                  ? 'fcr-student-detail-tab-replay-bottom-list-item-active'
+                  : ''
+              }`}
+              onClick={() => {
+                onEventClick(e.ts);
+                setCurrentEvent(e.sequence);
+              }}>
+              <div>{Math.abs(index - userEvents.length)}</div>
+              <div>
+                <div className="fcr-student-detail-tab-replay-bottom-list-item-logo">
+                  <SvgImg type={SvgIconEnum.AI} size={36}></SvgImg>
+                </div>
+                <div className="fcr-student-detail-tab-replay-bottom-list-item-info">
+                  <div className="fcr-student-detail-tab-replay-bottom-list-item-type">
+                    {dayjs.duration(Math.abs(e.ts - startTime), 'ms').format('mm:ss')}{' '}
+                    {e.data?.abnormal?.reason}
+                  </div>
+                  <div className="fcr-student-detail-tab-replay-bottom-list-item-desc">
+                    Description From AI
+                  </div>
+                </div>
+              </div>
+              <div>
+                <SvgImg type={SvgIconEnum.REPLAY} size={35}></SvgImg>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    );
+  },
+);

@@ -2,22 +2,41 @@ import { useStore } from '@/infra/hooks/ui-store';
 import { Space } from 'antd';
 import { observer } from 'mobx-react';
 import styled, { css } from 'styled-components';
+import { SvgIconEnum, SvgImg } from '~ui-kit';
 import { RemoteTrackPlayer } from '../../common/stream/track-player';
-
+import { useMemo } from 'react';
+import { AgoraRteMediaPublishState } from 'agora-rte-sdk';
 export const InteractiveVideo = observer(() => {
   const {
     studentViewUIStore: { userAvatar },
     streamUIStore: { teacherCameraStream },
   } = useStore();
+  const isTeacherCameraStreamEnabled = useMemo(() => {
+    return (
+      teacherCameraStream &&
+      (teacherCameraStream.stream.audioState === AgoraRteMediaPublishState.Published ||
+        teacherCameraStream.stream.videoState === AgoraRteMediaPublishState.Published)
+    );
+  }, [
+    teacherCameraStream,
+    teacherCameraStream?.stream.audioState,
+    teacherCameraStream?.stream.videoState,
+  ]);
   return (
     <Space direction="vertical" size={15}>
-      <StudentPhoto scale={!!teacherCameraStream ? 0.5 : 1} backgroundImage={userAvatar} />
-      {teacherCameraStream &&
-        (!teacherCameraStream?.isCameraMuted || !teacherCameraStream.isMicMuted) && (
-          <TeacherVideo>
-            <RemoteTrackPlayer stream={teacherCameraStream.stream} />
-          </TeacherVideo>
-        )}
+      <StudentPhoto scale={isTeacherCameraStreamEnabled ? 0.5 : 1} backgroundImage={userAvatar} />
+      {isTeacherCameraStreamEnabled && (
+        <TeacherVideo>
+          {!teacherCameraStream?.isMicMuted && (
+            <SvgImg className={'video-volume'} type={SvgIconEnum.VOLUME}></SvgImg>
+          )}
+          {teacherCameraStream?.isCameraMuted ? (
+            <SvgImg type={SvgIconEnum.NO_VIDEO} size={36}></SvgImg>
+          ) : (
+            <RemoteTrackPlayer subscribeLowStream={false} stream={teacherCameraStream!.stream} />
+          )}
+        </TeacherVideo>
+      )}
     </Space>
   );
 });
@@ -29,7 +48,7 @@ const siderVideoBox = css`
   width: ${videoWidth}px;
   height: ${videoHeight}px;
   border-radius: 16px;
-  background: #cecece;
+  background: #f8faff;
 `;
 
 const StudentPhoto = styled.div<{ scale?: number; backgroundImage?: string }>`
@@ -46,13 +65,24 @@ const StudentPhoto = styled.div<{ scale?: number; backgroundImage?: string }>`
       background: url(${props.backgroundImage});
       background-repeat: no-repeat;
       background-size: cover;
+      transform: rotateY(180deg);
     `}
 `;
 
 const TeacherVideo = styled.div`
   ${siderVideoBox};
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   overflow: hidden;
   & video {
-    object-fit: contain !important;
+    object-fit: cover !important;
+  }
+  & .video-volume {
+    position: absolute;
+    bottom: 5px;
+    left: 5px;
+    z-index: 9;
   }
 `;
