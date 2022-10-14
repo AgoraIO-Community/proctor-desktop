@@ -34,7 +34,6 @@ export const Content = observer(() => {
 const ContentProspect = observer(() => {
   const {
     navigationBarUIStore: { classTimeDuration },
-
     studentViewUIStore: { counterOpening, setCounterOpening, beforeClass },
   } = useStore();
 

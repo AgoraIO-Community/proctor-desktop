@@ -84,7 +84,6 @@ export class RoomScene {
 
     //listen to rtc state change
     scene.on(AgoraRteEventType.RtcConnectionStateChanged, (state, connectionType) => {
-      console.log(scene, state, connectionType, 'connectionStateChanged');
       this.setRtcState(state, connectionType);
     });
   }
