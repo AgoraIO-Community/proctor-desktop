@@ -1,9 +1,9 @@
-import { Button, ButtonProps } from "antd";
-import React, { FC } from "react";
-import styled, { css } from "styled-components";
-import { AgoraMidBorderRadius } from "../common";
+import { Button, ButtonProps } from 'antd';
+import React, { FC } from 'react';
+import styled, { css } from 'styled-components';
+import { AgoraLargeBtnBorderRadius } from '../common';
 
-type primarySubType = "black" | "original" | "red";
+type primarySubType = 'black' | 'original' | 'red';
 type AgoraButtonProps = ButtonProps &
   React.RefAttributes<HTMLElement> & {
     subType?: primarySubType;
@@ -33,23 +33,29 @@ const original = css`
 
 const selectPrimaryCss = (type: primarySubType) => {
   switch (type) {
-    case "black":
+    case 'black':
       return black;
-    case "red":
+    case 'red':
       return red;
-    case "original":
+    case 'original':
       return original;
   }
 };
 
 export const AgoraButton = styled(ButtonComponent)<AgoraButtonProps>`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: none;
   ${(props) =>
     props.width &&
     css`
       width: ${props.width};
     `}
   &.ant-btn-lg {
-    height: 50px;
+    height: 48px;
+    padding-left: 30px;
+    padding-right: 30px;
   }
   &.ant-btn-primary[disabled],
   .ant-btn-primary[disabled]:hover,
@@ -62,8 +68,8 @@ export const AgoraButton = styled(ButtonComponent)<AgoraButtonProps>`
   }
   ${(props) => {
     switch (props.size) {
-      case "large":
-        return AgoraMidBorderRadius;
+      case 'large':
+        return AgoraLargeBtnBorderRadius;
       default:
         break;
     }

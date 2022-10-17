@@ -1,19 +1,17 @@
-import { useStore } from "@/infra/hooks/ui-store";
-import { AgoraButton } from "@/ui-kit/components/button";
-import { FlexContainer } from "@/ui-kit/components/container";
-import { AgoraModal } from "@/ui-kit/components/modal";
-import {
-  AgoraEduClassroomEvent,
-  EduEventCenter,
-  LeaveReason,
-} from "agora-edu-core";
-import { observer } from "mobx-react";
-import { useCallback } from "react";
-import styled from "styled-components";
-import { Content } from "../containers/examinee/content";
-import { Sider } from "../containers/examinee/sider";
-import { ToastContainer } from "../containers/common/toast";
-import Room from "./room";
+import { useStore } from '@/infra/hooks/ui-store';
+import { AgoraButton } from '@/ui-kit/components/button';
+import { FlexContainer } from '@/ui-kit/components/container';
+import { AgoraModal } from '@/ui-kit/components/modal';
+import { AgoraEduClassroomEvent, EduEventCenter, LeaveReason } from 'agora-edu-core';
+import { observer } from 'mobx-react';
+import { useCallback } from 'react';
+import styled from 'styled-components';
+import { Content } from '../containers/examinee/content';
+import { Sider } from '../containers/examinee/sider';
+import { ToastContainer } from '../containers/common/toast';
+import { DialogContainer } from '../containers/common/dialog';
+
+import Room from './room';
 
 export const ExamineeScenario = observer(() => {
   return (
@@ -24,6 +22,7 @@ export const ExamineeScenario = observer(() => {
       </FlexContainer>
       <RoomCloseModal />
       <ToastContainer />
+      <DialogContainer></DialogContainer>
     </Room>
   );
 });
@@ -38,24 +37,19 @@ const RoomCloseModal = observer(() => {
       open={roomClose}
       width={730}
       placement="bottom"
-      footer={<LeaveRoomFooter />}
-    >
+      footer={<LeaveRoomFooter />}>
       <Title>The Exam is Over!</Title>
-      <section style={{ padding: "0 70px 103px 70px" }}>
+      <section style={{ padding: '0 70px 103px 70px' }}>
         <FlexContainer direction="row" gap={20}>
           <FlexContainer direction="column" gap={28}>
             <section>
               <BolderTitle>Hello Alice</BolderTitle>
             </section>
-            <DescriptionTip>
-              The exam is over. Hope you can get a good result!
-            </DescriptionTip>
+            <DescriptionTip>The exam is over. Hope you can get a good result!</DescriptionTip>
           </FlexContainer>
           <Avatar image={userAvatar} />
         </FlexContainer>
-        <Description>
-          You can exit the computer and mobile examination room
-        </Description>
+        <Description>You can exit the computer and mobile examination room</Description>
       </section>
     </AgoraModal>
   );
@@ -64,19 +58,11 @@ const RoomCloseModal = observer(() => {
 const LeaveRoomFooter = observer(() => {
   const handleLeaveRoom = useCallback(() => {
     // leave room
-    EduEventCenter.shared.emitClasroomEvents(
-      AgoraEduClassroomEvent.Destroyed,
-      LeaveReason.leave
-    );
+    EduEventCenter.shared.emitClasroomEvents(AgoraEduClassroomEvent.Destroyed, LeaveReason.leave);
   }, []);
   return (
     <FooterContainer>
-      <AgoraButton
-        type="primary"
-        size="large"
-        width="200px"
-        onClick={handleLeaveRoom}
-      >
+      <AgoraButton type="primary" size="large" width="200px" onClick={handleLeaveRoom}>
         I get it
       </AgoraButton>
     </FooterContainer>

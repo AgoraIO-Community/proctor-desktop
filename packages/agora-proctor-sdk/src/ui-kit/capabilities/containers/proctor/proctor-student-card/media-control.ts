@@ -12,6 +12,7 @@ export class MediaController {
 
   @observable totalDuration: number = 0;
   @observable currentTime: number = 0;
+  @observable isPlaying: boolean = false;
 
   private _lastReloadTime: number = 0;
   private _reloadTimer: number = -1;
@@ -21,6 +22,34 @@ export class MediaController {
     private _mainDeviceCameraVideoUrl?: string,
     private _subDeviceCameraVideoUrl?: string,
   ) {}
+  @bound
+  async play() {
+    try {
+      await Promise.all([
+        this.mainDeviceScreenVideoPlyr?.mediaElement?.play(),
+        this.mainDeviceCameraVideoPlyr?.mediaElement?.play(),
+        this.subDeviceCameraVideoPlyr?.mediaElement?.play(),
+      ]);
+      runInAction(() => {
+        this.isPlaying = true;
+      });
+    } catch (e) {
+      this.pause();
+    }
+  }
+  @bound
+  async pause() {
+    try {
+      await Promise.all([
+        this.mainDeviceScreenVideoPlyr?.mediaElement?.pause(),
+        this.mainDeviceCameraVideoPlyr?.mediaElement?.pause(),
+        this.subDeviceCameraVideoPlyr?.mediaElement?.pause(),
+      ]);
+      runInAction(() => {
+        this.isPlaying = false;
+      });
+    } catch (e) {}
+  }
   setMainDeviceScreenVideoUrl(url: string) {
     this._mainDeviceScreenVideoUrl = url;
     this.mainDeviceScreenVideoPlyr = new StreamMediaPlayer(this._mainDeviceScreenVideoUrl);
@@ -38,8 +67,9 @@ export class MediaController {
       this.mainDeviceScreenVideoContainer = dom;
       this.mainDeviceScreenVideoPlyr.setView(this.mainDeviceScreenVideoContainer);
       this.mainDeviceScreenVideoPlyr.play(true, true);
-      this.syncPlyrCurrentTime(this.currentTime);
       this.addMediaElementListeners();
+
+      this.syncPlyrCurrentTime(this.currentTime);
     }
   }
   setMainDeviceCameraView(dom: HTMLElement) {
@@ -47,6 +77,8 @@ export class MediaController {
       this.mainDeviceCameraVideoContainer = dom;
       this.mainDeviceCameraVideoPlyr.setView(this.mainDeviceCameraVideoContainer);
       this.mainDeviceCameraVideoPlyr.play(true, true);
+      this.mainDeviceCameraVideoPlyr?.mediaElement?.addEventListener('play', this.play);
+      this.mainDeviceCameraVideoPlyr?.mediaElement?.addEventListener('pause', this.pause);
     }
   }
   setSubDeviceCameraView(dom: HTMLElement) {
@@ -54,6 +86,8 @@ export class MediaController {
       this.subDeviceCameraVideoContainer = dom;
       this.subDeviceCameraVideoPlyr.setView(this.subDeviceCameraVideoContainer);
       this.subDeviceCameraVideoPlyr.play(true, true);
+      this.subDeviceCameraVideoPlyr?.mediaElement?.addEventListener('play', this.play);
+      this.subDeviceCameraVideoPlyr?.mediaElement?.addEventListener('pause', this.pause);
     }
   }
   syncPlyrCurrentTime(time: number) {
@@ -82,6 +116,9 @@ export class MediaController {
       'timeupdate',
       this.setCurrentTime,
     );
+    this.mainDeviceScreenVideoPlyr?.mediaElement?.addEventListener('play', this.play);
+    this.mainDeviceScreenVideoPlyr?.mediaElement?.addEventListener('pause', this.pause);
+
     this.mainDeviceScreenVideoPlyr?.mediaElement?.addEventListener('ended', this.throllteReload);
   }
   removeMediaElementListeners() {
@@ -94,6 +131,13 @@ export class MediaController {
       'timeupdate',
       this.setCurrentTime,
     );
+    this.mainDeviceScreenVideoPlyr?.mediaElement?.removeEventListener('play', this.play);
+    this.mainDeviceScreenVideoPlyr?.mediaElement?.removeEventListener('pause', this.pause);
+    this.mainDeviceCameraVideoPlyr?.mediaElement?.removeEventListener('play', this.play);
+    this.mainDeviceCameraVideoPlyr?.mediaElement?.removeEventListener('pause', this.pause);
+    this.subDeviceCameraVideoPlyr?.mediaElement?.removeEventListener('play', this.play);
+    this.subDeviceCameraVideoPlyr?.mediaElement?.removeEventListener('pause', this.pause);
+
     this.mainDeviceScreenVideoPlyr?.mediaElement?.removeEventListener('ended', this.throllteReload);
   }
   @bound

@@ -50,19 +50,21 @@ export const AllVideos = observer(() => {
     <div className="fcr-all-videos-tab" ref={containerRef}>
       {studentListByUserUuidPrefix(filterTag).size > 0 ? (
         <>
-          <div className="fcr-all-videos-tab-controller">
-            <div className="fcr-all-videos-tab-controller-prev" onClick={prev}>
-              <SvgImg type={SvgIconEnum.TRIANGLE_SOLID_UP}></SvgImg>
+          {studentListByUserUuidPrefix(filterTag).size > videosWallLayout && (
+            <div className="fcr-all-videos-tab-controller">
+              <div className="fcr-all-videos-tab-controller-prev" onClick={prev}>
+                <SvgImg type={SvgIconEnum.TRIANGLE_SOLID_UP}></SvgImg>
+              </div>
+              <div className="fcr-all-videos-tab-controller-info">
+                <span>{currentUserCount}</span>
+                <span>/</span>
+                <span>{studentListByUserUuidPrefix(filterTag).size}</span>
+              </div>
+              <div className="fcr-all-videos-tab-controller-next" onClick={next}>
+                <SvgImg type={SvgIconEnum.TRIANGLE_SOLID_DOWN}></SvgImg>
+              </div>
             </div>
-            <div className="fcr-all-videos-tab-controller-info">
-              <span>{currentUserCount}</span>
-              <span>/</span>
-              <span>{studentListByUserUuidPrefix(filterTag).size}</span>
-            </div>
-            <div className="fcr-all-videos-tab-controller-next" onClick={next}>
-              <SvgImg type={SvgIconEnum.TRIANGLE_SOLID_DOWN}></SvgImg>
-            </div>
-          </div>
+          )}
           <div className="fcr-all-videos-tab-page" onWheel={onWheel}>
             <Carousel
               initialSlide={0}

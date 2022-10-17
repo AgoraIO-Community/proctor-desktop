@@ -162,4 +162,8 @@ export enum SvgIconEnum {
   ABNORMAL = 'abnormal',
   DROPDOWN = 'dropdown',
   EXTRA_VERTICAL = 'extra-vertical',
+  BROADCAST = 'broadcast',
+  TICK = 'tick',
+  PLAY = 'play',
+  PAUSE = 'pause',
 }

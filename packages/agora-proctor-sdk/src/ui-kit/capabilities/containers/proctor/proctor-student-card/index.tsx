@@ -273,13 +273,30 @@ export const StudentHLSVideos = observer(
             }}
             value={currentTime}
             min={0}
-            max={mediaControllerRef.current?.totalDuration || 0}
-            marks={{
-              0: dayjs.duration(mediaControllerRef.current?.currentTime || 0, 's').format('mm:ss'),
-              [mediaControllerRef.current?.totalDuration || 0]: dayjs
-                .duration(mediaControllerRef.current?.totalDuration || 0, 's')
-                .format('mm:ss'),
-            }}></Slider>
+            max={mediaControllerRef.current?.totalDuration || 0}></Slider>
+          <div className="fcr-student-card-videos-progress-btns">
+            {mediaControllerRef.current?.isPlaying ? (
+              <SvgImg
+                type={SvgIconEnum.PAUSE}
+                style={{ cursor: 'pointer' }}
+                size={28}
+                onClick={() => {
+                  mediaControllerRef.current?.pause();
+                }}></SvgImg>
+            ) : (
+              <SvgImg
+                size={28}
+                type={SvgIconEnum.PLAY}
+                style={{ cursor: 'pointer' }}
+                onClick={() => {
+                  mediaControllerRef.current?.play();
+                }}></SvgImg>
+            )}
+            <div>
+              {dayjs.duration(mediaControllerRef.current?.currentTime || 0, 's').format('mm:ss')}/
+              {dayjs.duration(mediaControllerRef.current?.totalDuration || 0, 's').format('mm:ss')}
+            </div>
+          </div>
         </div>
         <div ref={screenContainerRef} className="fcr-student-card-videos-screen">
           <div className="fcr-track-player-fullscreen-cover">

@@ -1,6 +1,6 @@
-import { Select } from "antd";
-import styled from "styled-components";
-import { AgoraMidBorderRadius } from "../common";
+import { Select } from 'antd';
+import styled from 'styled-components';
+import { AgoraMidBorderRadius } from '../common';
 
 export const AgoraSelect = styled(Select)`
   ${AgoraMidBorderRadius}

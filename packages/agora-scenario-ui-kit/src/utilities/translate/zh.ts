@@ -61,6 +61,8 @@ export const zh = {
   fcr_device_test_button_join_exam: '正式进入考场',
   fcr_device_test_button_stay: '留下',
   fcr_device_test_button_leave: '退出',
+  fcr_device_test_label_enable: '开启',
+  fcr_device_test_label_disable: '关闭',
 
   edu_error: {
     '600000': '房间资源未获取',

@@ -1,6 +1,7 @@
 import { useStore } from '@/infra/hooks/ui-store';
 import { observer } from 'mobx-react';
 import styled from 'styled-components';
+import { SvgIconEnum, SvgImg } from '~ui-kit';
 import cameraImage from '../assets/camera.png';
 import microphoneImage from '../assets/microphone.png';
 import photoImage from '../assets/photo.png';
@@ -23,7 +24,12 @@ export const Conclusion = observer(() => {
         <Item key={step.text}>
           <ItemImg src={step.image} width="80px" height="80px" alt={step.text} />
           <ItemText>
-            {stepupStates[index] ? '√' : 'x'} {step.text}
+            {stepupStates[index] ? (
+              <SvgImg type={SvgIconEnum.TICK} colors={{ iconPrimary: '#000' }} size={20}></SvgImg>
+            ) : (
+              <SvgImg type={SvgIconEnum.CLOSE} colors={{ iconPrimary: '#000' }} size={20}></SvgImg>
+            )}
+            <span>{step.text}</span>
           </ItemText>
         </Item>
       ))}
@@ -33,8 +39,7 @@ export const Conclusion = observer(() => {
 
 const Container = styled.div`
   display: flex;
-  justify-content: space-between;
-  padding: 0 90px;
+  justify-content: space-around;
 `;
 
 const Item = styled.div`
@@ -60,4 +65,7 @@ const ItemText = styled.div`
   font-size: 14px;
   color: #000;
   background: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 `;

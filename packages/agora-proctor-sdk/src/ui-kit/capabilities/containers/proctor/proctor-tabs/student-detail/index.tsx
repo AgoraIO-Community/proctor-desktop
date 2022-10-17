@@ -58,7 +58,7 @@ export const StudentDetail = observer(({ userUuidPrefix }: { userUuidPrefix: str
     {
       recordDetails: {
         streamUuid: string;
-        type: 'audio' | 'video';
+        type: 'audio' | 'video' | 'av';
         url: string;
         startTime: number;
       }[];
@@ -121,7 +121,7 @@ export const StudentDetail = observer(({ userUuidPrefix }: { userUuidPrefix: str
     recordList.length - 1 < 0 ? 0 : recordList.length - 1
   ]?.recordDetails?.find((i) => {
     return (
-      i.type === 'video' &&
+      i.type === 'av' &&
       Array.from(roomScene?.streamController?.streamByUserUuid.get(mainDeviceUserUuid) || []).find(
         (i) =>
           roomScene?.streamController?.streamByStreamUuid.get(i)?.videoSourceType ===
@@ -133,7 +133,7 @@ export const StudentDetail = observer(({ userUuidPrefix }: { userUuidPrefix: str
     recordList.length - 1 < 0 ? 0 : recordList.length - 1
   ]?.recordDetails?.find((i) => {
     return (
-      i.type === 'video' &&
+      i.type === 'av' &&
       Array.from(roomScene?.streamController?.streamByUserUuid.get(subDeviceUserUuid) || []).find(
         (i) =>
           roomScene?.streamController?.streamByStreamUuid.get(i)?.videoSourceType ===
@@ -223,7 +223,7 @@ export const StudentDetail = observer(({ userUuidPrefix }: { userUuidPrefix: str
 export const Alarm = () => {
   return (
     <div className="fcr-alarm">
-      <SvgImg type={SvgIconEnum.ALARM} size={14}></SvgImg>
+      <SvgImg type={SvgIconEnum.ALARM} size={24}></SvgImg>
     </div>
   );
 };
