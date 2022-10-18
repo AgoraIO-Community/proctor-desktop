@@ -63,6 +63,7 @@ const PreTestHeader = styled.p`
   line-height: 26px;
   text-align: center;
   padding-top: 36px;
+  padding-bottom: 20px;
 `;
 
 const ProcessInfo = styled(PreTestHeader)`
