@@ -80,7 +80,17 @@ export class NotificationUIStore extends EduUIStoreBase {
           } else if (ClassState.close === state) {
             this.classroomStore.connectionStore.leaveClassroomUntil(
               LeaveReason.leave,
-              Promise.resolve(),
+              new Promise((resolve) => {
+                this.shareUIStore.addConfirmDialog(
+                  transI18n('fcr_alert_title'),
+                  transI18n('fcr_room_label_exam_over'),
+                  {
+                    onOK: resolve,
+                    btnText: { ok: transI18n('fcr_room_button_leave'), cancel: '' },
+                    actions: ['ok'],
+                  },
+                );
+              }),
             );
           }
         },
@@ -96,13 +106,14 @@ export class NotificationUIStore extends EduUIStoreBase {
               LeaveReason.leave,
               new Promise((resolve) => {
                 this.shareUIStore.addConfirmDialog(
-                  transI18n('fcr_room_button_leave'),
+                  transI18n('fcr_alert_title'),
                   this._getStateErrorReason(
                     this.classroomStore.connectionStore.classroomStateErrorReason,
                   ),
                   {
                     onOK: resolve,
                     actions: ['ok'],
+                    btnText: { ok: transI18n('fcr_room_button_leave'), cancel: '' },
                   },
                 );
               }),
