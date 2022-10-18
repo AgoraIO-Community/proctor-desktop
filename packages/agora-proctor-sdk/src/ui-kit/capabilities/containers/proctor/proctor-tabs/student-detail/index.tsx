@@ -107,7 +107,7 @@ export const StudentDetail = observer(({ userUuidPrefix }: { userUuidPrefix: str
     recordList.length - 1 < 0 ? 0 : recordList.length - 1
   ]?.recordDetails?.find((i) => {
     return (
-      i.type === 'video' &&
+      i.type === 'av' &&
       roomScene?.streamController?.streamByStreamUuid.get(i.streamUuid)?.videoSourceType ===
         AgoraRteVideoSourceType.ScreenShare
     );
