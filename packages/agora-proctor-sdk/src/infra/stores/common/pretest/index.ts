@@ -234,7 +234,7 @@ export class PretestUIStore extends EduUIStoreBase {
       ? playbackDevicesList
       : [
           {
-            label: transI18n(`media.default`),
+            label: transI18n(`fcr_device_test_label_default`),
             value: 'default',
           },
         ];

@@ -33,16 +33,16 @@ export class StudentViewUIStore extends EduUIStoreBase {
 
   @computed
   get userAvatar() {
-    return typeof this.classroomStore.userStore.localUserProperties === 'undefined'
+    return typeof this.classroomStore.userStore.localUser?.userProperties === 'undefined'
       ? ''
-      : this.classroomStore.userStore.localUserProperties.get('avatar');
+      : this.classroomStore.userStore.localUser?.userProperties.get('avatar');
   }
 
   @computed
   get userWarning() {
-    return typeof this.classroomStore.userStore.localUserProperties === 'undefined'
+    return typeof this.classroomStore.userStore.localUser?.userProperties === 'undefined'
       ? {}
-      : this.classroomStore.userStore.localUserProperties.get('warning');
+      : this.classroomStore.userStore.localUser?.userProperties.get('warning');
   }
 
   @computed

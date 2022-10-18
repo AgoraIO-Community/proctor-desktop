@@ -35,9 +35,9 @@ export const zh = {
   fcr_exam_prep_label_camera: '摄像头',
   fcr_exam_prep_label_microphone: '麦克风',
   fcr_exam_prep_label_speaker: '扬声器',
-  fcr_exam_prep_label_align_: 'face	请将你的脸对准下面区域',
-  fcr_exam_prep_label_authorize_share_: 'screen	请授权要分享的屏幕',
-  fcr_exam_prep_label_join_: 'exam	现在可以加入考试啦！',
+  fcr_exam_prep_label_align_face: '请将你的脸对准下面区域',
+  fcr_exam_prep_label_authorize_share_screen: '请授权要分享的屏幕',
+  fcr_exam_prep_label_join_exam: '现在可以加入考试啦！',
   fcr_exam_prep_button_test: '测试',
   fcr_exam_prep_button_cancel: '取消',
   fcr_exam_prep_button_next_step: '下一步',
@@ -63,6 +63,9 @@ export const zh = {
   fcr_device_test_button_leave: '退出',
   fcr_device_test_label_enable: '开启',
   fcr_device_test_label_disable: '关闭',
+  fcr_device_test_label_default: '默认',
+  fcr_exam_prep_label_close_screen_share: '考试期间请勿关闭屏幕分享',
+  fcr_alert_title: '提示',
 
   edu_error: {
     '600000': '房间资源未获取',

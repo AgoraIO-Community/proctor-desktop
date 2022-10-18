@@ -7,7 +7,24 @@ import { Conclusion } from './conclusion';
 import { DeviceTest } from './device-test';
 import { ImageSnapshot } from './image-snapshot';
 import { ShareScreen } from './share-screen';
-
+const PretestInfoByStep = [
+  {
+    title: transI18n('fcr_exam_prep_label_test_exam_device'),
+    component: <DeviceTest />,
+  },
+  {
+    title: transI18n('fcr_exam_prep_label_align_face'),
+    component: <ImageSnapshot />,
+  },
+  {
+    title: transI18n('fcr_exam_prep_label_authorize_share_screen'),
+    component: <ShareScreen />,
+  },
+  {
+    title: transI18n('fcr_exam_prep_label_join_exam'),
+    component: <Conclusion />,
+  },
+];
 export const StudentPretest = observer(() => {
   const {
     pretestUIStore: { currentStep, headerStep },
@@ -21,11 +38,8 @@ export const StudentPretest = observer(() => {
         <AgoraStep title="02" description={transI18n('fcr_exam_prep_label_take_photo')} />
         <AgoraStep title="03" description={transI18n('fcr_exam_prep_label_share_screen')} />
       </AgoraSteps>
-      <ProcessInfo> {transI18n('fcr_exam_prep_label_test_exam_device')}</ProcessInfo>
-      {currentStep === 0 && <DeviceTest />}
-      {currentStep === 1 && <ImageSnapshot />}
-      {currentStep === 2 && <ShareScreen />}
-      {currentStep === 3 && <Conclusion />}
+      <ProcessInfo>{PretestInfoByStep[currentStep].title}</ProcessInfo>
+      {PretestInfoByStep[currentStep].component}
     </Container>
   );
 });

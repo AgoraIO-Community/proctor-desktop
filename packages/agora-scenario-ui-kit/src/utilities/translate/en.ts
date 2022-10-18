@@ -35,9 +35,9 @@ export const en = {
   fcr_exam_prep_label_camera: 'Camera',
   fcr_exam_prep_label_microphone: 'Microphone',
   fcr_exam_prep_label_speaker: 'Speaker',
-  fcr_exam_prep_label_align_: 'face	Please align your face within the frame below',
-  fcr_exam_prep_label_authorize_share_: 'screen	Please authorize the screen to share',
-  fcr_exam_prep_label_join_: ' exam	Now, you can join the exam!',
+  fcr_exam_prep_label_align_face: 'Please align your face within the frame below',
+  fcr_exam_prep_label_authorize_share_screen: 'Please authorize the screen to share',
+  fcr_exam_prep_label_join_exam: 'Now, you can join the exam!',
   fcr_exam_prep_button_test: 'Test',
   fcr_exam_prep_button_cancel: 'Cancel',
   fcr_exam_prep_button_next_step: '	Next step',
@@ -64,6 +64,9 @@ export const en = {
   fcr_device_test_button_leave: 'Leave',
   fcr_device_test_label_enable: 'On',
   fcr_device_test_label_disable: 'Off',
+  fcr_device_test_label_default: 'Default',
+  fcr_exam_prep_label_close_screen_share: 'Don‘t turn off screen share during the exam',
+  fcr_alert_title: 'Prompt',
 
   edu_error: {
     '600000': 'Failed to join the classroom',

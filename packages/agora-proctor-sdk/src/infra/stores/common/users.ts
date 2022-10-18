@@ -109,7 +109,7 @@ export class UsersUIStore extends EduUIStoreBase {
     causeDataFilterKeys?: string,
     causeDataFilterValues?: string,
   ) {
-    return this.classroomStore.api.queryRoomEvents({
+    return this.classroomStore.api.getRoomEvents({
       roomUuid,
       userUuid,
       cmd,
@@ -119,7 +119,7 @@ export class UsersUIStore extends EduUIStoreBase {
   }
   @bound
   async queryRecordList(roomUuid: string, nextId?: number) {
-    return this.classroomStore.api.queryRecordList({ roomUuid, nextId });
+    return this.classroomStore.api.getRecordList({ roomUuid, nextId });
   }
   generateGroupUuid(userUuidPrefix: string) {
     const { roomUuid } = EduClassroomConfig.shared.sessionInfo;

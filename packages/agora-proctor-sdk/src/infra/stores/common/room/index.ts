@@ -381,11 +381,11 @@ export class RoomUIStore extends EduUIStoreBase {
                 LeaveReason.leave,
                 new Promise((resolve) => {
                   this.shareUIStore.addConfirmDialog(
-                    transI18n('fcr_should_share_your_screen'),
-                    transI18n('fcr_should_share_your_screen'),
+                    transI18n('fcr_alert_title'),
+                    transI18n('fcr_exam_prep_label_close_screen_share'),
                     {
                       onOK: resolve,
-                      btnText: { ok: transI18n('toast.leave_room'), cancel: '' },
+                      btnText: { ok: transI18n('fcr_room_button_leave'), cancel: '' },
                       actions: ['ok'],
                     },
                   );
