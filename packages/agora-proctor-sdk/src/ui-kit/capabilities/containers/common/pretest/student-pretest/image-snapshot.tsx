@@ -37,14 +37,17 @@ const Container = styled.div`
 const Actions = styled.div<{ align: 'center' | 'space-between' }>`
   height: 93px;
   width: 100%;
-  margin-top: 12px;
-  padding: 0 12px;
+  padding: 12px 12px 0;
   display: flex;
   justify-content: ${(props) => props.align};
   align-items: center;
   background: ${(props) =>
     props.align === 'space-between' ? 'rgba(51, 50, 68, 0.05)' : 'transparent'};
-  ${AgoraMidBorderRadius}
+  ${AgoraMidBorderRadius};
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  position: relative;
+  top: -12px;
 `;
 const SnapshotImage = styled.div<{ image: string | undefined }>`
   width: 120px;

@@ -1,10 +1,10 @@
-import { useStore } from "@/infra/hooks/ui-store";
-import { AgoraButton } from "@/ui-kit/components/button";
-import { AgoraBaseTextColor } from "@/ui-kit/components/common";
-import { observer } from "mobx-react";
-import { useCallback } from "react";
-import styled from "styled-components";
-import { transI18n } from "~ui-kit";
+import { useStore } from '@/infra/hooks/ui-store';
+import { AgoraButton } from '@/ui-kit/components/button';
+import { AgoraBaseTextColor } from '@/ui-kit/components/common';
+import { observer } from 'mobx-react';
+import { useCallback } from 'react';
+import styled from 'styled-components';
+import { SvgIconEnum, SvgImg, transI18n } from '~ui-kit';
 
 const RoomTimer = observer(() => {
   const {
@@ -31,15 +31,9 @@ const ExistBtn = observer(() => {
     }
   }, []);
   return (
-    <AgoraButton
-      type="primary"
-      subType="red"
-      shape="round"
-      onClick={handleExitRoom}
-    >
-      {exitProcessing
-        ? transI18n("fcr_room_button_leave")
-        : transI18n("fcr_room_button_leave")}
+    <AgoraButton size="middle" type="primary" subType="red" shape="round" onClick={handleExitRoom}>
+      <SvgImg type={SvgIconEnum.QUIT} />
+      {exitProcessing ? transI18n('fcr_room_button_leave') : transI18n('fcr_room_button_leave')}
     </AgoraButton>
   );
 });
@@ -52,8 +46,7 @@ const ExistClose = observer(() => {
     <CloseBtn
       onClick={(_) => {
         toggleExistState(false);
-      }}
-    >
+      }}>
       x
     </CloseBtn>
   );
@@ -74,6 +67,7 @@ export const RoomOperation = observer(() => {
 });
 
 const OperationContainer = styled.div`
+  height: 40px;
   display: flex;
   justify-content: space-between;
   align-items: center;

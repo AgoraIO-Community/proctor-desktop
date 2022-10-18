@@ -62,6 +62,8 @@ export const en = {
   fcr_device_test_button_join_exam: 'Join Exam',
   fcr_device_test_button_stay: 'Stay',
   fcr_device_test_button_leave: 'Leave',
+  fcr_device_test_label_enable: 'On',
+  fcr_device_test_label_disable: 'Off',
 
   edu_error: {
     '600000': 'Failed to join the classroom',

@@ -50,14 +50,25 @@
 
 .fcr_proctor_sider_info_proctor-actions {
   width: 214px;
-  height: 354px;
-
-  background: linear-gradient(180deg, #fafafa 0%, #f3f3f3 100%);
+  background: #fafafa;
   border-radius: 24px;
+
+  transition: max-height 0.2s;
+  height: 353px;
+  max-height: 353px;
+  overflow: hidden;
+  position: relative;
+}
+.fcr_proctor_sider_info_proctor-actions > div {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: space-between;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin: 0 auto;
 }
 .fcr_proctor_sider_info_proctor-actions-video {
   width: 178px;
@@ -94,6 +105,7 @@
   border: 0.5px solid rgba(0, 0, 0, 0.8);
   border-radius: 20px;
   padding: 8px;
+  overflow: hidden;
 }
 .fcr_proctor_sider_info_proctor-actions-video-container-placeholder {
   height: 130px;
@@ -123,6 +135,26 @@
   z-index: 2;
   font-size: 16px;
 }
+.fcr_proctor_sider_info_proctor-actions-speaker .ant-switch-small {
+  height: 18px;
+  line-height: 18px;
+}
+.fcr_proctor_sider_info_proctor-actions-speaker .ant-switch-handle {
+  width: 14px;
+  top: 3px;
+  left: 3px;
+}
+.fcr_proctor_sider_info_proctor-actions-speaker
+  .ant-switch-small.ant-switch-checked
+  .ant-switch-handle {
+  left: calc(100% - 14px - 3px);
+}
+.fcr_proctor_sider_info_proctor-actions-speaker .ant-switch {
+  background: #565656;
+}
+.fcr_proctor_sider_info_proctor-actions-speaker .ant-switch-checked {
+  background: #292929;
+}
 .fcr_proctor_sider .fcr_proctor_sider_info_proctor-actions-speaker {
   position: relative;
 }
@@ -150,22 +182,26 @@
   left: 0;
   bottom: 20px;
   width: 100%;
-  height: 88px;
   background: linear-gradient(180deg, #d5ecf3 0%, #ffffff 38.1%, #ffffff 104.5%);
   display: flex;
   box-shadow: 10px 10px 60px rgba(0, 0, 0, 0.14);
   z-index: 1;
-  border-top-left-radius: 24px;
-  border-top-right-radius: 24px;
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
   flex-direction: column;
-  padding-top: 5px;
+  padding-top: 12px;
+  padding-bottom: 20px;
+  transition: max-height 0.2s;
+  overflow: hidden;
+  max-height: 132px;
 }
 .fcr_proctor_sider_info_proctor-actions-speaker-overlay > div {
   display: flex;
   justify-content: space-between;
   align-items: center;
   width: 100%;
-  padding: 3px 18px;
+  height: 50px;
+  padding: 0 18px;
 }
 .fcr_proctor_sider_info_proctor-actions-speaker-overlay > div > div {
   display: flex;
@@ -208,4 +244,15 @@
   font-size: 16px;
   line-height: 19px;
   color: #000000;
+}
+.fcr_proctor_sider_info_proctor-actions-name > div {
+  font-size: 12px;
+  line-height: 15px;
+
+  text-align: center;
+
+  color: #bdbec6;
+  padding-bottom: 73px;
+  padding-top: 8px;
+  font-weight: normal;
 }

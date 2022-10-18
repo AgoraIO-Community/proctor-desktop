@@ -78,9 +78,11 @@ export const ProctorSider = observer(() => {
           )}
         </div>
       </div>
-      <div className="fcr_proctor_sider_info_proctor-actions">
+      <div
+        className="fcr_proctor_sider_info_proctor-actions"
+        style={isBroadCasting ? { maxHeight: '353px' } : { maxHeight: '225px' }}>
         <div>
-          {isBroadCasting ? (
+          <div>
             <div
               className={`fcr_proctor_sider_info_proctor-actions-video-container ${
                 localMicTrackState === AgoraRteMediaSourceState.started
@@ -102,15 +104,14 @@ export const ProctorSider = observer(() => {
                 )}
               </div>
             </div>
-          ) : (
-            <div
-              className={`fcr_proctor_sider_info_proctor-actions-video-container-placeholder`}></div>
-          )}
-          <div className="fcr_proctor_sider_info_proctor-actions-name">
-            {EduClassroomConfig.shared.sessionInfo.userName}
+
+            <div className="fcr_proctor_sider_info_proctor-actions-name">
+              {EduClassroomConfig.shared.sessionInfo.userName}
+              <div>You can broadcast here</div>
+            </div>
           </div>
+          <BroadCastButtonGroup isBroadCasting={!!isBroadCasting} />
         </div>
-        <BroadCastButtonGroup isBroadCasting={!!isBroadCasting} />
       </div>
     </div>
   );
@@ -198,7 +199,7 @@ const BroadCastButtonGroup = ({ isBroadCasting }: { isBroadCasting: boolean }) =
               <SvgImg type={SvgIconEnum.PHONE} size={36}></SvgImg>
             ) : (
               <>
-                <SvgImg type={SvgIconEnum.SPEAKER} size={36} />
+                <SvgImg type={SvgIconEnum.BROADCAST} size={36} />
                 {transI18n('fcr_room_button_broadcast')}
               </>
             )}
@@ -209,45 +210,52 @@ const BroadCastButtonGroup = ({ isBroadCasting }: { isBroadCasting: boolean }) =
             className="fcr_proctor_sider_info_proctor-actions-speaker-extra">
             <SvgImg type={SvgIconEnum.EXTRA_VERTICAL} />
           </div>
-          {showBroadCastOverlay && (
-            <div
-              onMouseEnter={showOverlay}
-              onMouseLeave={closeOverlay}
-              className="fcr_proctor_sider_info_proctor-actions-speaker-overlay">
-              <div>
-                <div>
-                  <SvgImg type={SvgIconEnum.CAMERA_ON} colors={{ iconPrimary: '#000' }}></SvgImg>
-                  <span>{transI18n('fcr_exam_prep_label_camera')}</span>
-                </div>
 
-                <Switch
-                  checked={cameraOpen}
-                  checkedChildren="开启"
-                  unCheckedChildren="关闭"
-                  size="small"
-                  onChange={(checked) => {
-                    setCameraOpen(checked);
-                  }}></Switch>
-              </div>
+          <div
+            onMouseEnter={showOverlay}
+            onMouseLeave={closeOverlay}
+            style={showBroadCastOverlay ? { maxHeight: '132px' } : { maxHeight: 0, padding: 0 }}
+            className="fcr_proctor_sider_info_proctor-actions-speaker-overlay">
+            <div>
               <div>
-                <div>
-                  <SvgImg
-                    type={SvgIconEnum.MICROPHONE_ON}
-                    colors={{ iconPrimary: '#000' }}></SvgImg>
-                  <span>{transI18n('fcr_exam_prep_label_microphone')}</span>
-                </div>
+                <SvgImg
+                  style={{ marginRight: '4px' }}
+                  type={SvgIconEnum.CAMERA_ON}
+                  size={24}
+                  colors={{ iconPrimary: '#357BF6' }}></SvgImg>
 
-                <Switch
-                  checked={micOpen}
-                  checkedChildren="开启"
-                  unCheckedChildren="关闭"
-                  size="small"
-                  onChange={(checked) => {
-                    setMicOpen(checked);
-                  }}></Switch>
+                <span>{transI18n('fcr_exam_prep_label_camera')}</span>
               </div>
+
+              <Switch
+                checked={cameraOpen}
+                checkedChildren={transI18n('fcr_device_test_label_enable')}
+                unCheckedChildren={transI18n('fcr_device_test_label_disable')}
+                size="small"
+                onChange={(checked) => {
+                  setCameraOpen(checked);
+                }}></Switch>
             </div>
-          )}
+            <div>
+              <div>
+                <SvgImg
+                  style={{ marginRight: '4px' }}
+                  size={24}
+                  type={SvgIconEnum.MICROPHONE_ON}
+                  colors={{ iconPrimary: '#357BF6' }}></SvgImg>
+                <span>{transI18n('fcr_exam_prep_label_microphone')}</span>
+              </div>
+
+              <Switch
+                checked={micOpen}
+                checkedChildren={transI18n('fcr_device_test_label_enable')}
+                unCheckedChildren={transI18n('fcr_device_test_label_disable')}
+                size="small"
+                onChange={(checked) => {
+                  setMicOpen(checked);
+                }}></Switch>
+            </div>
+          </div>
         </div>
       }
     </div>

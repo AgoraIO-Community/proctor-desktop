@@ -429,10 +429,7 @@ export class PretestUIStore extends EduUIStoreBase {
   @computed
   get isScreenSharing() {
     return (
-      this.classroomStore.mediaStore.localScreenShareTrackState ===
-        AgoraRteMediaSourceState.started ||
-      this.classroomStore.mediaStore.localScreenShareTrackState ===
-        AgoraRteMediaSourceState.starting
+      this.classroomStore.mediaStore.localScreenShareTrackState === AgoraRteMediaSourceState.started
     );
   }
 
@@ -442,21 +439,16 @@ export class PretestUIStore extends EduUIStoreBase {
   @computed
   get isMediaReady() {
     return (
-      (this.classroomStore.mediaStore.localCameraTrackState === AgoraRteMediaSourceState.started ||
-        this.classroomStore.mediaStore.localCameraTrackState ===
-          AgoraRteMediaSourceState.starting) &&
-      (this.classroomStore.mediaStore.localMicTrackState === AgoraRteMediaSourceState.started ||
-        this.classroomStore.mediaStore.localMicTrackState === AgoraRteMediaSourceState.starting)
+      this.classroomStore.mediaStore.localCameraTrackState === AgoraRteMediaSourceState.started &&
+      this.classroomStore.mediaStore.localMicTrackState === AgoraRteMediaSourceState.started
     );
   }
 
   @computed
   get stepupStates() {
     return [
-      this.classroomStore.mediaStore.localCameraTrackState === AgoraRteMediaSourceState.started ||
-        this.classroomStore.mediaStore.localCameraTrackState === AgoraRteMediaSourceState.starting,
-      this.classroomStore.mediaStore.localMicTrackState === AgoraRteMediaSourceState.started ||
-        this.classroomStore.mediaStore.localMicTrackState === AgoraRteMediaSourceState.starting,
+      this.classroomStore.mediaStore.localCameraTrackState === AgoraRteMediaSourceState.started,
+      this.classroomStore.mediaStore.localMicTrackState === AgoraRteMediaSourceState.started,
       this.snapshotImage,
       this.isScreenSharing,
     ];
@@ -470,7 +462,14 @@ export class PretestUIStore extends EduUIStoreBase {
     if (this.currentStep === 0) return !this.isMediaReady;
     if (this.currentStep === 1) return !this.snapshotImage && !this.snapshotImageProcess;
     if (this.currentStep === 2) return !this.isScreenSharing;
-    if (this.currentStep === 3) return this.stepupStates.every((item) => !item);
+    if (this.currentStep === 3)
+      return (
+        this.classroomStore.mediaStore.localCameraTrackState !== AgoraRteMediaSourceState.started ||
+        this.classroomStore.mediaStore.localMicTrackState !== AgoraRteMediaSourceState.started ||
+        !this.snapshotImage ||
+        !this.isScreenSharing
+      );
+    return false;
   }
 
   @computed

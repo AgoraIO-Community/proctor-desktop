@@ -371,24 +371,26 @@ export class RoomUIStore extends EduUIStoreBase {
           classRoomState: this.roomSceneByRoomUuid(this.currentGroupUuid)?.roomState.state,
         })).observe(({ newValue, oldValue }) => {
           if (newValue.classRoomState === ClassroomState.Connected) {
-            const { roomUuid, role } = EduClassroomConfig.shared.sessionInfo;
+            const { role } = EduClassroomConfig.shared.sessionInfo;
             if (
               (newValue.screenShareState === AgoraRteMediaSourceState.stopped ||
                 newValue.screenShareState === AgoraRteMediaSourceState.error) &&
               role === EduRoleTypeEnum.student
             ) {
-              setTimeout(() => {
-                this.leaveClassroom(roomUuid)
-                  .then(() => {
-                    this.classroomStore.connectionStore.leaveClassroom(LeaveReason.leave);
-                  })
-                  .catch((e) => {
-                    this.shareUIStore.addToast('leave classroom error', e);
-                  });
-              }, 1000 * 2);
-              Modal.info({
-                content: transI18n('fcr_should_share_your_screen'),
-              });
+              this.classroomStore.connectionStore.leaveClassroomUntil(
+                LeaveReason.leave,
+                new Promise((resolve) => {
+                  this.shareUIStore.addConfirmDialog(
+                    transI18n('fcr_should_share_your_screen'),
+                    transI18n('fcr_should_share_your_screen'),
+                    {
+                      onOK: resolve,
+                      btnText: { ok: transI18n('toast.leave_room'), cancel: '' },
+                      actions: ['ok'],
+                    },
+                  );
+                }),
+              );
             }
           }
         }),

@@ -5,7 +5,10 @@ import { SupervisorView } from '@/ui-kit/components/supervisor-view';
 import { EduClassroomConfig } from 'agora-edu-core';
 import { AgoraRteVideoSourceType } from 'agora-rte-sdk';
 import { observer } from 'mobx-react';
+import { SvgIconEnum, SvgImg } from '~ui-kit';
 import { RemoteTrackPlayer } from '../../common/stream/track-player';
+import styled from 'styled-components';
+
 export const SubCameraView = () => {
   return (
     <AgoraCard>
@@ -33,11 +36,23 @@ const SubCamera = observer(() => {
       scene?.streamController?.streamByStreamUuid.get(streamUuid)?.videoSourceType ===
       AgoraRteVideoSourceType.Camera,
   );
-  const subDeviceStream =
-    subDeviceStreamUuid && scene?.streamController?.streamByStreamUuid?.get(subDeviceStreamUuid);
+  const subDeviceStream = scene?.streamController?.streamByStreamUuid?.get(
+    subDeviceStreamUuid || '',
+  );
   return (
-    <div style={{ height: '133px' }}>
-      {subDeviceStream && <RemoteTrackPlayer stream={subDeviceStream} fromScene={scene?.scene} />}
-    </div>
+    <SubCameraContainer>
+      {subDeviceStream ? (
+        <RemoteTrackPlayer stream={subDeviceStream} fromScene={scene?.scene} />
+      ) : (
+        <SvgImg type={SvgIconEnum.NO_VIDEO}></SvgImg>
+      )}
+    </SubCameraContainer>
   );
 });
+const SubCameraContainer = styled.div`
+  height: 133px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #f8faff;
+`;

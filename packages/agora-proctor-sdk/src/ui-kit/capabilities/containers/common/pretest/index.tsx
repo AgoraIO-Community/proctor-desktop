@@ -5,7 +5,7 @@ import { EduClassroomConfig, EduRoleTypeEnum } from 'agora-edu-core';
 import { observer } from 'mobx-react';
 import { FC } from 'react';
 import styled from 'styled-components';
-import { transI18n } from '~ui-kit';
+import { SvgIconEnum, SvgImg, transI18n } from '~ui-kit';
 import { StudentPretest, TeacherPretest } from './student-pretest';
 
 interface pretestProps {
@@ -28,6 +28,7 @@ export const PretestContainer: FC<pretestProps> = observer(({ onOk }) => {
 const StudentPretestModal: FC<pretestContainerProps> = observer(({ onOk, onCancel }) => {
   return (
     <AgoraModal
+      closeIcon={<SvgImg type={SvgIconEnum.CLOSE}></SvgImg>}
       centered
       open={true}
       width={730}
@@ -42,9 +43,11 @@ const StudentPretestModal: FC<pretestContainerProps> = observer(({ onOk, onCance
 const TeacherPretestModal: FC<pretestContainerProps> = observer(({ onOk, onCancel }) => {
   return (
     <AgoraModal
+      closeIcon={<SvgImg type={SvgIconEnum.CLOSE}></SvgImg>}
       centered
       open={true}
       width={730}
+      maskClosable={false}
       footer={<TeacherPretestFooter onOk={onOk} />}
       placement="bottom"
       onCancel={onCancel}>
@@ -89,7 +92,7 @@ const TeacherPretestFooter: FC<pretestProps> = observer(({ onOk }) => {
   } = useStore();
 
   return (
-    <FooterContainer>
+    <FooterContainer style={{ justifyContent: 'center' }}>
       <AgoraButton size="large" type="primary" onClick={onOk} width="200px">
         {rightBtnText}
       </AgoraButton>
