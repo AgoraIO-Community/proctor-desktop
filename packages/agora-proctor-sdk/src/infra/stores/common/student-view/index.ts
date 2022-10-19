@@ -14,8 +14,6 @@ import { EduUIStoreBase } from '../base';
 @Log.attach({ proxyMethods: false })
 export class StudentViewUIStore extends EduUIStoreBase {
   private _disposers: (IReactionDisposer | Lambda)[] = [];
-  @observable
-  exitProcessing = false;
 
   @observable
   roomClose = false; // 房间是否关闭
@@ -35,14 +33,7 @@ export class StudentViewUIStore extends EduUIStoreBase {
   get userAvatar() {
     return typeof this.classroomStore.userStore.localUser?.userProperties === 'undefined'
       ? ''
-      : this.classroomStore.userStore.localUser?.userProperties.get('avatar');
-  }
-
-  @computed
-  get userWarning() {
-    return typeof this.classroomStore.userStore.localUser?.userProperties === 'undefined'
-      ? {}
-      : this.classroomStore.userStore.localUser?.userProperties.get('warning');
+      : this.classroomStore.userStore.localUser?.userProperties.get('flexProps')?.avatar;
   }
 
   @computed
@@ -52,21 +43,6 @@ export class StudentViewUIStore extends EduUIStoreBase {
   @computed
   get beforeClass() {
     return this.classRoomState === ClassState.beforeClass;
-  }
-
-  @action.bound
-  toggleExistState(state?: boolean) {
-    this.exitProcessing = state ? state : !this.exitProcessing;
-  }
-
-  @action.bound
-  exitRoom() {
-    // leave room
-    if (!this.exitProcessing) {
-      this.toggleExistState();
-      return false;
-    }
-    return true;
   }
 
   @bound
@@ -89,14 +65,6 @@ export class StudentViewUIStore extends EduUIStoreBase {
           }
         },
       ),
-    );
-
-    this._disposers.push(
-      computed(() => this.userWarning).observe(({ newValue }) => {
-        if (newValue?.message) {
-          this.shareUIStore.addToast(newValue.message, 'error');
-        }
-      }),
     );
 
     // class is end

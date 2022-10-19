@@ -43,7 +43,7 @@ const RoomCloseModal = observer(() => {
         <FlexContainer direction="row" gap={20}>
           <FlexContainer direction="column" gap={28}>
             <section>
-              <BolderTitle>Hello Alice</BolderTitle>
+              <BolderTitle>Hello </BolderTitle>
             </section>
             <DescriptionTip>The exam is over. Hope you can get a good result!</DescriptionTip>
           </FlexContainer>
@@ -104,4 +104,7 @@ const FooterContainer = styled.div`
   text-align: center;
   height: 100%;
   line-height: 100px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 `;

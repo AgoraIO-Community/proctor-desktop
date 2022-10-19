@@ -9,6 +9,7 @@
 .fcr_proctor_sider_logo {
   padding-bottom: 27px;
 }
+
 .fcr_proctor_sider_info_title {
   font-weight: 400;
   font-size: 12px;
@@ -226,10 +227,14 @@
   border-bottom-left-radius: 8px;
   border-top-left-radius: 8px;
 }
-.fcr_proctor_sider_info_start,
-.fcr_proctor_sider_info_end {
-  margin-top: 20px;
+.fcr_proctor_sider_info_btn {
+  padding-top: 20px;
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  align-items: center;
 }
+
 .fcr_proctor_sider_info_end,
 .fcr_proctor_sider_info_end:focus,
 .fcr_proctor_sider_info_end:hover {

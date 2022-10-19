@@ -17,7 +17,7 @@ export const Sider = observer(() => {
       <AgoraCard background="linear-gradient(180deg, #FAFAFA 0%, #F3F3F3 100%)">
         <SiderSpace size={17} direction="vertical">
           <HelloHeader>
-            {transI18n('fcr_device_test_label_hello')},{' '}
+            {transI18n('fcr_device_test_label_hello')},
             {EduClassroomConfig.shared.sessionInfo.userName}
           </HelloHeader>
           <RoomOperation />
@@ -31,11 +31,17 @@ export const Sider = observer(() => {
 });
 
 const SiderSpace = styled(Space)`
-  padding: 16px;
+  padding: 16px 0 16px 16px;
+  width: 100%;
 `;
 
-const HelloHeader = styled.div`
+const HelloHeader = styled.div.attrs((props) => ({
+  title: EduClassroomConfig.shared.sessionInfo.userName,
+}))`
   font-weight: 400;
   font-size: 30px;
   color: ${AgoraBaseTextColor};
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 `;

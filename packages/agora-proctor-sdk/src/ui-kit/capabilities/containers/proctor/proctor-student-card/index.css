@@ -107,6 +107,8 @@
 .fcr-student-card-user {
   display: flex;
   align-items: center;
+  flex: 1;
+  overflow: hidden;
 }
 .fcr-student-card-user-avatar {
   width: 30px;
@@ -123,6 +125,7 @@
 }
 .fcr-student-card-actions {
   display: flex;
+  width: 120px;
 }
 .fcr-student-card-actions > div,
 .fcr-student-card-actions-like {
@@ -190,6 +193,9 @@
 }
 .fcr-student-card-user-name {
   padding-left: 10px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 .fcr-student-card-actions-warning-count {
   height: 13px;

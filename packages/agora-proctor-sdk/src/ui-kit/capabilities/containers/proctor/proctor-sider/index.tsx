@@ -1,5 +1,6 @@
 import { AgoraEduSDK } from '@/infra/api';
 import { useStore } from '@/infra/hooks/ui-store';
+import { AgoraButton } from '@/ui-kit/components/button';
 import { ClassState, DEVICE_DISABLE, EduClassroomConfig } from 'agora-edu-core';
 import { AgoraRteMediaPublishState, AgoraRteMediaSourceState } from 'agora-rte-sdk';
 import { Button, Switch } from 'antd';
@@ -7,6 +8,7 @@ import { observer } from 'mobx-react';
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { SvgIconEnum, SvgImg, transI18n } from '~ui-kit';
 import { LocalTrackPlayer } from '../../common/stream/track-player';
+import { BtnWithCloseCheck } from '../../examinee/sider/room-operation';
 import './index.css';
 export const ProctorSider = observer(() => {
   const {
@@ -58,14 +60,18 @@ export const ProctorSider = observer(() => {
         </div>
         <div className="fcr_proctor_sider_info_btn">
           {classState === ClassState.ongoing ? (
-            <Button
-              className="fcr_proctor_sider_info_end"
-              type="primary"
-              block
-              size="large"
-              onClick={endExam}>
-              {transI18n('fcr_room_button_exam_end')}
-            </Button>
+            <BtnWithCloseCheck
+              foldBtn={
+                <Button className="fcr_proctor_sider_info_end" type="primary" block size="large">
+                  {transI18n('fcr_room_button_exam_end')}
+                </Button>
+              }
+              unFoldBtn={
+                <AgoraButton size="middle" type="primary" subType="red" shape="round">
+                  {transI18n('fcr_room_button_leave')}
+                </AgoraButton>
+              }
+              onClick={endExam}></BtnWithCloseCheck>
           ) : (
             <Button
               className="fcr_proctor_sider_info_start"

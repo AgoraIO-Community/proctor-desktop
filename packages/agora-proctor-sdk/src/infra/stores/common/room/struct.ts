@@ -426,7 +426,7 @@ class StreamController {
   async publishScreenShare() {
     const sessionInfo = EduClassroomConfig.shared.sessionInfo;
     try {
-      let res = await this._classroomStore.api.startScreenShareStateless(
+      let res = await this._classroomStore.api.startShareScreenStateless(
         this._scene.sceneId,
         sessionInfo.userUuid,
       );
@@ -442,7 +442,7 @@ class StreamController {
   async unpublishScreenShare() {
     const sessionInfo = EduClassroomConfig.shared.sessionInfo;
     try {
-      let res = await this._classroomStore.api.stopScreenShareStateless(
+      let res = await this._classroomStore.api.stopShareScreenStateless(
         this._scene.sceneId,
         sessionInfo.userUuid,
       );

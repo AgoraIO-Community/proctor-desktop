@@ -2,7 +2,7 @@ import { useStore } from '@/infra/hooks/ui-store';
 import { AgoraButton } from '@/ui-kit/components/button';
 import { AgoraBaseTextColor } from '@/ui-kit/components/common';
 import { observer } from 'mobx-react';
-import { useCallback } from 'react';
+import { useCallback, useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { SvgIconEnum, SvgImg, transI18n } from '~ui-kit';
 
@@ -17,56 +17,86 @@ const RoomTimer = observer(() => {
     </div>
   );
 });
-
-const ExistBtn = observer(() => {
+const ExistBtn = observer(({ onFold }: { onFold: (fold: boolean) => void }) => {
   const {
-    studentViewUIStore: { exitRoom, exitProcessing, leaveMainClassroom },
+    studentViewUIStore: { leaveMainClassroom },
     roomUIStore: { leaveClassroom, currentGroupUuid },
   } = useStore();
 
   const handleExitRoom = useCallback(async () => {
-    if (exitRoom()) {
-      await leaveClassroom(currentGroupUuid!);
-      await leaveMainClassroom();
-    }
+    await leaveClassroom(currentGroupUuid!);
+    await leaveMainClassroom();
   }, []);
   return (
-    <AgoraButton size="middle" type="primary" subType="red" shape="round" onClick={handleExitRoom}>
-      <SvgImg type={SvgIconEnum.QUIT} />
-      {exitProcessing ? transI18n('fcr_room_button_leave') : transI18n('fcr_room_button_leave')}
-    </AgoraButton>
+    <BtnWithCloseCheck
+      foldBtn={
+        <AgoraButton size="middle" type="primary" subType="red" shape="round">
+          <SvgImg type={SvgIconEnum.QUIT} />
+          {transI18n('fcr_room_button_leave')}
+        </AgoraButton>
+      }
+      unFoldBtn={
+        <AgoraButton size="middle" type="primary" subType="red" shape="round">
+          <SvgImg type={SvgIconEnum.QUIT} />
+          {transI18n('fcr_room_button_leave')}
+        </AgoraButton>
+      }
+      onClick={handleExitRoom}
+      onFold={onFold}></BtnWithCloseCheck>
   );
 });
+export const BtnWithCloseCheck = observer(
+  ({
+    onClick,
+    onFold,
+    foldBtn,
+    unFoldBtn,
+  }: {
+    onClick: () => void;
+    onFold?: (fold: boolean) => void;
+    foldBtn: JSX.Element;
+    unFoldBtn: JSX.Element;
+  }) => {
+    const [fold, setFold] = useState(true);
+    useEffect(() => {
+      onFold && onFold(fold);
+    }, [fold]);
+    const handleExitClick = () => {
+      if (fold) {
+        setFold(false);
+      } else {
+        onClick();
+      }
+    };
+    return (
+      <>
+        <div onClick={handleExitClick}>{fold ? foldBtn : unFoldBtn}</div>
 
-const ExistClose = observer(() => {
-  const {
-    studentViewUIStore: { toggleExistState },
-  } = useStore();
-  return (
-    <CloseBtn
-      onClick={(_) => {
-        toggleExistState(false);
-      }}>
-      x
-    </CloseBtn>
-  );
-});
+        {!fold && (
+          <CloseBtn
+            onClick={() => {
+              setFold(true);
+            }}>
+            <SvgImg type={SvgIconEnum.CLOSE}></SvgImg>
+          </CloseBtn>
+        )}
+      </>
+    );
+  },
+);
 
 export const RoomOperation = observer(() => {
-  const {
-    studentViewUIStore: { exitProcessing },
-  } = useStore();
-
+  const [fold, setFold] = useState(true);
   return (
     <OperationContainer>
-      {!exitProcessing && <RoomTimer />}
-      <ExistBtn />
-      {exitProcessing && <ExistClose />}
+      {fold && <RoomTimer />}
+      <ExistBtn onFold={setFold} />
     </OperationContainer>
   );
 });
 
 const OperationContainer = styled.div`
+  padding-right: 15px;
   height: 40px;
   display: flex;
   justify-content: space-between;
@@ -82,15 +112,13 @@ const Timer = styled.div`
   color: ${AgoraBaseTextColor};
 `;
 const CloseBtn = styled.span`
-  display: inline-block;
+  display: flex;
   width: 40px;
   height: 40px;
-  border-radius: 100px;
+  border-radius: 15px;
+  background: #8a8a8a1a;
   line-height: 40px;
-  text-align: center;
-  font-size: 18px;
-  font-weight: 200;
-  background: rgba(138, 138, 138, 0.1);
-  opacity: 0.8;
   cursor: pointer;
+  justify-content: center;
+  align-items: center;
 `;

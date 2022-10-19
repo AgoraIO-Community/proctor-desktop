@@ -107,7 +107,7 @@ export const StudentDetail = observer(({ userUuidPrefix }: { userUuidPrefix: str
     recordList.length - 1 < 0 ? 0 : recordList.length - 1
   ]?.recordDetails?.find((i) => {
     return (
-      i.type === 'av' &&
+      i.type === 'video' &&
       roomScene?.streamController?.streamByStreamUuid.get(i.streamUuid)?.videoSourceType ===
         AgoraRteVideoSourceType.ScreenShare
     );
@@ -170,6 +170,7 @@ export const StudentDetail = observer(({ userUuidPrefix }: { userUuidPrefix: str
       <div className="fcr-student-detail-tab-live">
         <StudentVideos
           showFullscreen
+          showTag
           userUuidPrefix={userUuidPrefix}
           layout={VideosWallLayoutEnum.Compact}
         />

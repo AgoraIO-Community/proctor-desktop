@@ -25,6 +25,7 @@ import dayjs from 'dayjs';
 import { SvgIconEnum, SvgImg, transI18n } from '~ui-kit';
 import { DeviceTypeEnum } from '@/infra/api';
 import { MediaController } from './media-control';
+import { Tag } from '@/ui-kit/components/tag';
 export const StudentCard = observer(
   ({ userUuidPrefix, renderVideos }: { userUuidPrefix: string; renderVideos: boolean }) => {
     const {
@@ -62,7 +63,9 @@ export const StudentCard = observer(
         <div className="fcr-student-card-extra">
           <div className="fcr-student-card-user">
             <UserAvatar userUuidPrefix={userUuidPrefix} />
-            <div className="fcr-student-card-user-name">{mainDeviceStudent?.userName}</div>
+            <div className="fcr-student-card-user-name" title={mainDeviceStudent?.userName}>
+              {mainDeviceStudent?.userName}
+            </div>
           </div>
           <div className="fcr-student-card-actions">
             <UserFocus userUuidPrefix={userUuidPrefix} />
@@ -82,10 +85,12 @@ export const StudentVideos = observer(
     layout,
     userUuidPrefix,
     showFullscreen = false,
+    showTag = false,
   }: {
     layout: VideosWallLayoutEnum;
     userUuidPrefix: string;
     showFullscreen?: boolean;
+    showTag?: boolean;
   }) => {
     const {
       roomUIStore: { joinClassroom, roomSceneByRoomUuid, leaveClassroom },
@@ -130,7 +135,6 @@ export const StudentVideos = observer(
     const screenShareStream =
       screenShareStreamUuid &&
       scene?.streamController?.streamByStreamUuid?.get(screenShareStreamUuid);
-
     const mainDeviceCameraStreamUuid = Array.from(
       scene?.streamController?.streamByUserUuid.get(mainDeviceUserUuid) || [],
     ).find(
@@ -165,15 +169,22 @@ export const StudentVideos = observer(
             : 'fcr-student-card-videos-loose'
         }`}>
         <div className="fcr-student-card-videos-screen">
+          {showTag && <Tag tagText={'Screen'}></Tag>}
           {rtcConnected &&
           screenShareStream &&
           screenShareStream.videoSourceState === AgoraRteMediaSourceState.started ? (
-            <Player fromScene={scene?.scene} mirrorMode={false} stream={screenShareStream}></Player>
+            <Player
+              fromScene={scene?.scene}
+              subscribeLowStream={false}
+              mirrorMode={false}
+              stream={screenShareStream}></Player>
           ) : (
-            <SvgImg type={SvgIconEnum.NO_VIDEO}></SvgImg>
+            <SvgImg type={SvgIconEnum.NO_VIDEO} size={36}></SvgImg>
           )}
         </div>
         <div className="fcr-student-card-videos-camera">
+          {showTag && <Tag tagText={'PC'}></Tag>}
+
           {rtcConnected &&
           mainDeviceCameraStream &&
           mainDeviceCameraStream.videoSourceState === AgoraRteMediaSourceState.started ? (
@@ -182,16 +193,18 @@ export const StudentVideos = observer(
               fromScene={scene?.scene}
               stream={mainDeviceCameraStream}></Player>
           ) : (
-            <SvgImg type={SvgIconEnum.NO_VIDEO}></SvgImg>
+            <SvgImg type={SvgIconEnum.NO_VIDEO} size={36}></SvgImg>
           )}
         </div>
         <div className="fcr-student-card-videos-mobile">
+          {showTag && <Tag tagText={'Phone'}></Tag>}
+
           {rtcConnected &&
           subDeviceStream &&
           subDeviceStream.videoSourceState === AgoraRteMediaSourceState.started ? (
             <Player placment="top" fromScene={scene?.scene} stream={subDeviceStream}></Player>
           ) : (
-            <SvgImg type={SvgIconEnum.NO_VIDEO}></SvgImg>
+            <SvgImg type={SvgIconEnum.NO_VIDEO} size={36}></SvgImg>
           )}
         </div>
       </div>

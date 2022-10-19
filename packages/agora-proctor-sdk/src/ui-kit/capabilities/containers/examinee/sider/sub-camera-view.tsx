@@ -44,7 +44,7 @@ const SubCamera = observer(() => {
       {subDeviceStream ? (
         <RemoteTrackPlayer stream={subDeviceStream} fromScene={scene?.scene} />
       ) : (
-        <SvgImg type={SvgIconEnum.NO_VIDEO}></SvgImg>
+        <SvgImg type={SvgIconEnum.NO_VIDEO} size={36}></SvgImg>
       )}
     </SubCameraContainer>
   );
