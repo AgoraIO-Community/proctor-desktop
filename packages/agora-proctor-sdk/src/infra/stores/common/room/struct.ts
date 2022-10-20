@@ -36,6 +36,7 @@ import {
 import to from 'await-to-js';
 import { get } from 'lodash';
 import { action, computed, observable, reaction, runInAction } from 'mobx';
+import { computedFn } from 'mobx-utils';
 
 export class RoomScene {
   protected logger!: Injectable.Logger;
@@ -254,6 +255,24 @@ class StreamController {
   @computed get streamByUserUuid() {
     return this.dataStore.streamByUserUuid;
   }
+  screenShareStreamByUserUuid = computedFn((userUuid) => {
+    let streamUuids = this.streamByUserUuid.get(userUuid) || new Set();
+    for (const streamUuid of streamUuids) {
+      let stream = this.streamByStreamUuid.get(streamUuid);
+      if (stream && stream.videoSourceType === AgoraRteVideoSourceType.ScreenShare) {
+        return stream;
+      }
+    }
+  });
+  cameraStreamByUserUuid = computedFn((userUuid) => {
+    let streamUuids = this.streamByUserUuid.get(userUuid) || new Set();
+    for (const streamUuid of streamUuids) {
+      let stream = this.streamByStreamUuid.get(streamUuid);
+      if (stream && stream.videoSourceType === AgoraRteVideoSourceType.Camera) {
+        return stream;
+      }
+    }
+  });
   async joinRTC(options?: AgoraRteSceneJoinRTCOptions) {
     //join rtc
     let [err] = await to(this._scene?.joinRTC(options) || Promise.resolve());

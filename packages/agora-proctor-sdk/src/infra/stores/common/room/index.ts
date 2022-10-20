@@ -23,7 +23,6 @@ import {
   Logger,
   retryAttempt,
 } from 'agora-rte-sdk';
-import { Modal } from 'antd';
 import to from 'await-to-js';
 import dayjs from 'dayjs';
 import md5 from 'js-md5';

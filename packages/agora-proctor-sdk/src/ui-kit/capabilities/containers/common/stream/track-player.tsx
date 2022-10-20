@@ -1,6 +1,6 @@
 import { useStore } from '@/infra/hooks/ui-store';
 import { EduStream } from 'agora-edu-core';
-import { AgoraRteRemoteStreamType, AgoraRteScene, AGRenderMode } from 'agora-rte-sdk';
+import { AGRemoteVideoStreamType, AgoraRteScene, AGRenderMode } from 'agora-rte-sdk';
 import { observer } from 'mobx-react';
 import {
   CSSProperties,
@@ -55,14 +55,14 @@ export const RemoteTrackPlayer = observer(
         if (isFullScreen) {
           setRemoteVideoStreamType(
             stream.streamUuid,
-            AgoraRteRemoteStreamType.HIGH_STREAM,
+            AGRemoteVideoStreamType.HIGH_STREAM,
             fromScene,
           );
           muteRemoteAudioStream(stream, false, fromScene);
         } else {
           setRemoteVideoStreamType(
             stream.streamUuid,
-            AgoraRteRemoteStreamType.LOW_STREAM,
+            AGRemoteVideoStreamType.LOW_STREAM,
             fromScene,
           );
 

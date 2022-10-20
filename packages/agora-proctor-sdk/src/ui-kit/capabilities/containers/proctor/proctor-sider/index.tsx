@@ -1,4 +1,3 @@
-import { AgoraProctorSDK } from '@/infra/api';
 import { useStore } from '@/infra/hooks/ui-store';
 import { AgoraButton } from '@/ui-kit/components/button';
 import { ClassState, DEVICE_DISABLE, EduClassroomConfig } from 'agora-edu-core';

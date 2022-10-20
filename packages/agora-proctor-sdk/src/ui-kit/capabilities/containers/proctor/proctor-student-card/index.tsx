@@ -125,35 +125,13 @@ export const StudentVideos = observer(
       };
     }, []);
 
-    const screenShareStreamUuid = Array.from(
-      scene?.streamController?.streamByUserUuid.get(mainDeviceUserUuid) || [],
-    ).find(
-      (streamUuid) =>
-        scene?.streamController?.streamByStreamUuid.get(streamUuid)?.videoSourceType ===
-        AgoraRteVideoSourceType.ScreenShare,
-    );
     const screenShareStream =
-      screenShareStreamUuid &&
-      scene?.streamController?.streamByStreamUuid?.get(screenShareStreamUuid);
-    const mainDeviceCameraStreamUuid = Array.from(
-      scene?.streamController?.streamByUserUuid.get(mainDeviceUserUuid) || [],
-    ).find(
-      (streamUuid) =>
-        scene?.streamController?.streamByStreamUuid.get(streamUuid)?.videoSourceType ===
-        AgoraRteVideoSourceType.Camera,
-    );
+      scene?.streamController?.screenShareStreamByUserUuid(mainDeviceUserUuid);
+
     const mainDeviceCameraStream =
-      mainDeviceCameraStreamUuid &&
-      scene?.streamController?.streamByStreamUuid?.get(mainDeviceCameraStreamUuid);
-    const subDeviceStreamUuid = Array.from(
-      scene?.streamController?.streamByUserUuid.get(subDeviceUserUuid) || [],
-    ).find(
-      (streamUuid) =>
-        scene?.streamController?.streamByStreamUuid.get(streamUuid)?.videoSourceType ===
-        AgoraRteVideoSourceType.Camera,
-    );
-    const subDeviceStream =
-      subDeviceStreamUuid && scene?.streamController?.streamByStreamUuid?.get(subDeviceStreamUuid);
+      scene?.streamController?.cameraStreamByUserUuid(mainDeviceUserUuid);
+
+    const subDeviceStream = scene?.streamController?.cameraStreamByUserUuid(subDeviceUserUuid);
     const Player = useMemo(
       () => (showFullscreen ? RemoteTrackPlayerWithFullScreen : RemoteTrackPlayer),
       [showFullscreen],
