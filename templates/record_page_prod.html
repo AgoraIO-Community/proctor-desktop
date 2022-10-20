@@ -5,7 +5,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Cloud Recording</title>
-    <script src="./edu_sdk.bundle.js"></script>
+    <script src="./proctor_sdk.bundle.js"></script>
   </head>
 
   <body>
@@ -59,17 +59,17 @@
         autoFPS: false,
       };
 
-      AgoraEduSDK.setParameters(
+      AgoraProctorSDK.setParameters(
         JSON.stringify({
           host: `https://api.sd-rtn.com`,
         }),
       );
-      AgoraEduSDK.config({
+      AgoraProctorSDK.config({
         appId,
         cachePath: undefined,
         region: region ? region : 'CN',
       });
-      AgoraEduSDK.launch(document.querySelector('#root'), {
+      AgoraProctorSDK.launch(document.querySelector('#root'), {
         userUuid,
         userName,
         roomUuid,
@@ -91,7 +91,7 @@
           console.log('connected to classroom', evt, args);
           if (evt === 1) {
             // do something when classroom is connected
-            AgoraEduSDK.setRecordReady();
+            AgoraProctorSDK.setRecordReady();
           }
         },
       });

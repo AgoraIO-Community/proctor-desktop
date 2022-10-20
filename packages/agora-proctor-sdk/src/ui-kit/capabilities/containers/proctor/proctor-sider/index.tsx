@@ -1,4 +1,4 @@
-import { AgoraEduSDK } from '@/infra/api';
+import { AgoraProctorSDK } from '@/infra/api';
 import { useStore } from '@/infra/hooks/ui-store';
 import { AgoraButton } from '@/ui-kit/components/button';
 import { ClassState, DEVICE_DISABLE, EduClassroomConfig } from 'agora-edu-core';
@@ -89,7 +89,7 @@ export const ProctorSider = observer(() => {
       </div>
       <div
         className="fcr_proctor_sider_info_proctor-actions"
-        style={isBroadCasting ? { maxHeight: '353px' } : { maxHeight: '225px' }}>
+        style={isBroadCasting ? { maxHeight: '361px' } : { maxHeight: '225px' }}>
         <div>
           <div>
             <div

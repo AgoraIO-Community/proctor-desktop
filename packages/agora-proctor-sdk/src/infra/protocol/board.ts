@@ -1,19 +1,10 @@
-import {
-  AgoraWidgetController,
-  EduClassroomConfig,
-  EduRoleTypeEnum,
-} from "agora-edu-core";
-import { bound, Injectable, Log } from "agora-rte-sdk";
-import { action, computed, observable, runInAction, toJS } from "mobx";
-import { AgoraEduSDK } from "../api";
-import { withTimeout } from "../utils/ipc";
-import { AgoraExtensionRoomEvent, AgoraExtensionWidgetEvent } from "./events";
-import {
-  BoardConnectionState,
-  BoardMountState,
-  FcrBoardShape,
-  FcrBoardTool,
-} from "./type";
+import { AgoraWidgetController, EduClassroomConfig, EduRoleTypeEnum } from 'agora-edu-core';
+import { bound, Injectable, Log } from 'agora-rte-sdk';
+import { action, computed, observable, runInAction, toJS } from 'mobx';
+import { AgoraProctorSDK } from '../api';
+import { withTimeout } from '../utils/ipc';
+import { AgoraExtensionRoomEvent, AgoraExtensionWidgetEvent } from './events';
+import { BoardConnectionState, BoardMountState, FcrBoardShape, FcrBoardTool } from './type';
 
 @Log.attach({ proxyMethods: false })
 export class Board {
@@ -61,9 +52,7 @@ export class Board {
   }
   @bound
   addPage() {
-    this._sendBoardCommandMessage(AgoraExtensionRoomEvent.BoardAddPage, [
-      { after: true },
-    ]);
+    this._sendBoardCommandMessage(AgoraExtensionRoomEvent.BoardAddPage, [{ after: true }]);
   }
   @bound
   removePage() {
@@ -71,9 +60,7 @@ export class Board {
   }
   @bound
   gotoPage(index: number) {
-    this._sendBoardCommandMessage(AgoraExtensionRoomEvent.BoardGotoPage, [
-      index,
-    ]);
+    this._sendBoardCommandMessage(AgoraExtensionRoomEvent.BoardGotoPage, [index]);
   }
   @bound
   undo() {
@@ -88,27 +75,16 @@ export class Board {
     this._sendBoardCommandMessage(AgoraExtensionRoomEvent.BoardClean);
   }
   @bound
-  putImageResource(
-    url: string,
-    pos?: { x: number; y: number; width: number; height: number }
-  ) {
-    this._sendBoardCommandMessage(
-      AgoraExtensionRoomEvent.BoardPutImageResource,
-      [url, pos]
-    );
+  putImageResource(url: string, pos?: { x: number; y: number; width: number; height: number }) {
+    this._sendBoardCommandMessage(AgoraExtensionRoomEvent.BoardPutImageResource, [url, pos]);
   }
   @bound
   putImageResourceIntoWindow(src: string) {
-    this._sendBoardCommandMessage(
-      AgoraExtensionRoomEvent.BoardPutImageResourceIntoWindow,
-      [src]
-    );
+    this._sendBoardCommandMessage(AgoraExtensionRoomEvent.BoardPutImageResourceIntoWindow, [src]);
   }
   @action
   selectTool(tool: FcrBoardTool) {
-    this._sendBoardCommandMessage(AgoraExtensionRoomEvent.BoardSelectTool, [
-      tool,
-    ]);
+    this._sendBoardCommandMessage(AgoraExtensionRoomEvent.BoardSelectTool, [tool]);
     this.selectedTool = tool;
     this.selectedShape = undefined;
   }
@@ -124,25 +100,16 @@ export class Board {
   }
   @bound
   grantPrivilege(userUuid: string, granted: boolean) {
-    this._sendBoardCommandMessage(AgoraExtensionRoomEvent.BoardGrantPrivilege, [
-      userUuid,
-      granted,
-    ]);
+    this._sendBoardCommandMessage(AgoraExtensionRoomEvent.BoardGrantPrivilege, [userUuid, granted]);
   }
   @action
   changeStrokeWidth(strokeWidth: number) {
-    this._sendBoardCommandMessage(
-      AgoraExtensionRoomEvent.BoardChangeStrokeWidth,
-      [strokeWidth]
-    );
+    this._sendBoardCommandMessage(AgoraExtensionRoomEvent.BoardChangeStrokeWidth, [strokeWidth]);
     this.strokeWidth = strokeWidth;
   }
   @action
   changeStrokeColor(color: { r: number; g: number; b: number }) {
-    this._sendBoardCommandMessage(
-      AgoraExtensionRoomEvent.BoardChangeStrokeColor,
-      [color]
-    );
+    this._sendBoardCommandMessage(AgoraExtensionRoomEvent.BoardChangeStrokeColor, [color]);
     this.strokeColor = color;
   }
 
@@ -152,24 +119,18 @@ export class Board {
   }
   @bound
   saveAttributes() {
-    this._sendBoardCommandMessage(
-      AgoraExtensionRoomEvent.BoardSaveAttributes,
-      []
-    );
+    this._sendBoardCommandMessage(AgoraExtensionRoomEvent.BoardSaveAttributes, []);
   }
   @bound
   getSnapshotImageList() {
-    this._sendBoardCommandMessage(
-      AgoraExtensionRoomEvent.BoardGetSnapshotImageList,
-      [AgoraEduSDK.theme.foreground]
-    );
+    this._sendBoardCommandMessage(AgoraExtensionRoomEvent.BoardGetSnapshotImageList, [
+      AgoraProctorSDK.theme.foreground,
+    ]);
   }
 
   @bound
   setDelay(delay: number) {
-    this._sendBoardCommandMessage(AgoraExtensionRoomEvent.BoardSetDelay, [
-      delay,
-    ]);
+    this._sendBoardCommandMessage(AgoraExtensionRoomEvent.BoardSetDelay, [delay]);
   }
   @bound
   hasPrivilege() {
@@ -269,7 +230,7 @@ export class Board {
     this._controller?.sendMessage(
       widgetId,
       AgoraExtensionRoomEvent.ResponseGrantedList,
-      toJS(this.grantedUsers, { exportMapsAsObjects: false })
+      toJS(this.grantedUsers, { exportMapsAsObjects: false }),
     );
   }
 
@@ -288,10 +249,7 @@ export class Board {
   }
 
   @action.bound
-  private _handlePageInfoChanged(pageInfo: {
-    showIndex: number;
-    count: number;
-  }) {
+  private _handlePageInfoChanged(pageInfo: { showIndex: number; count: number }) {
     this.pageCount = pageInfo.count;
     this.pageIndex = pageInfo.showIndex;
   }
@@ -326,11 +284,7 @@ export class Board {
     this.selectTool(FcrBoardTool.Clicker);
   }
 
-  private _waitReply<T>(
-    messageType: string,
-    messageId: string,
-    timeout: number
-  ) {
+  private _waitReply<T>(messageType: string, messageId: string, timeout: number) {
     return withTimeout<T>(
       new Promise<T>((resolve) => () => {
         const handler = (message: { id: string; payload: T }) => {
@@ -347,18 +301,15 @@ export class Board {
           onMessage: handler,
         });
       }),
-      timeout
+      timeout,
     );
   }
 
-  private _sendBoardCommandMessage(
-    event: AgoraExtensionRoomEvent,
-    args?: unknown
-  ) {
+  private _sendBoardCommandMessage(event: AgoraExtensionRoomEvent, args?: unknown) {
     if (this._controller) {
       this._controller.broadcast(event, args);
     } else {
-      this.logger.warn("Widget controller not ready, cannot broadcast message");
+      this.logger.warn('Widget controller not ready, cannot broadcast message');
     }
   }
 }

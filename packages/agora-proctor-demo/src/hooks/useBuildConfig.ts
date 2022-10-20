@@ -1,4 +1,4 @@
-import { AgoraEduSDK } from '@/infra/api';
+import { AgoraProctorSDK } from '@/infra/api';
 import { EduRoomTypeEnum } from 'agora-edu-core';
 import { useEffect, useRef, useState } from 'react';
 import { useI18n } from '~ui-kit';
@@ -35,19 +35,19 @@ export const useBuilderConfig = () => {
           themes: themes ? { default: themes } : {},
         };
 
-        AgoraEduSDK.setParameters(
+        AgoraProctorSDK.setParameters(
           JSON.stringify({
             uiConfigs: builderResource.current.scenes,
             themes: builderResource.current.themes,
           }),
         );
 
-        setRoomTypes(AgoraEduSDK.getLoadedScenes().map(({ roomType }) => roomType));
+        setRoomTypes(AgoraProctorSDK.getLoadedScenes().map(({ roomType }) => roomType));
         setConfigReady(true);
       });
     } else {
       setConfigReady(true);
-      setRoomTypes(AgoraEduSDK.getLoadedScenes().map(({ roomType }) => roomType));
+      setRoomTypes(AgoraProctorSDK.getLoadedScenes().map(({ roomType }) => roomType));
     }
   }, []);
 

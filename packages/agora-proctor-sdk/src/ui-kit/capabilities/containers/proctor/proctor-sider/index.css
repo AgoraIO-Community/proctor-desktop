@@ -55,8 +55,8 @@
   border-radius: 24px;
 
   transition: max-height 0.2s;
-  height: 353px;
-  max-height: 353px;
+  height: 361px;
+  max-height: 361px;
   overflow: hidden;
   position: relative;
 }
@@ -249,6 +249,9 @@
   font-size: 16px;
   line-height: 19px;
   color: #000000;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .fcr_proctor_sider_info_proctor-actions-name > div {
   font-size: 12px;

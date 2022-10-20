@@ -14,7 +14,7 @@ const { pack } = require('./utils/loaders');
 const config = {
   mode: 'production',
   entry: {
-    edu_sdk: './src/infra/api/index.tsx',
+    proctor_sdk: './src/infra/api/index.tsx',
   },
   output: {
     publicPath: '',

@@ -1,5 +1,5 @@
-import { AgoraEduSDK } from "@/infra/api";
-import { number2Percent } from "@/infra/utils";
+import { AgoraProctorSDK } from '@/infra/api';
+import { number2Percent } from '@/infra/utils';
 import {
   AGServiceErrorCode,
   ClassroomState,
@@ -10,7 +10,7 @@ import {
   LeaveReason,
   RecordMode,
   RecordStatus,
-} from "agora-edu-core";
+} from 'agora-edu-core';
 import {
   AGError,
   AGNetworkQuality,
@@ -18,30 +18,16 @@ import {
   AgoraRteMediaSourceState,
   AgoraRteVideoSourceType,
   bound,
-} from "agora-rte-sdk";
-import dayjs from "dayjs";
-import {
-  action,
-  computed,
-  IReactionDisposer,
-  observable,
-  reaction,
-  runInAction,
-} from "mobx";
-import { SvgIconEnum, transI18n } from "~ui-kit";
-import { NetworkStateColors } from "~utilities/state-color";
-import { EduUIStoreBase } from "./base";
-import { DialogCategory } from "./share-ui";
+} from 'agora-rte-sdk';
+import dayjs from 'dayjs';
+import { action, computed, IReactionDisposer, observable, reaction, runInAction } from 'mobx';
+import { SvgIconEnum, transI18n } from '~ui-kit';
+import { NetworkStateColors } from '~utilities/state-color';
+import { EduUIStoreBase } from './base';
+import { DialogCategory } from './share-ui';
 
 export interface EduNavAction<P = undefined> {
-  id:
-    | "Record"
-    | "AskForHelp"
-    | "Settings"
-    | "Exit"
-    | "Camera"
-    | "Mic"
-    | "Share";
+  id: 'Record' | 'AskForHelp' | 'Settings' | 'Exit' | 'Camera' | 'Mic' | 'Share';
   title: string;
   iconType: SvgIconEnum;
   iconColor?: string;
@@ -67,20 +53,14 @@ export class NavigationBarUIStore extends EduUIStoreBase {
         () => this.networkQuality,
         (networkQuality) => {
           if (networkQuality === AGNetworkQuality.bad) {
-            this.shareUIStore.addToast(
-              transI18n("nav.singal_poor_tip"),
-              "warning"
-            );
+            this.shareUIStore.addToast(transI18n('nav.singal_poor_tip'), 'warning');
           }
 
           if (networkQuality === AGNetworkQuality.down) {
-            this.shareUIStore.addToast(
-              transI18n("nav.singal_down_tip"),
-              "error"
-            );
+            this.shareUIStore.addToast(transI18n('nav.singal_down_tip'), 'error');
           }
-        }
-      )
+        },
+      ),
     );
   }
   //observables
@@ -138,8 +118,7 @@ export class NavigationBarUIStore extends EduUIStoreBase {
    */
   @computed get localCameraOff() {
     return (
-      this.classroomStore.mediaStore.localCameraTrackState !==
-      AgoraRteMediaSourceState.started
+      this.classroomStore.mediaStore.localCameraTrackState !== AgoraRteMediaSourceState.started
     );
   }
 
@@ -148,10 +127,7 @@ export class NavigationBarUIStore extends EduUIStoreBase {
    */
   @computed
   get localMicOff() {
-    return (
-      this.classroomStore.mediaStore.localMicTrackState !==
-      AgoraRteMediaSourceState.started
-    );
+    return this.classroomStore.mediaStore.localMicTrackState !== AgoraRteMediaSourceState.started;
   }
 
   /**
@@ -165,14 +141,14 @@ export class NavigationBarUIStore extends EduUIStoreBase {
   @computed
   get localNavCameraOff() {
     if (
-      (typeof this.classroomStore.roomStore.flexProps.stage !== "undefined" &&
+      (typeof this.classroomStore.roomStore.flexProps.stage !== 'undefined' &&
         this.classroomStore.roomStore.flexProps.stage) ||
-      typeof this.classroomStore.roomStore.flexProps.stage === "undefined"
+      typeof this.classroomStore.roomStore.flexProps.stage === 'undefined'
     ) {
       return this.localCameraOff;
     }
     if (
-      typeof this.classroomStore.roomStore.flexProps.stage !== "undefined" &&
+      typeof this.classroomStore.roomStore.flexProps.stage !== 'undefined' &&
       !this.classroomStore.roomStore.flexProps.stage
     ) {
       return !this.teacherStreamWindow;
@@ -188,15 +164,15 @@ export class NavigationBarUIStore extends EduUIStoreBase {
   get actions(): EduNavAction<EduNavRecordActionPayload | undefined>[] {
     const { isRecording, isRecordStarting, recordStatus } = this;
     const recordingTitle = isRecording
-      ? transI18n("toast.stop_recording.title")
-      : transI18n("toast.start_recording.title");
+      ? transI18n('toast.stop_recording.title')
+      : transI18n('toast.start_recording.title');
     const recordingBody = isRecording
-      ? transI18n("toast.stop_recording.body")
-      : transI18n("toast.start_recording.body");
+      ? transI18n('toast.stop_recording.body')
+      : transI18n('toast.start_recording.body');
 
     const exitAction: EduNavAction<EduNavRecordActionPayload | undefined> = {
-      id: "Exit",
-      title: transI18n("biz-header.exit"),
+      id: 'Exit',
+      title: transI18n('biz-header.exit'),
       iconType: SvgIconEnum.EXIT,
       onClick: async () => {
         const isInSubRoom = this.classroomStore.groupStore.currentSubRoom;
@@ -205,9 +181,7 @@ export class NavigationBarUIStore extends EduUIStoreBase {
             if (back) {
               this._leaveSubRoom();
             } else {
-              this.classroomStore.connectionStore.leaveClassroom(
-                LeaveReason.leave
-              );
+              this.classroomStore.connectionStore.leaveClassroom(LeaveReason.leave);
             }
           },
           showOption: isInSubRoom,
@@ -216,8 +190,8 @@ export class NavigationBarUIStore extends EduUIStoreBase {
     };
 
     const shareAction: EduNavAction<EduNavRecordActionPayload | undefined> = {
-      id: "Share",
-      title: transI18n("fcr_copy_title"),
+      id: 'Share',
+      title: transI18n('fcr_copy_title'),
       iconType: SvgIconEnum.LINK,
       onClick: async () => {
         runInAction(() => {
@@ -229,13 +203,11 @@ export class NavigationBarUIStore extends EduUIStoreBase {
     // 合流转推场景&&学生角色
     const isMixStreamCDNModelStudent =
       EduClassroomConfig.shared.sessionInfo.role !== EduRoleTypeEnum.teacher &&
-      EduClassroomConfig.shared.sessionInfo.roomServiceType ===
-        EduRoomServiceTypeEnum.MixStreamCDN;
+      EduClassroomConfig.shared.sessionInfo.roomServiceType === EduRoomServiceTypeEnum.MixStreamCDN;
 
     // 伪直播
     const isHostingScene =
-      EduClassroomConfig.shared.sessionInfo.roomServiceType ===
-      EduRoomServiceTypeEnum.HostingScene;
+      EduClassroomConfig.shared.sessionInfo.roomServiceType === EduRoomServiceTypeEnum.HostingScene;
 
     if (isMixStreamCDNModelStudent || isHostingScene) {
       return [exitAction];
@@ -243,26 +215,24 @@ export class NavigationBarUIStore extends EduUIStoreBase {
 
     const teacherActions: EduNavAction<EduNavRecordActionPayload>[] = [
       {
-        id: "Record",
+        id: 'Record',
         title: recordingTitle,
         iconType: SvgIconEnum.RECORDING,
         payload: {
           text: isRecordStarting
-            ? transI18n("biz-header.record_starting")
+            ? transI18n('biz-header.record_starting')
             : isRecording
-            ? transI18n("biz-header.recording")
-            : "",
+            ? transI18n('biz-header.recording')
+            : '',
           recordStatus: recordStatus,
         },
         onClick: async () => {
           this.shareUIStore.addConfirmDialog(recordingTitle, recordingBody, {
             onOK: () => {
               if (isRecording) {
-                this.classroomStore.recordingStore
-                  .stopRecording()
-                  .catch((e: AGError) => {
-                    this.shareUIStore.addGenericErrorDialog(e);
-                  });
+                this.classroomStore.recordingStore.stopRecording().catch((e: AGError) => {
+                  this.shareUIStore.addGenericErrorDialog(e);
+                });
               } else if (this.isRecordStoped) {
                 this.classroomStore.recordingStore
                   .startRecording(this.recordArgs)
@@ -278,13 +248,9 @@ export class NavigationBarUIStore extends EduUIStoreBase {
 
     const teacherMediaActions: EduNavAction[] = [
       {
-        id: "Camera",
-        title: this.localNavCameraOff
-          ? transI18n("Open Camera")
-          : transI18n("Close Camera"),
-        iconType: this.localNavCameraOff
-          ? SvgIconEnum.CAMERA_DISABLED
-          : SvgIconEnum.CAMERA_ENABLED, // 根据讲台的隐藏和设备的开发控制 icon
+        id: 'Camera',
+        title: this.localNavCameraOff ? transI18n('Open Camera') : transI18n('Close Camera'),
+        iconType: this.localNavCameraOff ? SvgIconEnum.CAMERA_DISABLED : SvgIconEnum.CAMERA_ENABLED, // 根据讲台的隐藏和设备的开发控制 icon
         onClick: () => {
           try {
             this._toggleNavCamera();
@@ -294,13 +260,9 @@ export class NavigationBarUIStore extends EduUIStoreBase {
         },
       },
       {
-        id: "Mic",
-        title: this.localMicOff
-          ? transI18n("Open Microphone")
-          : transI18n("Close Microphone"),
-        iconType: this.localMicOff
-          ? SvgIconEnum.MICROPHONE_OFF
-          : SvgIconEnum.MICROPHONE_ON,
+        id: 'Mic',
+        title: this.localMicOff ? transI18n('Open Microphone') : transI18n('Close Microphone'),
+        iconType: this.localMicOff ? SvgIconEnum.MICROPHONE_OFF : SvgIconEnum.MICROPHONE_ON,
         onClick: async () => {
           try {
             this._toggleLocalAudio();
@@ -313,30 +275,24 @@ export class NavigationBarUIStore extends EduUIStoreBase {
 
     const studentActions: EduNavAction[] = [
       {
-        id: "AskForHelp",
-        title: "AskForHelp",
+        id: 'AskForHelp',
+        title: 'AskForHelp',
         iconType: SvgIconEnum.ASK_FOR_HELP,
-        iconColor: this.teacherInCurrentRoom ? "#D2D2E2" : undefined,
+        iconColor: this.teacherInCurrentRoom ? '#D2D2E2' : undefined,
         onClick: () => {
-          const { updateGroupUsers, currentSubRoom } =
-            this.classroomStore.groupStore;
-          const teachers =
-            this.classroomStore.userStore.mainRoomDataStore.teacherList;
-          const assistants =
-            this.classroomStore.userStore.mainRoomDataStore.assistantList;
+          const { updateGroupUsers, currentSubRoom } = this.classroomStore.groupStore;
+          const teachers = this.classroomStore.userStore.mainRoomDataStore.teacherList;
+          const assistants = this.classroomStore.userStore.mainRoomDataStore.assistantList;
 
           if (!teachers.size && !assistants.size) {
             this.shareUIStore.addConfirmDialog(
-              transI18n("fcr_group_help_title"),
-              transI18n("breakout_room.confirm_ask_for_help_absent_content")
+              transI18n('fcr_group_help_title'),
+              transI18n('breakout_room.confirm_ask_for_help_absent_content'),
             );
             return;
           }
           if (this.teacherGroupUuid === currentSubRoom) {
-            this.shareUIStore.addToast(
-              transI18n("fcr_group_teacher_exist_hint"),
-              "warning"
-            );
+            this.shareUIStore.addToast(transI18n('fcr_group_teacher_exist_hint'), 'warning');
             return;
           }
 
@@ -344,8 +300,8 @@ export class NavigationBarUIStore extends EduUIStoreBase {
           const assistantUuids = Array.from(assistants.keys());
 
           this.shareUIStore.addConfirmDialog(
-            transI18n("fcr_group_help_title"),
-            transI18n("fcr_group_help_content"),
+            transI18n('fcr_group_help_title'),
+            transI18n('fcr_group_help_content'),
             {
               onOK: () => {
                 updateGroupUsers(
@@ -355,47 +311,37 @@ export class NavigationBarUIStore extends EduUIStoreBase {
                       addUsers: [teacherUuid].concat(assistantUuids),
                     },
                   ],
-                  true
+                  true,
                 ).catch((e) => {
-                  if (
-                    AGError.isOf(e, AGServiceErrorCode.SERV_USER_BEING_INVITED)
-                  ) {
+                  if (AGError.isOf(e, AGServiceErrorCode.SERV_USER_BEING_INVITED)) {
                     this.shareUIStore.addConfirmDialog(
-                      transI18n("fcr_group_help_title"),
-                      transI18n("fcr_group_teacher_is_helping_others_msg"),
+                      transI18n('fcr_group_help_title'),
+                      transI18n('fcr_group_teacher_is_helping_others_msg'),
                       {
-                        actions: ["ok"],
-                      }
+                        actions: ['ok'],
+                      },
                     );
                   } else {
                     this.shareUIStore.addGenericErrorDialog(e as AGError);
                   }
                 });
               },
-              actions: ["ok", "cancel"],
+              actions: ['ok', 'cancel'],
               btnText: {
-                ok: transI18n("fcr_group_invite"),
-                cancel: transI18n(
-                  "breakout_room.confirm_ask_for_help_btn_cancel"
-                ),
+                ok: transI18n('fcr_group_invite'),
+                cancel: transI18n('breakout_room.confirm_ask_for_help_btn_cancel'),
               },
-            }
+            },
           );
         },
       },
     ];
 
-    const studentMediaActions: EduNavAction<
-      EduNavRecordActionPayload | undefined
-    >[] = [
+    const studentMediaActions: EduNavAction<EduNavRecordActionPayload | undefined>[] = [
       {
-        id: "Camera",
-        title: this.localCameraOff
-          ? transI18n("Open Camera")
-          : transI18n("Close Camera"),
-        iconType: this.localCameraOff
-          ? SvgIconEnum.CAMERA_DISABLED
-          : SvgIconEnum.CAMERA_ENABLED,
+        id: 'Camera',
+        title: this.localCameraOff ? transI18n('Open Camera') : transI18n('Close Camera'),
+        iconType: this.localCameraOff ? SvgIconEnum.CAMERA_DISABLED : SvgIconEnum.CAMERA_ENABLED,
         onClick: () => {
           try {
             this._toggleLocalVideo();
@@ -405,13 +351,9 @@ export class NavigationBarUIStore extends EduUIStoreBase {
         },
       },
       {
-        id: "Mic",
-        title: this.localMicOff
-          ? transI18n("Open Microphone")
-          : transI18n("Close Microphone"),
-        iconType: this.localMicOff
-          ? SvgIconEnum.MICROPHONE_OFF
-          : SvgIconEnum.MICROPHONE_ON,
+        id: 'Mic',
+        title: this.localMicOff ? transI18n('Open Microphone') : transI18n('Close Microphone'),
+        iconType: this.localMicOff ? SvgIconEnum.MICROPHONE_OFF : SvgIconEnum.MICROPHONE_ON,
         onClick: async () => {
           try {
             this._toggleLocalAudio();
@@ -422,49 +364,44 @@ export class NavigationBarUIStore extends EduUIStoreBase {
       },
     ];
 
-    const commonActions: EduNavAction<EduNavRecordActionPayload | undefined>[] =
-      [
-        {
-          id: "Settings",
-          title: transI18n("biz-header.setting"),
-          iconType: SvgIconEnum.SET,
-          onClick: () => {
-            this.shareUIStore.addDialog(DialogCategory.DeviceSetting);
-          },
+    const commonActions: EduNavAction<EduNavRecordActionPayload | undefined>[] = [
+      {
+        id: 'Settings',
+        title: transI18n('biz-header.setting'),
+        iconType: SvgIconEnum.SET,
+        onClick: () => {
+          this.shareUIStore.addDialog(DialogCategory.DeviceSetting);
         },
-        exitAction,
-      ];
+      },
+      exitAction,
+    ];
 
-    if (AgoraEduSDK.shareUrl) {
+    if (AgoraProctorSDK.shareUrl) {
       commonActions.splice(1, 0, shareAction);
     }
 
     const isInSubRoom = this.classroomStore.groupStore.currentSubRoom;
 
     let actions: EduNavAction<EduNavRecordActionPayload | undefined>[] = [];
-    if (
-      EduClassroomConfig.shared.sessionInfo.role === EduRoleTypeEnum.teacher
-    ) {
+    if (EduClassroomConfig.shared.sessionInfo.role === EduRoleTypeEnum.teacher) {
       if (!isInSubRoom) {
         actions = actions.concat(teacherActions);
       }
       actions = actions.concat(teacherMediaActions);
     }
 
-    if (
-      EduClassroomConfig.shared.sessionInfo.role === EduRoleTypeEnum.student
-    ) {
+    if (EduClassroomConfig.shared.sessionInfo.role === EduRoleTypeEnum.student) {
       actions = studentMediaActions.concat(actions);
       if (isInSubRoom) {
         actions = actions.concat(studentActions);
       }
       if (isRecording)
         actions.unshift({
-          id: "Record",
+          id: 'Record',
           title: recordingTitle,
           iconType: SvgIconEnum.RECORDING,
           payload: {
-            text: transI18n("biz-header.recording"),
+            text: transI18n('biz-header.recording'),
             recordStatus: recordStatus,
           },
         });
@@ -487,14 +424,10 @@ export class NavigationBarUIStore extends EduUIStoreBase {
    */
   @computed
   get teacherGroupUuid() {
-    if (
-      this.classroomStore.connectionStore.classroomState !==
-      ClassroomState.Connected
-    ) {
+    if (this.classroomStore.connectionStore.classroomState !== ClassroomState.Connected) {
       return false;
     }
-    const teachers =
-      this.classroomStore.userStore.mainRoomDataStore.teacherList;
+    const teachers = this.classroomStore.userStore.mainRoomDataStore.teacherList;
 
     if (teachers.size) {
       const teacherUuid = teachers.keys().next().value;
@@ -545,18 +478,12 @@ export class NavigationBarUIStore extends EduUIStoreBase {
       switch (this.classState) {
         case ClassState.beforeClass:
           if (this.classroomSchedule.startTime !== undefined) {
-            duration = Math.max(
-              this.classroomSchedule.startTime - this.calibratedTime,
-              0
-            );
+            duration = Math.max(this.classroomSchedule.startTime - this.calibratedTime, 0);
           }
           break;
         case ClassState.ongoing:
           if (this.classroomSchedule.startTime !== undefined) {
-            duration = Math.max(
-              this.calibratedTime - this.classroomSchedule.startTime,
-              0
-            );
+            duration = Math.max(this.calibratedTime - this.classroomSchedule.startTime, 0);
           }
           break;
         case ClassState.afterClass:
@@ -564,10 +491,7 @@ export class NavigationBarUIStore extends EduUIStoreBase {
             this.classroomSchedule.startTime !== undefined &&
             this.classroomSchedule.duration !== undefined
           ) {
-            duration = Math.max(
-              this.calibratedTime - this.classroomSchedule.startTime,
-              0
-            );
+            duration = Math.max(this.calibratedTime - this.classroomSchedule.startTime, 0);
           }
           break;
       }
@@ -609,11 +533,11 @@ export class NavigationBarUIStore extends EduUIStoreBase {
   get classStatusTextColor() {
     switch (this.classState) {
       case ClassState.beforeClass:
-        return "#677386";
+        return '#677386';
       case ClassState.ongoing:
-        return "#677386";
+        return '#677386';
       case ClassState.afterClass:
-        return "#F04C36";
+        return '#F04C36';
       default:
         return undefined;
     }
@@ -641,12 +565,12 @@ export class NavigationBarUIStore extends EduUIStoreBase {
     switch (this.networkQuality) {
       case AGNetworkQuality.good:
       case AGNetworkQuality.great:
-        return "excellent";
+        return 'excellent';
       case AGNetworkQuality.poor:
       case AGNetworkQuality.bad:
-        return "bad";
+        return 'bad';
       case AGNetworkQuality.down:
-        return "down";
+        return 'down';
     }
     return `excellent`;
   }
@@ -685,14 +609,14 @@ export class NavigationBarUIStore extends EduUIStoreBase {
     switch (this.networkQuality) {
       case AGNetworkQuality.good:
       case AGNetworkQuality.great:
-        return transI18n("nav.signal_excellent");
+        return transI18n('nav.signal_excellent');
       case AGNetworkQuality.poor:
       case AGNetworkQuality.bad:
-        return transI18n("nav.signal_bad");
+        return transI18n('nav.signal_bad');
       case AGNetworkQuality.down:
-        return transI18n("nav.signal_down");
+        return transI18n('nav.signal_down');
     }
-    return transI18n("nav.signal_excellent");
+    return transI18n('nav.signal_excellent');
   }
 
   /**
@@ -716,12 +640,12 @@ export class NavigationBarUIStore extends EduUIStoreBase {
       this.classroomStore.statisticsStore.cpuTotal === -1 ||
       this.classroomStore.statisticsStore.cpuTotal === undefined
     ) {
-      return "-- %";
+      return '-- %';
     }
-    return `${number2Percent(
-      this.classroomStore.statisticsStore.cpu,
-      0
-    )} / ${number2Percent(this.classroomStore.statisticsStore.cpuTotal, 0)}`;
+    return `${number2Percent(this.classroomStore.statisticsStore.cpu, 0)} / ${number2Percent(
+      this.classroomStore.statisticsStore.cpuTotal,
+      0,
+    )}`;
   }
 
   /**
@@ -731,7 +655,7 @@ export class NavigationBarUIStore extends EduUIStoreBase {
   @computed
   get packetLoss() {
     if (this.classroomStore.statisticsStore.packetLoss === undefined) {
-      return "-- %";
+      return '-- %';
     }
     return number2Percent(this.classroomStore.statisticsStore.packetLoss, 2);
   }
@@ -746,18 +670,14 @@ export class NavigationBarUIStore extends EduUIStoreBase {
     let hasPublishedCameraStream = false;
     let hasPublishedMicStream = false;
 
-    const { streamByStreamUuid, streamByUserUuid } =
-      this.classroomStore.streamStore;
+    const { streamByStreamUuid, streamByUserUuid } = this.classroomStore.streamStore;
 
     const { userUuid } = EduClassroomConfig.shared.sessionInfo;
     const streamUuids = streamByUserUuid.get(userUuid) || new Set();
 
     for (const streamUuid of streamUuids) {
       const stream = streamByStreamUuid.get(streamUuid);
-      if (
-        stream &&
-        stream.videoSourceType === AgoraRteVideoSourceType.ScreenShare
-      ) {
+      if (stream && stream.videoSourceType === AgoraRteVideoSourceType.ScreenShare) {
         hasPublishedScreenStream = true;
       }
 
@@ -778,25 +698,16 @@ export class NavigationBarUIStore extends EduUIStoreBase {
       }
     }
 
-    const { downlinkNetworkQuality, uplinkNetworkQuality } =
-      this.classroomStore.statisticsStore;
+    const { downlinkNetworkQuality, uplinkNetworkQuality } = this.classroomStore.statisticsStore;
 
-    if (
-      [downlinkNetworkQuality, uplinkNetworkQuality].includes(
-        AGNetworkQuality.down
-      )
-    ) {
+    if ([downlinkNetworkQuality, uplinkNetworkQuality].includes(AGNetworkQuality.down)) {
       return AGNetworkQuality.down;
     }
 
-    if (
-      hasPublishedScreenStream ||
-      hasPublishedCameraStream ||
-      hasPublishedMicStream
-    ) {
+    if (hasPublishedScreenStream || hasPublishedCameraStream || hasPublishedMicStream) {
       return Math.min(
         downlinkNetworkQuality || AGNetworkQuality.unknown,
-        uplinkNetworkQuality || AGNetworkQuality.unknown
+        uplinkNetworkQuality || AGNetworkQuality.unknown,
       ) as AGNetworkQuality;
     }
 
@@ -810,11 +721,9 @@ export class NavigationBarUIStore extends EduUIStoreBase {
   @computed
   get delay() {
     if (this.classroomStore.statisticsStore.delay === undefined) {
-      return `-- ${transI18n("nav.ms")}`;
+      return `-- ${transI18n('nav.ms')}`;
     }
-    return `${Math.floor(
-      this.classroomStore.statisticsStore.delay
-    )} ${transI18n("nav.ms")}`;
+    return `${Math.floor(this.classroomStore.statisticsStore.delay)} ${transI18n('nav.ms')}`;
   }
 
   //others
@@ -824,19 +733,16 @@ export class NavigationBarUIStore extends EduUIStoreBase {
    */
   @computed
   get navigationTitle() {
-    return (
-      this.currentSubRoomName || EduClassroomConfig.shared.sessionInfo.roomName
-    );
+    return this.currentSubRoomName || EduClassroomConfig.shared.sessionInfo.roomName;
   }
   /**
    * 当前屏幕分享人名称
    */
   @computed
   get currScreenShareTitle() {
-    const currSharedUser =
-      this.classroomStore.remoteControlStore.currSharedUser;
+    const currSharedUser = this.classroomStore.remoteControlStore.currSharedUser;
     if (currSharedUser)
-      return `${transI18n("fcr_share_sharing", {
+      return `${transI18n('fcr_share_sharing', {
         reason: currSharedUser.userName,
       })}`;
   }
@@ -860,7 +766,7 @@ export class NavigationBarUIStore extends EduUIStoreBase {
 
     const args = {
       webRecordConfig: {
-        rootUrl: `${recordUrl}?language=${AgoraEduSDK.language}`,
+        rootUrl: `${recordUrl}?language=${AgoraProctorSDK.language}`,
         videoBitrate: 3000,
       },
       mode: RecordMode.Web,
@@ -880,10 +786,9 @@ export class NavigationBarUIStore extends EduUIStoreBase {
     const duration = dayjs.duration(time);
     let formatItems: string[] = [];
 
-    const hours_text = duration.hours() === 0 ? "" : `H :`;
-    const mins_text =
-      duration.minutes() === 0 ? "" : duration.seconds() === 0 ? `m :` : `m :`;
-    const seconds_text = duration.seconds() === 0 ? "" : `s`;
+    const hours_text = duration.hours() === 0 ? '' : `H :`;
+    const mins_text = duration.minutes() === 0 ? '' : duration.seconds() === 0 ? `m :` : `m :`;
+    const seconds_text = duration.seconds() === 0 ? '' : `s`;
     const short_hours_text = `HH :`;
     const short_mins_text = `mm :`;
     const short_seconds_text = `ss`;
@@ -901,16 +806,12 @@ export class NavigationBarUIStore extends EduUIStoreBase {
         // less than a min
         formatItems = [seconds_text];
       } else if (seconds < 60 * 60) {
-        [mins_text, seconds_text].forEach(
-          (item) => item && formatItems.push(item)
-        );
+        [mins_text, seconds_text].forEach((item) => item && formatItems.push(item));
       } else {
-        [hours_text, mins_text, seconds_text].forEach(
-          (item) => item && formatItems.push(item)
-        );
+        [hours_text, mins_text, seconds_text].forEach((item) => item && formatItems.push(item));
       }
     }
-    return duration.format(formatItems.join(" "));
+    return duration.format(formatItems.join(' '));
   }
 
   @action
@@ -961,9 +862,9 @@ export class NavigationBarUIStore extends EduUIStoreBase {
   @bound
   private _toggleNavCamera() {
     if (
-      (typeof this.classroomStore.roomStore.flexProps.stage !== "undefined" &&
+      (typeof this.classroomStore.roomStore.flexProps.stage !== 'undefined' &&
         this.classroomStore.roomStore.flexProps.stage) ||
-      typeof this.classroomStore.roomStore.flexProps.stage === "undefined"
+      typeof this.classroomStore.roomStore.flexProps.stage === 'undefined'
     ) {
       this._toggleLocalVideo();
       return;
@@ -974,9 +875,7 @@ export class NavigationBarUIStore extends EduUIStoreBase {
     const currentRoomUuid = this.classroomStore.groupStore.currentSubRoom;
     const { userUuid } = EduClassroomConfig.shared.sessionInfo;
     if (currentRoomUuid) {
-      this.classroomStore.groupStore.removeGroupUsers(currentRoomUuid, [
-        userUuid,
-      ]);
+      this.classroomStore.groupStore.removeGroupUsers(currentRoomUuid, [userUuid]);
     }
   }
 

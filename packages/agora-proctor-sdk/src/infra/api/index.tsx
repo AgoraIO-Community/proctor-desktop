@@ -43,7 +43,7 @@ import {
 } from './type';
 
 export * from './type';
-export class AgoraEduSDK {
+export class AgoraProctorSDK {
   private static _config: any = {};
   private static _widgets: Record<string, typeof AgoraWidgetBase> = {};
   private static _boardWindowAnimationOptions: BoardWindowAnimationOptions = {};
@@ -179,7 +179,7 @@ export class AgoraEduSDK {
     const isInvalid = (value: string) => value === undefined || value === null || value === '';
 
     if (!option) {
-      throw new Error('AgoraEduSDK: LaunchOption is required!');
+      throw new Error('AgoraProctorSDK: LaunchOption is required!');
     } else if (
       ![
         EduRoleTypeEnum.assistant,
@@ -190,7 +190,7 @@ export class AgoraEduSDK {
         EduRoleTypeEnum.observer,
       ].includes(option.roleType)
     ) {
-      throw new Error('AgoraEduSDK: Invalid roleType!');
+      throw new Error('AgoraProctorSDK: Invalid roleType!');
     } else if (
       ![
         EduRoomTypeEnum.Room1v1Class,
@@ -199,15 +199,15 @@ export class AgoraEduSDK {
         EduRoomTypeEnum.RoomProctor,
       ].includes(option.roomType)
     ) {
-      throw new Error('AgoraEduSDK: Invalid roomType!');
+      throw new Error('AgoraProctorSDK: Invalid roomType!');
     } else if (isInvalid(option.userName)) {
-      throw new Error('AgoraEduSDK: userName is required');
+      throw new Error('AgoraProctorSDK: userName is required');
     } else if (isInvalid(option.userUuid)) {
-      throw new Error('AgoraEduSDK: userUuid is required');
+      throw new Error('AgoraProctorSDK: userUuid is required');
     } else if (isInvalid(option.roomName)) {
-      throw new Error('AgoraEduSDK: roomName is required');
+      throw new Error('AgoraProctorSDK: roomName is required');
     } else if (isInvalid(option.roomUuid)) {
-      throw new Error('AgoraEduSDK: roomUuid is required');
+      throw new Error('AgoraProctorSDK: roomUuid is required');
     }
   }
 

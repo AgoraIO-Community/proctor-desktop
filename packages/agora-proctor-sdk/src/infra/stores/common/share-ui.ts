@@ -1,4 +1,4 @@
-import { AgoraEduSDK, WindowID } from '@/infra/api';
+import { AgoraProctorSDK, WindowID } from '@/infra/api';
 import { getEduErrorMessage, getErrorServCode } from '@/infra/utils/error';
 import { sendToMainProcess } from '@/infra/utils/ipc';
 import { ChannelType } from '@/infra/utils/ipc-channels';
@@ -357,7 +357,7 @@ export class EduShareUIStore {
       windowID,
       payload.args,
       payload.options,
-      AgoraEduSDK.language,
+      AgoraProctorSDK.language,
     );
   }
   @bound

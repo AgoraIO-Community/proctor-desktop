@@ -1,5 +1,5 @@
 import {
-  AgoraEduSDK,
+  AgoraProctorSDK,
   AgoraExtensionWidgetEvent,
   AgoraMultiInstanceWidget,
   AgoraTrackSyncedWidget,
@@ -87,8 +87,8 @@ export class WidgetUIStore extends EduUIStoreBase {
         widgetController,
         this.classroomStore,
         this.shareUIStore,
-        AgoraEduSDK.uiConfig,
-        AgoraEduSDK.theme,
+        AgoraProctorSDK.uiConfig,
+        AgoraProctorSDK.theme,
       ) as AgoraWidgetBase;
 
       if (instanceId) {
@@ -261,7 +261,7 @@ export class WidgetUIStore extends EduUIStoreBase {
   }
 
   private _getEnabledWidgets() {
-    return cloneDeep(AgoraEduSDK.widgets);
+    return cloneDeep(AgoraProctorSDK.widgets);
   }
 
   onInstall() {
