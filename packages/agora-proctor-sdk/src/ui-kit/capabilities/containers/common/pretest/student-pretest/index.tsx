@@ -7,29 +7,31 @@ import { Conclusion } from './conclusion';
 import { DeviceTest } from './device-test';
 import { ImageSnapshot } from './image-snapshot';
 import { ShareScreen } from './share-screen';
-const PretestInfoByStep = [
-  {
-    title: transI18n('fcr_exam_prep_label_test_exam_device'),
-    component: <DeviceTest />,
-  },
-  {
-    title: transI18n('fcr_exam_prep_label_align_face'),
-    component: <ImageSnapshot />,
-  },
-  {
-    title: transI18n('fcr_exam_prep_label_authorize_share_screen'),
-    component: <ShareScreen />,
-  },
-  {
-    title: transI18n('fcr_exam_prep_label_join_exam'),
-    component: <Conclusion />,
-  },
-];
+import { useMemo } from 'react';
 export const StudentPretest = observer(() => {
   const {
     pretestUIStore: { currentStep, headerStep },
   } = useStore();
-
+  const PretestInfoByStep = useMemo(() => {
+    return [
+      {
+        title: transI18n('fcr_exam_prep_label_test_exam_device'),
+        component: <DeviceTest />,
+      },
+      {
+        title: transI18n('fcr_exam_prep_label_align_face'),
+        component: <ImageSnapshot />,
+      },
+      {
+        title: transI18n('fcr_exam_prep_label_authorize_share_screen'),
+        component: <ShareScreen />,
+      },
+      {
+        title: transI18n('fcr_exam_prep_label_join_exam'),
+        component: <Conclusion />,
+      },
+    ];
+  }, []);
   return (
     <Container>
       <PreTestHeader>{transI18n('fcr_home_page_scene_option_online_proctoring')}</PreTestHeader>

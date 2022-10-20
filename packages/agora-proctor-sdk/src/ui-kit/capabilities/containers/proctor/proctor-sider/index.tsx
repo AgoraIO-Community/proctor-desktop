@@ -41,7 +41,9 @@ export const ProctorSider = observer(() => {
         </div>
         <div className={'fcr_proctor_sider_info_wrap'}>
           <div className={'fcr_proctor_sider_info_room_number'}>
-            <div className={'fcr_proctor_sider_info_title'}>RoomNumber</div>
+            <div className={'fcr_proctor_sider_info_title'}>
+              {transI18n('fcr_room_label_room_number')}
+            </div>
             <div className={'fcr_proctor_sider_info_val'}>
               {EduClassroomConfig.shared.sessionInfo.roomUuid}
             </div>
@@ -61,6 +63,7 @@ export const ProctorSider = observer(() => {
         <div className="fcr_proctor_sider_info_btn">
           {classState === ClassState.ongoing ? (
             <BtnWithCloseCheck
+              fullWidth
               foldBtn={
                 <Button className="fcr_proctor_sider_info_end" type="primary" block size="large">
                   {transI18n('fcr_room_button_exam_end')}
@@ -68,7 +71,7 @@ export const ProctorSider = observer(() => {
               }
               unFoldBtn={
                 <AgoraButton size="middle" type="primary" subType="red" shape="round">
-                  {transI18n('fcr_room_button_leave')}
+                  {transI18n('fcr_room_button_leave_confirm')}
                 </AgoraButton>
               }
               onClick={endExam}></BtnWithCloseCheck>

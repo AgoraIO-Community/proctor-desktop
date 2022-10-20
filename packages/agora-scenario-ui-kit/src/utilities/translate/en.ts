@@ -67,6 +67,7 @@ export const en = {
   fcr_device_test_label_default: 'Default',
   fcr_exam_prep_label_close_screen_share: 'Don‘t turn off screen share during the exam',
   fcr_alert_title: 'Prompt',
+  fcr_room_button_leave_confirm: 'Confirm',
 
   edu_error: {
     '600000': 'Failed to join the classroom',

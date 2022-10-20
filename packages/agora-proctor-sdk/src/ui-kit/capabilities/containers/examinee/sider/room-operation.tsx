@@ -37,8 +37,7 @@ const ExistBtn = observer(({ onFold }: { onFold: (fold: boolean) => void }) => {
       }
       unFoldBtn={
         <AgoraButton size="middle" type="primary" subType="red" shape="round">
-          <SvgImg type={SvgIconEnum.QUIT} />
-          {transI18n('fcr_room_button_leave')}
+          {transI18n('fcr_room_button_leave_confirm')}
         </AgoraButton>
       }
       onClick={handleExitRoom}
@@ -51,11 +50,13 @@ export const BtnWithCloseCheck = observer(
     onFold,
     foldBtn,
     unFoldBtn,
+    fullWidth = false,
   }: {
     onClick: () => void;
     onFold?: (fold: boolean) => void;
     foldBtn: JSX.Element;
     unFoldBtn: JSX.Element;
+    fullWidth?: boolean;
   }) => {
     const [fold, setFold] = useState(true);
     useEffect(() => {
@@ -70,7 +71,9 @@ export const BtnWithCloseCheck = observer(
     };
     return (
       <>
-        <div onClick={handleExitClick}>{fold ? foldBtn : unFoldBtn}</div>
+        <MainButtonContainer fullWidth fold onClick={handleExitClick}>
+          {fold ? foldBtn : unFoldBtn}
+        </MainButtonContainer>
 
         {!fold && (
           <CloseBtn
@@ -94,6 +97,10 @@ export const RoomOperation = observer(() => {
     </OperationContainer>
   );
 });
+
+const MainButtonContainer = styled.div<{ fullWidth: boolean; fold: boolean }>`
+  ${(props) => (props.fullWidth ? (props.fold ? 'flex: 1;' : '') : '')}
+`;
 
 const OperationContainer = styled.div`
   padding-right: 15px;

@@ -66,6 +66,7 @@ export const zh = {
   fcr_device_test_label_default: '默认',
   fcr_exam_prep_label_close_screen_share: '考试期间请勿关闭屏幕分享',
   fcr_alert_title: '提示',
+  fcr_room_button_leave_confirm: '确定',
 
   edu_error: {
     '600000': '房间资源未获取',
