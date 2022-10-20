@@ -71,7 +71,7 @@ export const BtnWithCloseCheck = observer(
     };
     return (
       <>
-        <MainButtonContainer fullWidth fold onClick={handleExitClick}>
+        <MainButtonContainer fullWidth={fullWidth} fold={fold} onClick={handleExitClick}>
           {fold ? foldBtn : unFoldBtn}
         </MainButtonContainer>
 

@@ -114,7 +114,9 @@ export const ProctorSider = observer(() => {
               </div>
             </div>
 
-            <div className="fcr_proctor_sider_info_proctor-actions-name">
+            <div
+              className="fcr_proctor_sider_info_proctor-actions-name"
+              title={EduClassroomConfig.shared.sessionInfo.userName}>
               {EduClassroomConfig.shared.sessionInfo.userName}
               <div>You can broadcast here</div>
             </div>

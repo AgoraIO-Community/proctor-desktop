@@ -71,6 +71,9 @@
   right: 0;
   margin: 0 auto;
 }
+.fcr_proctor_sider_info_proctor-actions > div > div {
+  width: 100%;
+}
 .fcr_proctor_sider_info_proctor-actions-video {
   width: 178px;
   height: 111px;
@@ -244,7 +247,6 @@
 
 .fcr_proctor_sider_info_proctor-actions-name {
   text-align: center;
-  padding-top: 30px;
   font-weight: 600;
   font-size: 16px;
   line-height: 19px;
@@ -252,6 +254,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  padding: 30px 10px 0;
 }
 .fcr_proctor_sider_info_proctor-actions-name > div {
   font-size: 12px;
