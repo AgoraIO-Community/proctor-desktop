@@ -110,6 +110,8 @@
   border-radius: 20px;
   padding: 8px;
   overflow: hidden;
+  width: 195px;
+  margin: 0 auto;
 }
 .fcr_proctor_sider_info_proctor-actions-video-container-placeholder {
   height: 130px;

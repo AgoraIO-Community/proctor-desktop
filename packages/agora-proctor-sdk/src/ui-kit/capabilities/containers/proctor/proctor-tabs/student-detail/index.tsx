@@ -184,6 +184,7 @@ export const StudentDetail = observer(({ userUuidPrefix }: { userUuidPrefix: str
             </div>
             <div className="fcr-student-detail-tab-live-bottom-suspicious-btns">
               <Select
+                getPopupContainer={(container) => container}
                 value={abnormal}
                 onChange={setAbnormal}
                 popupClassName={'fcr-student-detail-tab-live-bottom-suspicious-select-popup'}

@@ -91,10 +91,12 @@ export class PretestUIStore extends EduUIStoreBase {
         ({ oldValue, newValue }) => {
           if (oldValue === ClassroomState.Connecting && newValue === ClassroomState.Connected) {
             Logger.info(`newvalue ${newValue}, oldvalue ${oldValue}`);
-            const userUuid = EduClassroomConfig.shared.sessionInfo.userUuid;
-            this.classroomStore.userStore.updateUserProperties([
-              { userUuid, properties: { avatar: this.avatarUrl } },
-            ]);
+            if (this.avatarUrl) {
+              const userUuid = EduClassroomConfig.shared.sessionInfo.userUuid;
+              this.classroomStore.userStore.updateUserProperties([
+                { userUuid, properties: { avatar: this.avatarUrl } },
+              ]);
+            }
           }
         },
       ),

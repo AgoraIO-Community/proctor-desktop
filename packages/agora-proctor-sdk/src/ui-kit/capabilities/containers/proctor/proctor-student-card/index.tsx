@@ -290,6 +290,7 @@ export const StudentHLSVideos = observer(
           </div>
         </div>
         <div ref={screenContainerRef} className="fcr-student-card-videos-screen">
+          <Tag tagText={'Screen'}></Tag>
           <div className="fcr-track-player-fullscreen-cover">
             <SvgImg
               className={'fcr-track-player-fullscreen-btn'}
@@ -302,6 +303,7 @@ export const StudentHLSVideos = observer(
         </div>
 
         <div ref={mainCameraContainerRef} className="fcr-student-card-videos-camera">
+          <Tag tagText={'PC'}></Tag>
           <div className="fcr-track-player-fullscreen-cover fcr-track-player-fullscreen-cover-top">
             <SvgImg
               className={'fcr-track-player-fullscreen-btn'}
@@ -313,6 +315,7 @@ export const StudentHLSVideos = observer(
           </div>
         </div>
         <div ref={subCameraContainerRef} className="fcr-student-card-videos-mobile">
+          <Tag tagText={'Phone'}></Tag>
           <div className="fcr-track-player-fullscreen-cover fcr-track-player-fullscreen-cover-top">
             <SvgImg
               className={'fcr-track-player-fullscreen-btn'}
