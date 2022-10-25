@@ -34,7 +34,7 @@ export class MediaController {
         this.isPlaying = true;
       });
     } catch (e) {
-      this.pause();
+      await this.pause();
     }
   }
   @bound
