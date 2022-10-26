@@ -7,7 +7,6 @@ import {
   UserAbnormal as UserAbnormalType,
 } from '@/infra/stores/common/type';
 import { useStore } from '@/infra/hooks/ui-store';
-import { Slider } from 'antd';
 import {
   RemoteTrackPlayer,
   RemoteTrackPlayerWithFullScreen,
@@ -26,6 +25,7 @@ import { SvgIconEnum, SvgImg, transI18n } from '~ui-kit';
 import { DeviceTypeEnum } from '@/infra/api';
 import { MediaController } from './media-control';
 import { Tag } from '@/ui-kit/components/tag';
+import { AgoraSlider } from '@/ui-kit/components/slider';
 export const StudentCard = observer(
   ({ userUuidPrefix, renderVideos }: { userUuidPrefix: string; renderVideos: boolean }) => {
     const {
@@ -248,7 +248,7 @@ export const StudentHLSVideos = observer(
             : 'fcr-student-card-videos-loose'
         }`}>
         <div className="fcr-student-card-videos-progress">
-          <Slider
+          <AgoraSlider
             tooltip={{
               formatter: (val) => {
                 return dayjs.duration(val || 0, 's').format('mm:ss');
@@ -264,7 +264,7 @@ export const StudentHLSVideos = observer(
             }}
             value={currentTime}
             min={0}
-            max={mediaControllerRef.current?.totalDuration || 0}></Slider>
+            max={mediaControllerRef.current?.totalDuration || 0}></AgoraSlider>
           <div className="fcr-student-card-videos-progress-btns">
             {mediaControllerRef.current?.isPlaying ? (
               <SvgImg

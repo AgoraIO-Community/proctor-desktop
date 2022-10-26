@@ -1,5 +1,4 @@
 import { StudentCard } from '../../proctor-student-card';
-import { Carousel } from 'antd';
 import './index.css';
 import { useRef, useEffect, useState } from 'react';
 import { debounce } from 'lodash';
@@ -8,6 +7,7 @@ import { observer } from 'mobx-react';
 import { useStore } from '@/infra/hooks/ui-store';
 import { VideosWallLayoutEnum } from '@/infra/stores/common/type';
 import { SvgIconEnum, SvgImg } from '~ui-kit';
+import { AgoraCarousel } from '@/ui-kit/components/carousel';
 
 export const AllVideos = observer(() => {
   const {
@@ -66,7 +66,7 @@ export const AllVideos = observer(() => {
             </div>
           )}
           <div className="fcr-all-videos-tab-page" onWheel={onWheel}>
-            <Carousel
+            <AgoraCarousel
               initialSlide={0}
               dots={false}
               ref={carouselRef}
@@ -95,7 +95,7 @@ export const AllVideos = observer(() => {
                   </div>,
                 );
               }, [] as JSX.Element[])}
-            </Carousel>
+            </AgoraCarousel>
           </div>
         </>
       ) : (

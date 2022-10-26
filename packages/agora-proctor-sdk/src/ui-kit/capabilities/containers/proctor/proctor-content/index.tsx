@@ -1,7 +1,7 @@
 import { useStore } from '@/infra/hooks/ui-store';
 import { StudentFilterTag, VideosWallLayoutEnum } from '@/infra/stores/common/type';
 import { ClassState, LeaveReason } from 'agora-edu-core';
-import { Button, Popover, Segmented, Tabs } from 'antd';
+import { Button } from 'antd';
 import { observer } from 'mobx-react';
 import { useState } from 'react';
 import { SvgIconEnum, SvgImg, transI18n } from '~ui-kit';
@@ -9,6 +9,10 @@ import { AllVideos } from '../proctor-tabs/all-videos';
 import { StudentDetail } from '../proctor-tabs/student-detail';
 import { UserAbnormal, UserAvatar } from '../proctor-student-card';
 import './index.css';
+import { AgoraTabs } from '@/ui-kit/components/tabs';
+import { AgoraSegmented } from '@/ui-kit/components/segmented';
+import { AgoraPopover } from '@/ui-kit/components/popover';
+
 export const ProctorContent = observer(() => {
   const {
     layoutUIStore: { studentTabItems, currentTab, setCurrentTab, removeStudentTab },
@@ -16,7 +20,7 @@ export const ProctorContent = observer(() => {
   } = useStore();
   return (
     <div className="fcr-proctor-content">
-      <Tabs
+      <AgoraTabs
         activeKey={currentTab}
         onChange={(activeKey) => {
           setCurrentTab(activeKey);
@@ -32,7 +36,7 @@ export const ProctorContent = observer(() => {
         }}
         tabBarExtraContent={
           currentTab === 'ALL_VIDEOS' && (
-            <Segmented
+            <AgoraSegmented
               className="fcr-proctor-content-layout-segmented"
               onChange={(val) => {
                 setVideosWallLayout(VideosWallLayoutEnum[val]);
@@ -46,7 +50,7 @@ export const ProctorContent = observer(() => {
                   label: <SvgImg type={SvgIconEnum.LAYOUT_LOOSE} size={36}></SvgImg>,
                   value: 'Loose',
                 },
-              ]}></Segmented>
+              ]}></AgoraSegmented>
           )
         }
         items={[
@@ -74,10 +78,10 @@ export const ProctorContent = observer(() => {
               children: <StudentDetail userUuidPrefix={s.key} />,
             };
           }),
-        ]}></Tabs>
+        ]}></AgoraTabs>
       <div className="fcr-proctor-content-footer">
         <div className="fcr-proctor-content-footer-segmented">
-          <Segmented
+          <AgoraSegmented
             className="fcr-proctor-content-tag-segmented"
             onChange={(val) => setFilterTag(val as StudentFilterTag)}
             options={[
@@ -108,7 +112,7 @@ export const ProctorContent = observer(() => {
                 ),
                 value: StudentFilterTag.Focus,
               },
-            ]}></Segmented>
+            ]}></AgoraSegmented>
         </div>
         <div className="fcr-proctor-content-footer-leave">
           <LeaveBtnGroup></LeaveBtnGroup>
@@ -135,7 +139,7 @@ const LeaveBtnGroup = () => {
   return (
     <div className="fcr-proctor-content-footer-leave-btn-group">
       <div>
-        <Popover
+        <AgoraPopover
           open={showButtonPopover}
           placement="topRight"
           overlayClassName="fcr-proctor-content-footer-leave-btn-group-popover"
@@ -164,7 +168,7 @@ const LeaveBtnGroup = () => {
               <SvgImg type={SvgIconEnum.QUIT} /> <span>{transI18n('fcr_room_button_leave')}</span>
             </Button>
           )}
-        </Popover>
+        </AgoraPopover>
       </div>
     </div>
   );

@@ -1,8 +1,9 @@
 import { useStore } from '@/infra/hooks/ui-store';
 import { AgoraButton } from '@/ui-kit/components/button';
+import { AgoraSwitch } from '@/ui-kit/components/switch';
 import { ClassState, DEVICE_DISABLE, EduClassroomConfig } from 'agora-edu-core';
 import { AgoraRteMediaPublishState, AgoraRteMediaSourceState } from 'agora-rte-sdk';
-import { Button, Switch } from 'antd';
+import { Button } from 'antd';
 import { observer } from 'mobx-react';
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { SvgIconEnum, SvgImg, transI18n } from '~ui-kit';
@@ -237,14 +238,14 @@ const BroadCastButtonGroup = ({ isBroadCasting }: { isBroadCasting: boolean }) =
                 <span>{transI18n('fcr_exam_prep_label_camera')}</span>
               </div>
 
-              <Switch
+              <AgoraSwitch
                 checked={cameraOpen}
                 checkedChildren={transI18n('fcr_device_test_label_enable')}
                 unCheckedChildren={transI18n('fcr_device_test_label_disable')}
                 size="small"
                 onChange={(checked) => {
                   setCameraOpen(checked);
-                }}></Switch>
+                }}></AgoraSwitch>
             </div>
             <div>
               <div>
@@ -256,14 +257,14 @@ const BroadCastButtonGroup = ({ isBroadCasting }: { isBroadCasting: boolean }) =
                 <span>{transI18n('fcr_exam_prep_label_microphone')}</span>
               </div>
 
-              <Switch
+              <AgoraSwitch
                 checked={micOpen}
                 checkedChildren={transI18n('fcr_device_test_label_enable')}
                 unCheckedChildren={transI18n('fcr_device_test_label_disable')}
                 size="small"
                 onChange={(checked) => {
                   setMicOpen(checked);
-                }}></Switch>
+                }}></AgoraSwitch>
             </div>
           </div>
         </div>
