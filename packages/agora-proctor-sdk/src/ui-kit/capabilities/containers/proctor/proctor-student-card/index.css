@@ -88,6 +88,7 @@
   justify-content: flex-start;
   align-items: center;
   margin-top: 15px;
+  padding-left: 25px;
 }
 .fcr-student-card-videos-progress-btns > div {
   color: #fff;
