@@ -142,7 +142,7 @@ export const StudentDetail = observer(({ userUuidPrefix }: { userUuidPrefix: str
     );
   });
   const onUserEventClick = (ts: number) => {
-    studentHlsVideosRef.current?.seek(dayjs.duration(Math.abs(ts - startTime), 'ms').get('s'));
+    studentHlsVideosRef.current?.seek(dayjs.duration(Math.abs(ts - startTime), 'ms').asSeconds());
   };
   return (
     <div className="fcr-student-detail-tab">
@@ -264,7 +264,7 @@ export const UserEventsList = observer(
                 </div>
                 <div className="fcr-student-detail-tab-replay-bottom-list-item-info">
                   <div className="fcr-student-detail-tab-replay-bottom-list-item-type">
-                    {dayjs.duration(Math.abs(e.ts - startTime), 'ms').format('mm:ss')}{' '}
+                    {dayjs.duration(Math.abs(e.ts - startTime), 'ms').format('HH:mm:ss')}{' '}
                     {e.data?.abnormal?.reason}
                   </div>
                   <div className="fcr-student-detail-tab-replay-bottom-list-item-desc">

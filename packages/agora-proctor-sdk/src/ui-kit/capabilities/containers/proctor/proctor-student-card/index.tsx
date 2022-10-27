@@ -251,7 +251,7 @@ export const StudentHLSVideos = observer(
           <AgoraSlider
             tooltip={{
               formatter: (val) => {
-                return dayjs.duration(val || 0, 's').format('mm:ss');
+                return dayjs.duration(val || 0, 's').format('HH:mm:ss');
               },
             }}
             onAfterChange={(val) => {
@@ -284,8 +284,11 @@ export const StudentHLSVideos = observer(
                 }}></SvgImg>
             )}
             <div>
-              {dayjs.duration(mediaControllerRef.current?.currentTime || 0, 's').format('mm:ss')}/
-              {dayjs.duration(mediaControllerRef.current?.totalDuration || 0, 's').format('mm:ss')}
+              {dayjs.duration(mediaControllerRef.current?.currentTime || 0, 's').format('HH:mm:ss')}
+              /
+              {dayjs
+                .duration(mediaControllerRef.current?.totalDuration || 0, 's')
+                .format('HH:mm:ss')}
             </div>
           </div>
         </div>
