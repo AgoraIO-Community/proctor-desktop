@@ -376,7 +376,7 @@ export class RoomUIStore extends EduUIStoreBase {
                 newValue.screenShareState === AgoraRteMediaSourceState.error) &&
               role === EduRoleTypeEnum.student
             ) {
-              this.classroomStore.connectionStore.leaveClassroomUntil(
+              this.classroomStore.connectionStore.leaveClassroom(
                 LeaveReason.leave,
                 new Promise((resolve) => {
                   this.shareUIStore.addConfirmDialog(

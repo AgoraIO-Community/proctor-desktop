@@ -126,7 +126,7 @@ const LeaveBtnGroup = () => {
   const {
     classroomStore: {
       roomStore: { updateClassState },
-      connectionStore: { leaveClassroomUntil },
+      connectionStore: { leaveClassroom },
     },
   } = useStore();
   const endExam = async () => {
@@ -134,7 +134,7 @@ const LeaveBtnGroup = () => {
   };
   const [showButtonPopover, setShowButtonPopover] = useState(false);
   const leave = () => {
-    leaveClassroomUntil(LeaveReason.leave, Promise.resolve());
+    leaveClassroom(LeaveReason.leave, Promise.resolve());
   };
   return (
     <div className="fcr-proctor-content-footer-leave-btn-group">
