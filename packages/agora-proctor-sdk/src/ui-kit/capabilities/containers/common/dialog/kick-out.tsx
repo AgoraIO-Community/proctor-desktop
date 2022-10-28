@@ -28,7 +28,7 @@ export const KickOut: React.FC<BaseDialogProps & { onOk: (ban: boolean) => void 
             {transI18n('toast.cancel')}
           </Button>,
           <Button key="ok" type={'primary'} action="ok">
-            {transI18n('toast.confirm')}
+            {transI18n('fcr_room_button_leave_confirm')}
           </Button>,
         ]}>
         <div className="radio-container">

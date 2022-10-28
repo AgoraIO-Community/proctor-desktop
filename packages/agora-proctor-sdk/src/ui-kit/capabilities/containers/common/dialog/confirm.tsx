@@ -22,7 +22,7 @@ export const Confirm: React.FC<
       case 'ok':
         return (
           <Button type={'primary'} action="ok">
-            {opts?.btnText?.ok || t('toast.confirm')}
+            {opts?.btnText?.ok || t('fcr_room_button_leave_confirm')}
           </Button>
         );
       case 'cancel':
@@ -40,8 +40,8 @@ export const Confirm: React.FC<
       id={id}
       style={{ width: 300 }}
       title={title}
-      onOk={opts && opts.onOk ? opts.onOk : () => { }}
-      onCancel={opts && opts.onCancel ? opts.onCancel : () => { }}
+      onOk={opts && opts.onOk ? opts.onOk : () => {}}
+      onCancel={opts && opts.onCancel ? opts.onCancel : () => {}}
       footer={footer}>
       <p>{content}</p>
     </Modal>

@@ -1,4 +1,4 @@
-import { EduRoleTypeEnum } from "agora-edu-core";
+import { EduRoleTypeEnum } from 'agora-edu-core';
 /**
  * 视频流占位符类型
  */
@@ -6,40 +6,40 @@ export enum CameraPlaceholderType {
   /**
    * 摄像头打开
    */
-  none = "none",
+  none = 'none',
   /**
    * 设备正在打开
    */
-  loading = "loading",
+  loading = 'loading',
   /**
    * 摄像头关闭
    */
-  muted = "muted",
+  muted = 'muted',
   /**
    * 摄像头损坏
    */
-  broken = "broken",
+  broken = 'broken',
   /**
    * 摄像头禁用
    */
-  disabled = "disabled",
+  disabled = 'disabled',
   /**
    * 老师不在教室
    */
-  notpresent = "notpresent",
+  notpresent = 'notpresent',
   /**
    * 老师摄像头占位符（大小窗场景）
    */
-  nosetup = "nosetup",
+  nosetup = 'nosetup',
 }
 
 export enum DeviceStateChangedReason {
-  cameraFailed = "pretest.device_not_working",
-  micFailed = "pretest.device_not_working",
-  newDeviceDetected = "new_device_detected",
-  cameraUnplugged = "pretest.camera_move_out",
-  micUnplugged = "pretest.mic_move_out",
-  playbackUnplugged = "pretest.playback_move_out",
+  cameraFailed = 'pretest.device_not_working',
+  micFailed = 'pretest.device_not_working',
+  newDeviceDetected = 'new_device_detected',
+  cameraUnplugged = 'pretest.camera_move_out',
+  micUnplugged = 'pretest.mic_move_out',
+  playbackUnplugged = 'pretest.playback_move_out',
 }
 
 export interface WidgetTrackStruct {
@@ -83,11 +83,11 @@ export enum FetchUserType {
   /**
    * 筛选全部的用户
    */
-  all = "0",
+  all = '0',
   /**
    * 筛选禁言的用户
    */
-  mute = "1",
+  mute = '1',
 }
 
 /**
@@ -117,15 +117,15 @@ export interface FetchUserParam {
 }
 
 export enum OrientationEnum {
-  portrait = "portrait",
-  landscape = "landscape",
+  portrait = 'portrait',
+  landscape = 'landscape',
 }
 
-export type ConfirmDialogAction = "ok" | "cancel";
+export type ConfirmDialogAction = 'ok' | 'cancel';
 
 export enum ScreenShareRoleType {
-  Teacher = "teacher",
-  Student = "student",
+  Teacher = 'teacher',
+  Student = 'student',
 }
 
 export interface CabinetItem {
@@ -140,9 +140,9 @@ export enum VideosWallLayoutEnum {
 }
 
 export enum StudentFilterTag {
-  All = "all",
-  Focus = "focus",
-  Abnormal = "abnormal",
+  All = 'all',
+  Focus = 'focus',
+  Abnormal = 'abnormal',
 }
 export interface UserEvents<T> {
   cmd: number;
@@ -153,6 +153,18 @@ export interface UserEvents<T> {
   version: number;
 }
 export interface UserAbnormal {
-  reason: string;
-  type: "warning" | "normal";
+  reason: UserAbnormalReason;
+  type: UserAbnormalType;
+}
+export enum UserAbnormalReason {
+  ID_Verification = 'ID_Verification',
+  Multiple_People = 'Multiple_People',
+  Electronic_Devices = 'Electronic_Devices',
+  Paperworks = 'Paperworks',
+  Screen_Disconnected = 'Screen_Disconnected',
+}
+export enum UserAbnormalType {
+  Ai = 'Ai',
+  Manual = 'Manual',
+  Screen_Disconnected = 'Screen_Disconnected',
 }

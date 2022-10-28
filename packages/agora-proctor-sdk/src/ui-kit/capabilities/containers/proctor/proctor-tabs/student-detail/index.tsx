@@ -1,6 +1,8 @@
 import { useStore } from '@/infra/hooks/ui-store';
 import {
-  UserAbnormal as UserAbnormalType,
+  UserAbnormal as IUserAbnormal,
+  UserAbnormalReason,
+  UserAbnormalType,
   UserEvents,
   VideosWallLayoutEnum,
 } from '@/infra/stores/common/type';
@@ -49,7 +51,7 @@ export const StudentDetail = observer(({ userUuidPrefix }: { userUuidPrefix: str
 
   const [userEvents, setUserEvents] = useState<
     UserEvents<{
-      abnormal: UserAbnormalType;
+      abnormal: IUserAbnormal;
     }>[]
   >([]);
   const [abnormal, setAbnormal] = useState(undefined);
@@ -76,7 +78,7 @@ export const StudentDetail = observer(({ userUuidPrefix }: { userUuidPrefix: str
     setUserEvents(
       (
         res.list as UserEvents<{
-          abnormal: UserAbnormalType;
+          abnormal: IUserAbnormal;
         }>[]
       ).sort((a, b) => b.sequence - a.sequence),
     );
@@ -93,10 +95,7 @@ export const StudentDetail = observer(({ userUuidPrefix }: { userUuidPrefix: str
   const submitAbnormal = useCallback(async () => {
     await updateUserTags(
       'abnormal',
-      {
-        type: 'warining',
-        reason: abnormal,
-      },
+      UserAbnormals.find((i) => i.reason === abnormal),
       EduClassroomConfig.shared.sessionInfo.roomUuid,
       mainDeviceUserUuid,
     );
@@ -144,6 +143,7 @@ export const StudentDetail = observer(({ userUuidPrefix }: { userUuidPrefix: str
   const onUserEventClick = (ts: number) => {
     studentHlsVideosRef.current?.seek(dayjs.duration(Math.abs(ts - startTime), 'ms').asSeconds());
   };
+  const { userAbnormalsI18nMap } = useUserAbnormalsI18n();
   return (
     <div className="fcr-student-detail-tab">
       <div className="fcr-student-detail-tab-replay">
@@ -192,10 +192,13 @@ export const StudentDetail = observer(({ userUuidPrefix }: { userUuidPrefix: str
                 size="large"
                 placeholder={transI18n('fcr_sub_room_option_report_behavior_default')}
                 suffixIcon={<SvgImg type={SvgIconEnum.DROPDOWN}></SvgImg>}>
-                <Select.Option value={'ID Verification'}>ID Verification</Select.Option>
-                <Select.Option value={'Mutiple People'}>Mutiple People</Select.Option>
-                <Select.Option value={'Electronic Content'}>Electronic Content</Select.Option>
-                <Select.Option value={'Paperworks'}>Paperworks</Select.Option>
+                {UserAbnormals.map((i) => {
+                  return (
+                    <Select.Option key={i.reason} value={i.reason}>
+                      {userAbnormalsI18nMap[i.reason]}
+                    </Select.Option>
+                  );
+                })}
               </Select>
               <Button
                 onClick={submitAbnormal}
@@ -229,6 +232,36 @@ export const Alarm = () => {
     </div>
   );
 };
+const useUserAbnormalsI18n = () => {
+  const userAbnormalsI18nMap = useMemo(
+    () => ({
+      [UserAbnormalReason.Electronic_Devices]: transI18n(
+        'fcr_sub_room_option_report_electronic_devices',
+      ),
+      [UserAbnormalReason.ID_Verification]: transI18n('fcr_sub_room_option_report_ID_verification'),
+      [UserAbnormalReason.Multiple_People]: transI18n('fcr_sub_room_option_report_multiple_people'),
+      [UserAbnormalReason.Paperworks]: transI18n('fcr_sub_room_option_report_paperworks'),
+    }),
+    [],
+  );
+  const userAbnormalTypeI18nMap = useMemo(
+    () => ({
+      [UserAbnormalType.Ai]: transI18n('fcr_sub_room_label_AI_description'),
+      [UserAbnormalType.Manual]: transI18n('fcr_sub_room_label_Human_description'),
+      [UserAbnormalType.Screen_Disconnected]: transI18n('fcr_sub_room_label_web_disconnected'),
+    }),
+    [],
+  );
+  return { userAbnormalsI18nMap, userAbnormalTypeI18nMap };
+};
+
+const UserAbnormals: IUserAbnormal[] = [
+  { reason: UserAbnormalReason.Electronic_Devices, type: UserAbnormalType.Manual },
+  { reason: UserAbnormalReason.ID_Verification, type: UserAbnormalType.Manual },
+  { reason: UserAbnormalReason.Multiple_People, type: UserAbnormalType.Manual },
+  { reason: UserAbnormalReason.Paperworks, type: UserAbnormalType.Manual },
+];
+
 export const UserEventsList = observer(
   ({
     userEvents,
@@ -237,10 +270,11 @@ export const UserEventsList = observer(
   }: {
     startTime: number;
     userEvents: UserEvents<{
-      abnormal: UserAbnormalType;
+      abnormal: IUserAbnormal;
     }>[];
     onEventClick: (timestamp: number) => void;
   }) => {
+    const { userAbnormalsI18nMap, userAbnormalTypeI18nMap } = useUserAbnormalsI18n();
     const [currentEvent, setCurrentEvent] = useState(-1);
     return (
       <div className="fcr-student-detail-tab-replay-bottom-list">
@@ -265,10 +299,10 @@ export const UserEventsList = observer(
                 <div className="fcr-student-detail-tab-replay-bottom-list-item-info">
                   <div className="fcr-student-detail-tab-replay-bottom-list-item-type">
                     {dayjs.duration(Math.abs(e.ts - startTime), 'ms').format('HH:mm:ss')}{' '}
-                    {e.data?.abnormal?.reason}
+                    {userAbnormalsI18nMap[e.data?.abnormal?.reason]}
                   </div>
                   <div className="fcr-student-detail-tab-replay-bottom-list-item-desc">
-                    Description From AI
+                    {userAbnormalTypeI18nMap[e.data?.abnormal?.type]}
                   </div>
                 </div>
               </div>

@@ -153,7 +153,7 @@ export class EduShareUIStore {
       id,
       title,
       content: message,
-      okBtnText: okBtnText ?? transI18n('toast.confirm'),
+      okBtnText: okBtnText ?? transI18n('fcr_room_button_leave_confirm'),
       onOK: () => {
         onOK && onOK();
         this.removeDialog(id);

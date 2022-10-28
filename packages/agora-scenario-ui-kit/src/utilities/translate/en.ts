@@ -68,7 +68,13 @@ export const en = {
   fcr_exam_prep_label_close_screen_share: 'Don‘t turn off screen share during the exam',
   fcr_alert_title: 'Prompt',
   fcr_room_button_leave_confirm: 'Confirm',
-
+  fcr_sub_room_option_report_ID_verification: 'ID Verification',
+  fcr_sub_room_option_report_multiple_people: 'Multiple People',
+  fcr_sub_room_option_report_electronic_devices: 'Electronic Devices',
+  fcr_sub_room_option_report_paperworks: 'Paperworks',
+  fcr_sub_room_label_AI_description: 'Description from AI',
+  fcr_sub_room_label_Human_description: 'Description from human being',
+  fcr_sub_room_label_web_disconnected: 'Web disconnected',
   edu_error: {
     '600000': 'Failed to join the classroom',
     '600001': 'Failed to join the classroom',

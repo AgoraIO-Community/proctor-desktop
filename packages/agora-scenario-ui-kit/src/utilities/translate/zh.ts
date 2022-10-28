@@ -68,6 +68,14 @@ export const zh = {
   fcr_alert_title: '提示',
   fcr_room_button_leave_confirm: '确定',
 
+  fcr_sub_room_option_report_ID_verification: '身份验证',
+  fcr_sub_room_option_report_multiple_people: '多人入镜',
+  fcr_sub_room_option_report_electronic_devices: '使用电子设备',
+  fcr_sub_room_option_report_paperworks: '小抄',
+  fcr_sub_room_label_AI_description: 'AI消息',
+  fcr_sub_room_label_Human_description: '人工消息',
+  fcr_sub_room_label_web_disconnected: '断网',
+
   edu_error: {
     '600000': '房间资源未获取',
     '600001': '加入房间失败',
