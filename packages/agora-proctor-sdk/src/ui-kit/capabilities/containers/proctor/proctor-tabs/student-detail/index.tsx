@@ -132,7 +132,7 @@ export const StudentDetail = observer(({ userUuidPrefix }: { userUuidPrefix: str
     recordList.length - 1 < 0 ? 0 : recordList.length - 1
   ]?.recordDetails?.find((i) => {
     return (
-      i.type === 'av' &&
+      i.type === 'video' &&
       Array.from(roomScene?.streamController?.streamByUserUuid.get(subDeviceUserUuid) || []).find(
         (i) =>
           roomScene?.streamController?.streamByStreamUuid.get(i)?.videoSourceType ===
