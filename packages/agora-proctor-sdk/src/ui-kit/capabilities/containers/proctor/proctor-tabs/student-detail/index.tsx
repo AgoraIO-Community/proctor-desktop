@@ -58,6 +58,7 @@ export const StudentDetail = observer(({ userUuidPrefix }: { userUuidPrefix: str
   const [startTime, setStartTime] = useState(0);
   const [recordList, setRecordList] = useState<
     {
+      startTime: number;
       recordDetails: {
         streamUuid: string;
         type: 'audio' | 'video' | 'av';
@@ -102,23 +103,19 @@ export const StudentDetail = observer(({ userUuidPrefix }: { userUuidPrefix: str
     queryUserAbnormal();
   }, [abnormal]);
 
-  const mainDeviceScreenVideo = recordList[
-    recordList.length - 1 < 0 ? 0 : recordList.length - 1
-  ]?.recordDetails?.find((i) => {
+  const currentRecord = useMemo(() => {
+    return recordList[recordList.length - 1 < 0 ? 0 : recordList.length - 1];
+  }, [recordList]);
+
+  const mainDeviceScreenVideo = currentRecord?.recordDetails?.find((i) => {
     return (
       i.type === 'video' &&
       roomScene?.streamController?.streamByStreamUuid.get(i.streamUuid)?.videoSourceType ===
         AgoraRteVideoSourceType.ScreenShare
     );
   });
-  useEffect(() => {
-    if (mainDeviceScreenVideo && mainDeviceScreenVideo.startTime !== startTime) {
-      setStartTime(mainDeviceScreenVideo.startTime);
-    }
-  }, [mainDeviceScreenVideo, startTime]);
-  const mainDeviceCameraVideo = recordList[
-    recordList.length - 1 < 0 ? 0 : recordList.length - 1
-  ]?.recordDetails?.find((i) => {
+
+  const mainDeviceCameraVideo = currentRecord?.recordDetails?.find((i) => {
     return (
       i.type === 'av' &&
       Array.from(roomScene?.streamController?.streamByUserUuid.get(mainDeviceUserUuid) || []).find(
@@ -128,9 +125,7 @@ export const StudentDetail = observer(({ userUuidPrefix }: { userUuidPrefix: str
       ) === i.streamUuid
     );
   });
-  const subDeviceCameraVideo = recordList[
-    recordList.length - 1 < 0 ? 0 : recordList.length - 1
-  ]?.recordDetails?.find((i) => {
+  const subDeviceCameraVideo = currentRecord?.recordDetails?.find((i) => {
     return (
       i.type === 'video' &&
       Array.from(roomScene?.streamController?.streamByUserUuid.get(subDeviceUserUuid) || []).find(
@@ -140,6 +135,11 @@ export const StudentDetail = observer(({ userUuidPrefix }: { userUuidPrefix: str
       ) === i.streamUuid
     );
   });
+  useEffect(() => {
+    if (currentRecord && currentRecord.startTime !== startTime) {
+      setStartTime(currentRecord.startTime);
+    }
+  }, [currentRecord, startTime]);
   const onUserEventClick = (ts: number) => {
     studentHlsVideosRef.current?.seek(dayjs.duration(Math.abs(ts - startTime), 'ms').asSeconds());
   };
@@ -241,6 +241,7 @@ const useUserAbnormalsI18n = () => {
       [UserAbnormalReason.ID_Verification]: transI18n('fcr_sub_room_option_report_ID_verification'),
       [UserAbnormalReason.Multiple_People]: transI18n('fcr_sub_room_option_report_multiple_people'),
       [UserAbnormalReason.Paperworks]: transI18n('fcr_sub_room_option_report_paperworks'),
+      [UserAbnormalType.Screen_Disconnected]: transI18n('fcr_sub_room_label_web_disconnected'),
     }),
     [],
   );
@@ -298,7 +299,9 @@ export const UserEventsList = observer(
                 </div>
                 <div className="fcr-student-detail-tab-replay-bottom-list-item-info">
                   <div className="fcr-student-detail-tab-replay-bottom-list-item-type">
-                    {dayjs.duration(Math.abs(e.ts - startTime), 'ms').format('HH:mm:ss')}{' '}
+                    {dayjs
+                      .duration(startTime === 0 ? 0 : Math.abs(e.ts - startTime), 'ms')
+                      .format('HH:mm:ss')}{' '}
                     {userAbnormalsI18nMap[e.data?.abnormal?.reason]}
                   </div>
                   <div className="fcr-student-detail-tab-replay-bottom-list-item-desc">

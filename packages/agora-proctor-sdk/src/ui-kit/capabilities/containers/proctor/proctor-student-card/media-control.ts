@@ -1,14 +1,21 @@
-import { bound, MediaPlayerEvents, StreamMediaPlayer } from 'agora-rte-sdk';
+import { bound, Injectable, Log, MediaPlayerEvents, StreamMediaPlayer } from 'agora-rte-sdk';
 import { action, observable, runInAction } from 'mobx';
 
+export enum MediaDeviceType {
+  MainScreen = 'MainScreen',
+  MainCamera = 'MainCamera',
+  SubCamera = 'SubCamera',
+}
+interface MediaInstance {
+  plyr: StreamMediaPlayer;
+  container?: HTMLElement;
+  url: string;
+}
+@Log.attach({ proxyMethods: false })
 export class MediaController {
-  mainDeviceScreenVideoPlyr?: StreamMediaPlayer;
-  mainDeviceCameraVideoPlyr?: StreamMediaPlayer;
-  subDeviceCameraVideoPlyr?: StreamMediaPlayer;
+  logger!: Injectable.Logger;
 
-  mainDeviceScreenVideoContainer?: HTMLElement;
-  mainDeviceCameraVideoContainer?: HTMLElement;
-  subDeviceCameraVideoContainer?: HTMLElement;
+  mediaPlyrMap: Map<MediaDeviceType, MediaInstance> = new Map();
 
   @observable totalDuration: number = 0;
   @observable currentTime: number = 0;
@@ -17,134 +24,121 @@ export class MediaController {
   private _lastReloadTime: number = 0;
   private _reloadTimer: number = -1;
 
-  constructor(
-    private _mainDeviceScreenVideoUrl?: string,
-    private _mainDeviceCameraVideoUrl?: string,
-    private _subDeviceCameraVideoUrl?: string,
-  ) {}
-  @bound
-  async play() {
-    try {
-      await Promise.all([
-        this.mainDeviceScreenVideoPlyr?.mediaElement?.play(),
-        this.mainDeviceCameraVideoPlyr?.mediaElement?.play(),
-        this.subDeviceCameraVideoPlyr?.mediaElement?.play(),
-      ]);
-      runInAction(() => {
-        this.isPlaying = true;
-      });
-    } catch (e) {
-      await this.pause();
-    }
+  get mainScreenPlyr() {
+    return this.mediaPlyrMap.get(MediaDeviceType.MainScreen)?.plyr;
   }
-  @bound
-  async pause() {
-    try {
-      await Promise.all([
-        this.mainDeviceScreenVideoPlyr?.mediaElement?.pause(),
-        this.mainDeviceCameraVideoPlyr?.mediaElement?.pause(),
-        this.subDeviceCameraVideoPlyr?.mediaElement?.pause(),
-      ]);
-      runInAction(() => {
-        this.isPlaying = false;
-      });
-    } catch (e) {}
-  }
-  setMainDeviceScreenVideoUrl(url: string) {
-    this._mainDeviceScreenVideoUrl = url;
-    this.mainDeviceScreenVideoPlyr = new StreamMediaPlayer(this._mainDeviceScreenVideoUrl);
-  }
-  setMainDeviceCameraVideoUrl(url: string) {
-    this._mainDeviceCameraVideoUrl = url;
-    this.mainDeviceCameraVideoPlyr = new StreamMediaPlayer(this._mainDeviceCameraVideoUrl);
-  }
-  setSubDeviceCameraVideoUrl(url: string) {
-    this._subDeviceCameraVideoUrl = url;
-    this.subDeviceCameraVideoPlyr = new StreamMediaPlayer(this._subDeviceCameraVideoUrl);
-  }
-  setMainDeviceScreenView(dom: HTMLElement) {
-    if (this.mainDeviceScreenVideoPlyr) {
-      this.mainDeviceScreenVideoContainer = dom;
-      this.mainDeviceScreenVideoPlyr.setView(this.mainDeviceScreenVideoContainer);
-      this.mainDeviceScreenVideoPlyr.play(true, true);
-      this.addMediaElementListeners();
 
-      this.syncPlyrCurrentTime(this.currentTime);
-    }
-  }
-  setMainDeviceCameraView(dom: HTMLElement) {
-    if (this.mainDeviceCameraVideoPlyr) {
-      this.mainDeviceCameraVideoContainer = dom;
-      this.mainDeviceCameraVideoPlyr.setView(this.mainDeviceCameraVideoContainer);
-      this.mainDeviceCameraVideoPlyr.play(true, true);
-      this.mainDeviceCameraVideoPlyr?.mediaElement?.addEventListener('play', this.play);
-      this.mainDeviceCameraVideoPlyr?.mediaElement?.addEventListener('pause', this.pause);
-    }
-  }
-  setSubDeviceCameraView(dom: HTMLElement) {
-    if (this.subDeviceCameraVideoPlyr) {
-      this.subDeviceCameraVideoContainer = dom;
-      this.subDeviceCameraVideoPlyr.setView(this.subDeviceCameraVideoContainer);
-      this.subDeviceCameraVideoPlyr.play(true, true);
-      this.subDeviceCameraVideoPlyr?.mediaElement?.addEventListener('play', this.play);
-      this.subDeviceCameraVideoPlyr?.mediaElement?.addEventListener('pause', this.pause);
-    }
-  }
-  syncPlyrCurrentTime(time: number) {
-    if (this.mainDeviceScreenVideoPlyr?.mediaElement)
-      this.mainDeviceScreenVideoPlyr.mediaElement.currentTime = time;
-    if (this.mainDeviceCameraVideoPlyr?.mediaElement)
-      this.mainDeviceCameraVideoPlyr.mediaElement.currentTime = time;
-    if (this.subDeviceCameraVideoPlyr?.mediaElement)
-      this.subDeviceCameraVideoPlyr.mediaElement.currentTime = time;
+  @action.bound
+  play() {
+    this.logger.info('call MediaController play');
+    this.mediaPlyrMap.forEach((p) => {
+      p.plyr.mediaElement?.play();
+    });
+    this.isPlaying = true;
   }
   @action.bound
+  pause() {
+    this.logger.info('call MediaController pause');
+
+    this.mediaPlyrMap.forEach((p) => {
+      p.plyr.mediaElement?.pause();
+    });
+    this.isPlaying = false;
+  }
+  setVideoUrl(type: MediaDeviceType, url: string, forceReload?: boolean) {
+    this.logger.info(`setVideoUrl,type: ${type}, url: ${url}`);
+
+    if (forceReload || !this.mediaPlyrMap.get(type)) {
+      this.mediaPlyrMap.set(type, {
+        url,
+        plyr: new StreamMediaPlayer(url),
+      });
+    }
+  }
+
+  setView(type: MediaDeviceType, dom: HTMLElement) {
+    const mediaPlyr = this.mediaPlyrMap.get(type);
+    if (mediaPlyr) {
+      mediaPlyr.plyr.setView(dom);
+      mediaPlyr.plyr.play(true, true);
+      this.mediaPlyrMap.set(type, { ...mediaPlyr, container: dom });
+      if (type === MediaDeviceType.MainScreen) {
+        this.addMediaElementListeners();
+      } else {
+        mediaPlyr.plyr.mediaElement?.addEventListener('fullscreenchange', () => {
+          if (document.fullscreenElement) {
+            mediaPlyr.plyr.mediaElement?.addEventListener('play', this.play);
+            mediaPlyr.plyr.mediaElement?.addEventListener('pause', this.pause);
+            this.logger.info(`Element: ${document.fullscreenElement.id} entered fullscreen mode.`);
+          } else {
+            mediaPlyr.plyr.mediaElement?.removeEventListener('play', this.play);
+            mediaPlyr.plyr.mediaElement?.removeEventListener('pause', this.pause);
+            this.logger.info('Leaving fullscreen mode.');
+          }
+        });
+        mediaPlyr.plyr.mediaElement?.addEventListener(
+          'canplay',
+          () => {
+            if (this.currentTime && mediaPlyr.plyr.mediaElement)
+              mediaPlyr.plyr.mediaElement.currentTime = this.currentTime;
+          },
+          { once: true },
+        );
+      }
+    }
+  }
+
+  syncPlyrCurrentTime(time: number) {
+    this.logger.info(`syncPlyrCurrentTime: ${time}`);
+    this.mediaPlyrMap.forEach((p) => {
+      if (p.plyr.mediaElement) {
+        p.plyr.mediaElement.currentTime = time;
+      }
+    });
+  }
+
+  @action.bound
   setTotalDuration() {
-    this.totalDuration = this.mainDeviceScreenVideoPlyr?.mediaElement?.duration || 0;
+    const mediaElement = this.mediaPlyrMap.get(MediaDeviceType.MainScreen)?.plyr?.mediaElement;
+    if (mediaElement) {
+      if (this.currentTime) mediaElement.currentTime = this.currentTime;
+      this.logger.info(`setTotalDuration, ${mediaElement.duration || 0}`);
+      this.totalDuration = mediaElement.duration || 0;
+    }
   }
   @action.bound
   setCurrentTime() {
-    this.currentTime = this.mainDeviceScreenVideoPlyr?.mediaElement?.currentTime || 0;
+    const mediaElement = this.mediaPlyrMap.get(MediaDeviceType.MainScreen)?.plyr?.mediaElement;
+    if (mediaElement) {
+      this.logger.info(`setCurrentTime, time: ${this.currentTime}`);
+      this.currentTime = mediaElement.currentTime || 0;
+    }
   }
   addMediaElementListeners() {
-    this.mainDeviceScreenVideoPlyr?.mediaElement?.addEventListener(
-      'loadedmetadata',
-      this.setTotalDuration,
-    );
+    this.logger.info(`addMediaElementListeners`);
+    this.mainScreenPlyr?.mediaElement?.addEventListener('play', this.play);
+    this.mainScreenPlyr?.mediaElement?.addEventListener('pause', this.pause);
 
-    this.mainDeviceScreenVideoPlyr?.mediaElement?.addEventListener(
-      'timeupdate',
-      this.setCurrentTime,
-    );
-    this.mainDeviceScreenVideoPlyr?.mediaElement?.addEventListener('play', this.play);
-    this.mainDeviceScreenVideoPlyr?.mediaElement?.addEventListener('pause', this.pause);
+    this.mainScreenPlyr?.mediaElement?.addEventListener('loadedmetadata', this.setTotalDuration);
 
-    this.mainDeviceScreenVideoPlyr?.mediaElement?.addEventListener('ended', this.throllteReload);
+    this.mainScreenPlyr?.mediaElement?.addEventListener('timeupdate', this.setCurrentTime);
+
+    this.mainScreenPlyr?.mediaElement?.addEventListener('ended', this.throllteReload);
   }
   removeMediaElementListeners() {
-    this.mainDeviceScreenVideoPlyr?.mediaElement?.removeEventListener(
-      'loadedmetadata',
-      this.setTotalDuration,
-    );
+    this.logger.info(`removeMediaElementListeners`);
+    this.mainScreenPlyr?.mediaElement?.removeEventListener('play', this.play);
+    this.mainScreenPlyr?.mediaElement?.removeEventListener('pause', this.pause);
+    this.mainScreenPlyr?.mediaElement?.removeEventListener('loadedmetadata', this.setTotalDuration);
 
-    this.mainDeviceScreenVideoPlyr?.mediaElement?.removeEventListener(
-      'timeupdate',
-      this.setCurrentTime,
-    );
-    this.mainDeviceScreenVideoPlyr?.mediaElement?.removeEventListener('play', this.play);
-    this.mainDeviceScreenVideoPlyr?.mediaElement?.removeEventListener('pause', this.pause);
-    this.mainDeviceCameraVideoPlyr?.mediaElement?.removeEventListener('play', this.play);
-    this.mainDeviceCameraVideoPlyr?.mediaElement?.removeEventListener('pause', this.pause);
-    this.subDeviceCameraVideoPlyr?.mediaElement?.removeEventListener('play', this.play);
-    this.subDeviceCameraVideoPlyr?.mediaElement?.removeEventListener('pause', this.pause);
+    this.mainScreenPlyr?.mediaElement?.removeEventListener('timeupdate', this.setCurrentTime);
 
-    this.mainDeviceScreenVideoPlyr?.mediaElement?.removeEventListener('ended', this.throllteReload);
+    this.mainScreenPlyr?.mediaElement?.removeEventListener('ended', this.throllteReload);
   }
   @bound
   throllteReload() {
     if (this._reloadTimer !== -1) return;
     const now = new Date().getTime();
-    console.log(now, this._lastReloadTime, now - this._lastReloadTime);
     if (now - this._lastReloadTime >= 30000) {
       this._lastReloadTime = now;
       this.reload();
@@ -158,32 +152,33 @@ export class MediaController {
   }
   @bound
   reload() {
-    this.removeMediaElementListeners();
-    this.mainDeviceCameraVideoPlyr?.dispose();
-    this.subDeviceCameraVideoPlyr?.dispose();
-    this.mainDeviceScreenVideoPlyr?.dispose();
+    this.logger.info(`reload`);
 
-    if (this._mainDeviceScreenVideoUrl && this.mainDeviceScreenVideoContainer) {
-      this.setMainDeviceScreenVideoUrl(this._mainDeviceScreenVideoUrl);
-      this.setMainDeviceScreenView(this.mainDeviceScreenVideoContainer);
-    }
-    if (this._mainDeviceCameraVideoUrl && this.mainDeviceCameraVideoContainer) {
-      this.setMainDeviceCameraVideoUrl(this._mainDeviceCameraVideoUrl);
-      this.setMainDeviceCameraView(this.mainDeviceCameraVideoContainer);
-    }
-    if (this._subDeviceCameraVideoUrl && this.subDeviceCameraVideoContainer) {
-      this.setSubDeviceCameraVideoUrl(this._subDeviceCameraVideoUrl);
-      this.setSubDeviceCameraView(this.subDeviceCameraVideoContainer);
-    }
+    this.removeMediaElementListeners();
+    this.mediaPlyrMap.forEach((p, k) => {
+      p.plyr.dispose();
+      if (p.url && p.container) {
+        this.setVideoUrl(k, p.url, true);
+        this.setView(k, p.container);
+      }
+    });
   }
   @bound
   destroy() {
+    this.logger.info(`destroy`);
+
     window.clearTimeout(this._reloadTimer);
     this._reloadTimer = -1;
     this._lastReloadTime = 0;
     this.removeMediaElementListeners();
-    this.mainDeviceCameraVideoPlyr?.dispose();
-    this.subDeviceCameraVideoPlyr?.dispose();
-    this.mainDeviceScreenVideoPlyr?.dispose();
+    this.mediaPlyrMap.forEach((p) => {
+      p.plyr.dispose();
+    });
+  }
+  requestFullscreen(type: MediaDeviceType) {
+    const plyr = this.mediaPlyrMap.get(type);
+    if (plyr && plyr.plyr.mediaElement) {
+      plyr.plyr.mediaElement.requestFullscreen();
+    }
   }
 }

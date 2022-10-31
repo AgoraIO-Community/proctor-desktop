@@ -31,6 +31,7 @@ import { computedFn } from 'mobx-utils';
 import { transI18n } from '~ui-kit';
 import { EduUIStoreBase } from '../base';
 import { SceneSubscription, SubscriptionFactory } from '../subscription/room';
+import { UserAbnormalReason, UserAbnormalType } from '../type';
 import { RoomScene } from './struct';
 
 export class RoomUIStore extends EduUIStoreBase {
@@ -376,6 +377,15 @@ export class RoomUIStore extends EduUIStoreBase {
                 newValue.screenShareState === AgoraRteMediaSourceState.error) &&
               role === EduRoleTypeEnum.student
             ) {
+              this.classroomStore.api.updateUserTags({
+                key: 'abnormal',
+                data: {
+                  reason: UserAbnormalReason.Screen_Disconnected,
+                  type: UserAbnormalType.Screen_Disconnected,
+                },
+                roomUuid: EduClassroomConfig.shared.sessionInfo.roomUuid,
+                userUuid: EduClassroomConfig.shared.sessionInfo.userUuid,
+              });
               this.classroomStore.connectionStore.leaveClassroom(
                 LeaveReason.leave,
                 new Promise((resolve) => {

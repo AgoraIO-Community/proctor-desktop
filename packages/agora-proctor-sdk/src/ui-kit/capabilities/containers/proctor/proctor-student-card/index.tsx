@@ -23,7 +23,7 @@ import {
 import dayjs from 'dayjs';
 import { SvgIconEnum, SvgImg, transI18n } from '~ui-kit';
 import { DeviceTypeEnum } from '@/infra/api';
-import { MediaController } from './media-control';
+import { MediaController, MediaDeviceType } from './media-control';
 import { Tag } from '@/ui-kit/components/tag';
 import { AgoraSlider } from '@/ui-kit/components/slider';
 export const StudentCard = observer(
@@ -214,20 +214,26 @@ export const StudentHLSVideos = observer(
     }));
     useEffect(() => {
       if (screenContainerRef.current && mainDeviceScreenVideo) {
-        mediaControllerRef.current?.setMainDeviceScreenVideoUrl(mainDeviceScreenVideo);
-        mediaControllerRef.current?.setMainDeviceScreenView(screenContainerRef.current);
+        mediaControllerRef.current?.setVideoUrl(MediaDeviceType.MainScreen, mainDeviceScreenVideo);
+        mediaControllerRef.current?.setView(MediaDeviceType.MainScreen, screenContainerRef.current);
       }
     }, [mainDeviceScreenVideo]);
     useEffect(() => {
       if (mainCameraContainerRef.current && mainDeviceCameraVideo) {
-        mediaControllerRef.current?.setMainDeviceCameraVideoUrl(mainDeviceCameraVideo);
-        mediaControllerRef.current?.setMainDeviceCameraView(mainCameraContainerRef.current);
+        mediaControllerRef.current?.setVideoUrl(MediaDeviceType.MainCamera, mainDeviceCameraVideo);
+        mediaControllerRef.current?.setView(
+          MediaDeviceType.MainCamera,
+          mainCameraContainerRef.current,
+        );
       }
     }, [mainDeviceCameraVideo]);
     useEffect(() => {
       if (subCameraContainerRef.current && subDeviceCameraVideo) {
-        mediaControllerRef.current?.setSubDeviceCameraVideoUrl(subDeviceCameraVideo);
-        mediaControllerRef.current?.setSubDeviceCameraView(subCameraContainerRef.current);
+        mediaControllerRef.current?.setVideoUrl(MediaDeviceType.SubCamera, subDeviceCameraVideo);
+        mediaControllerRef.current?.setView(
+          MediaDeviceType.SubCamera,
+          subCameraContainerRef.current,
+        );
       }
     }, [subDeviceCameraVideo]);
     const onSliderChange = (val: number) => {
@@ -300,7 +306,7 @@ export const StudentHLSVideos = observer(
               type={SvgIconEnum.VIDEO_FULLSCREEN}
               size={26}
               onClick={() => {
-                mediaControllerRef.current?.mainDeviceScreenVideoPlyr?.mediaElement?.requestFullscreen();
+                mediaControllerRef.current?.requestFullscreen(MediaDeviceType.MainScreen);
               }}></SvgImg>
           </div>
         </div>
@@ -313,7 +319,7 @@ export const StudentHLSVideos = observer(
               type={SvgIconEnum.VIDEO_FULLSCREEN}
               size={26}
               onClick={() => {
-                mediaControllerRef.current?.mainDeviceCameraVideoPlyr?.mediaElement?.requestFullscreen();
+                mediaControllerRef.current?.requestFullscreen(MediaDeviceType.MainCamera);
               }}></SvgImg>
           </div>
         </div>
@@ -325,7 +331,7 @@ export const StudentHLSVideos = observer(
               type={SvgIconEnum.VIDEO_FULLSCREEN}
               size={26}
               onClick={() => {
-                mediaControllerRef.current?.subDeviceCameraVideoPlyr?.mediaElement?.requestFullscreen();
+                mediaControllerRef.current?.requestFullscreen(MediaDeviceType.SubCamera);
               }}></SvgImg>
           </div>
         </div>
