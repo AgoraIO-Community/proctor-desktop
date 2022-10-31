@@ -78,20 +78,22 @@ export class NotificationUIStore extends EduUIStoreBase {
               Scheduler.Duration.second(1),
             );
           } else if (ClassState.close === state) {
-            this.classroomStore.connectionStore.leaveClassroom(
-              LeaveReason.leave,
-              new Promise((resolve) => {
-                this.shareUIStore.addConfirmDialog(
-                  transI18n('fcr_alert_title'),
-                  transI18n('fcr_room_label_exam_over'),
-                  {
-                    onOK: resolve,
-                    btnText: { ok: transI18n('fcr_room_button_leave'), cancel: '' },
-                    actions: ['ok'],
-                  },
-                );
-              }),
-            );
+            if (EduClassroomConfig.shared.sessionInfo.role !== EduRoleTypeEnum.student) {
+              this.classroomStore.connectionStore.leaveClassroom(
+                LeaveReason.leave,
+                new Promise((resolve) => {
+                  this.shareUIStore.addConfirmDialog(
+                    transI18n('fcr_alert_title'),
+                    transI18n('fcr_room_label_exam_over'),
+                    {
+                      onOK: resolve,
+                      btnText: { ok: transI18n('fcr_room_button_leave'), cancel: '' },
+                      actions: ['ok'],
+                    },
+                  );
+                }),
+              );
+            }
           }
         },
       ),

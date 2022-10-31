@@ -17,7 +17,7 @@ export const en = {
   fcr_room_label_start_time: '	Start Time',
   fcr_room_label_all_videos: '	All Videos',
   fcr_room_label_wait_you_start_exam: '	Waiting you start the exam',
-  fcr_room_label_exam_over: '	The exam is over',
+  fcr_room_label_exam_over: 'The exam is over',
   fcr_room_label_wait_teacher_start_exam: '	Please wait until the proctor starts the exam',
   fcr_room_label_broadcasting: '	You‘re broadcasting',
   fcr_room_tips_join_failed: '	Failed to join exam, please try again',

@@ -2,9 +2,7 @@ import { Modal } from 'antd';
 import styled, { css } from 'styled-components';
 
 const modalBorderRadius = css`
-  border-radius: 0;
-  border-top-left-radius: 16px;
-  border-top-right-radius: 16px;
+  border-radius: 16px;
 `;
 
 export const AgoraModal = styled(Modal)<{ placement?: 'bottom' }>`

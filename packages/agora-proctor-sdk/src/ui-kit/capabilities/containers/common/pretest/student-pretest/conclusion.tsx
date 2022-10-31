@@ -1,20 +1,23 @@
 import { useStore } from '@/infra/hooks/ui-store';
+import { useMemo } from 'react';
 import { observer } from 'mobx-react';
 import styled from 'styled-components';
-import { SvgIconEnum, SvgImg } from '~ui-kit';
+import { SvgIconEnum, SvgImg, transI18n } from '~ui-kit';
 import cameraImage from '../assets/camera.png';
 import microphoneImage from '../assets/microphone.png';
 import photoImage from '../assets/photo.png';
 import screenShareImage from '../assets/screen-share.png';
 
-const STEPS = [
-  { text: 'webCam', image: cameraImage },
-  { text: 'Microphone', image: microphoneImage },
-  { text: 'Photo', image: photoImage },
-  { text: 'Screen Share', image: screenShareImage },
-];
-
 export const Conclusion = observer(() => {
+  const STEPS = useMemo(
+    () => [
+      { text: transI18n('fcr_exam_prep_label_camera'), image: cameraImage },
+      { text: transI18n('fcr_exam_prep_label_microphone'), image: microphoneImage },
+      { text: transI18n('fcr_exam_prep_label_take_photo'), image: photoImage },
+      { text: transI18n('fcr_exam_prep_label_share_screen'), image: screenShareImage },
+    ],
+    [],
+  );
   const {
     pretestUIStore: { stepupStates },
   } = useStore();

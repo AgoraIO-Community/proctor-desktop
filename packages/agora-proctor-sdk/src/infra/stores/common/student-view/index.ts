@@ -8,6 +8,7 @@ import {
   observable,
   reaction,
   runInAction,
+  when,
 } from 'mobx';
 import { EduUIStoreBase } from '../base';
 
@@ -45,6 +46,10 @@ export class StudentViewUIStore extends EduUIStoreBase {
     return this.classRoomState === ClassState.beforeClass;
   }
 
+  @action.bound
+  setRoomClose(state: boolean) {
+    this.roomClose = state;
+  }
   @bound
   async leaveMainClassroom() {
     await this.classroomStore.connectionStore.leaveClassroom(LeaveReason.leave);
@@ -86,11 +91,17 @@ export class StudentViewUIStore extends EduUIStoreBase {
             runInAction(() => {
               this.roomClose = true;
             });
+            this.classroomStore.connectionStore.leaveClassroom(
+              LeaveReason.leave,
+              when(() => !this.roomClose),
+            );
           }
         },
       ),
     );
   }
 
-  onDestroy() {}
+  onDestroy() {
+    this._disposers.forEach((d) => d());
+  }
 }

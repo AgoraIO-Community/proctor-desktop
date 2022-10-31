@@ -29,15 +29,10 @@ export const ExamineeScenario = observer(() => {
 
 const RoomCloseModal = observer(() => {
   const {
-    studentViewUIStore: { roomClose, userAvatar },
+    studentViewUIStore: { roomClose, userAvatar, setRoomClose },
   } = useStore();
   return (
-    <AgoraModal
-      centered
-      open={roomClose}
-      width={730}
-      placement="bottom"
-      footer={<LeaveRoomFooter />}>
+    <AgoraModal centered open={roomClose} width={730} footer={<LeaveRoomFooter />}>
       <Title>The Exam is Over!</Title>
       <section style={{ padding: '0 70px 103px 70px' }}>
         <FlexContainer direction="row" gap={20}>
@@ -56,9 +51,12 @@ const RoomCloseModal = observer(() => {
 });
 
 const LeaveRoomFooter = observer(() => {
+  const {
+    studentViewUIStore: { setRoomClose },
+  } = useStore();
   const handleLeaveRoom = useCallback(() => {
     // leave room
-    EduEventCenter.shared.emitClasroomEvents(AgoraEduClassroomEvent.Destroyed, LeaveReason.leave);
+    setRoomClose(false);
   }, []);
   return (
     <FooterContainer>

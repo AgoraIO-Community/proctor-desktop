@@ -33,7 +33,6 @@ const StudentPretestModal: FC<pretestContainerProps> = observer(({ onOk, onCance
       open={true}
       width={730}
       footer={<StudentPretestFooter onOk={onOk} />}
-      placement="bottom"
       onCancel={onCancel}
       maskClosable={false}>
       <StudentPretest />
@@ -49,7 +48,6 @@ const TeacherPretestModal: FC<pretestContainerProps> = observer(({ onOk, onCance
       width={730}
       maskClosable={false}
       footer={<TeacherPretestFooter onOk={onOk} />}
-      placement="bottom"
       onCancel={onCancel}>
       <TeacherPretest />
     </AgoraModal>
