@@ -17,9 +17,6 @@ export class StudentViewUIStore extends EduUIStoreBase {
   private _disposers: (IReactionDisposer | Lambda)[] = [];
 
   @observable
-  roomClose = false; // 房间是否关闭
-
-  @observable
   widgetBlur = false;
 
   @observable
@@ -46,10 +43,6 @@ export class StudentViewUIStore extends EduUIStoreBase {
     return this.classRoomState === ClassState.beforeClass;
   }
 
-  @action.bound
-  setRoomClose(state: boolean) {
-    this.roomClose = state;
-  }
   @bound
   async leaveMainClassroom() {
     await this.classroomStore.connectionStore.leaveClassroom(LeaveReason.leave);
@@ -85,16 +78,6 @@ export class StudentViewUIStore extends EduUIStoreBase {
             runInAction(() => {
               this.widgetBlur = false;
             });
-          }
-
-          if (ClassState.close === state) {
-            runInAction(() => {
-              this.roomClose = true;
-            });
-            this.classroomStore.connectionStore.leaveClassroom(
-              LeaveReason.leave,
-              when(() => !this.roomClose),
-            );
           }
         },
       ),

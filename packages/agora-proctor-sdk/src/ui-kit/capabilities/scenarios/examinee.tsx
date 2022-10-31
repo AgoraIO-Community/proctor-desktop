@@ -2,7 +2,13 @@ import { useStore } from '@/infra/hooks/ui-store';
 import { AgoraButton } from '@/ui-kit/components/button';
 import { FlexContainer } from '@/ui-kit/components/container';
 import { AgoraModal } from '@/ui-kit/components/modal';
-import { AgoraEduClassroomEvent, EduEventCenter, LeaveReason } from 'agora-edu-core';
+import {
+  AgoraEduClassroomEvent,
+  ClassroomState,
+  ClassState,
+  EduEventCenter,
+  LeaveReason,
+} from 'agora-edu-core';
 import { observer } from 'mobx-react';
 import { useCallback } from 'react';
 import styled from 'styled-components';
@@ -29,10 +35,15 @@ export const ExamineeScenario = observer(() => {
 
 const RoomCloseModal = observer(() => {
   const {
-    studentViewUIStore: { roomClose, userAvatar, setRoomClose },
+    studentViewUIStore: { userAvatar },
+    classroomStore: {
+      roomStore: {
+        classroomSchedule: { state },
+      },
+    },
   } = useStore();
   return (
-    <AgoraModal centered open={roomClose} width={730} footer={<LeaveRoomFooter />}>
+    <AgoraModal centered open={state === ClassState.close} width={730} footer={<LeaveRoomFooter />}>
       <Title>The Exam is Over!</Title>
       <section style={{ padding: '0 70px 103px 70px' }}>
         <FlexContainer direction="row" gap={20}>
@@ -52,11 +63,11 @@ const RoomCloseModal = observer(() => {
 
 const LeaveRoomFooter = observer(() => {
   const {
-    studentViewUIStore: { setRoomClose },
+    roomUIStore: { setRoomClosed },
   } = useStore();
   const handleLeaveRoom = useCallback(() => {
     // leave room
-    setRoomClose(false);
+    setRoomClosed(true);
   }, []);
   return (
     <FooterContainer>

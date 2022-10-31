@@ -26,7 +26,16 @@ import {
 import to from 'await-to-js';
 import dayjs from 'dayjs';
 import md5 from 'js-md5';
-import { action, computed, IReactionDisposer, Lambda, observable, runInAction } from 'mobx';
+import {
+  action,
+  computed,
+  IReactionDisposer,
+  Lambda,
+  observable,
+  reaction,
+  runInAction,
+  when,
+} from 'mobx';
 import { computedFn } from 'mobx-utils';
 import { transI18n } from '~ui-kit';
 import { EduUIStoreBase } from '../base';
@@ -40,7 +49,12 @@ export class RoomUIStore extends EduUIStoreBase {
     SceneSubscription
   >();
   private _disposers: (IReactionDisposer | Lambda)[] = [];
+  @observable roomClosed: boolean = false;
   @observable roomScenes: Map<string, RoomScene> = new Map();
+  @action.bound
+  setRoomClosed(closed: boolean) {
+    this.roomClosed = closed;
+  }
   roomSceneByRoomUuid = computedFn((roomUuid: string) => {
     return this.roomScenes.get(roomUuid);
   });
@@ -361,37 +375,84 @@ export class RoomUIStore extends EduUIStoreBase {
         },
       ),
     );
-    if (
-      EduClassroomConfig.shared.sessionInfo.role === EduRoleTypeEnum.student &&
-      AgoraProctorSDK.checkStudentScreenShareState
-    ) {
+    if (EduClassroomConfig.shared.sessionInfo.role === EduRoleTypeEnum.student) {
       this._disposers.push(
-        computed(() => ({
-          screenShareState: this.classroomStore.mediaStore.localScreenShareTrackState,
-          classRoomState: this.roomSceneByRoomUuid(this.currentGroupUuid)?.roomState.state,
-        })).observe(({ newValue, oldValue }) => {
-          if (newValue.classRoomState === ClassroomState.Connected) {
-            const { role } = EduClassroomConfig.shared.sessionInfo;
-            if (
-              (newValue.screenShareState === AgoraRteMediaSourceState.stopped ||
-                newValue.screenShareState === AgoraRteMediaSourceState.error) &&
-              role === EduRoleTypeEnum.student
-            ) {
-              this.classroomStore.api.updateUserTags({
-                key: 'abnormal',
-                data: {
-                  reason: UserAbnormalReason.Screen_Disconnected,
-                  type: UserAbnormalType.Screen_Disconnected,
-                },
-                roomUuid: EduClassroomConfig.shared.sessionInfo.roomUuid,
-                userUuid: EduClassroomConfig.shared.sessionInfo.userUuid,
-              });
+        reaction(
+          () => this.classroomStore.roomStore.classroomSchedule.state,
+          async (state) => {
+            if (ClassState.close === state) {
+              if (this.roomScenes.get(this.currentGroupUuid)) {
+                await this.leaveClassroom(this.currentGroupUuid);
+              }
+              this.classroomStore.connectionStore.leaveClassroom(
+                LeaveReason.leave,
+                when(() => this.roomClosed),
+              );
+            }
+          },
+        ),
+      );
+      if (AgoraProctorSDK.checkStudentScreenShareState) {
+        this._disposers.push(
+          computed(() => ({
+            screenShareState: this.classroomStore.mediaStore.localScreenShareTrackState,
+            classRoomState: this.roomSceneByRoomUuid(this.currentGroupUuid)?.roomState.state,
+          })).observe(async ({ newValue, oldValue }) => {
+            if (newValue.classRoomState === ClassroomState.Connected) {
+              const { role } = EduClassroomConfig.shared.sessionInfo;
+              if (
+                (newValue.screenShareState === AgoraRteMediaSourceState.stopped ||
+                  newValue.screenShareState === AgoraRteMediaSourceState.error) &&
+                role === EduRoleTypeEnum.student
+              ) {
+                this.classroomStore.api.updateUserTags({
+                  key: 'abnormal',
+                  data: {
+                    reason: UserAbnormalReason.Screen_Disconnected,
+                    type: UserAbnormalType.Screen_Disconnected,
+                  },
+                  roomUuid: EduClassroomConfig.shared.sessionInfo.roomUuid,
+                  userUuid: EduClassroomConfig.shared.sessionInfo.userUuid,
+                });
+                if (this.roomScenes.get(this.currentGroupUuid)) {
+                  await this.leaveClassroom(this.currentGroupUuid);
+                }
+                this.classroomStore.connectionStore.leaveClassroom(
+                  LeaveReason.leave,
+                  new Promise((resolve) => {
+                    this.shareUIStore.addConfirmDialog(
+                      transI18n('fcr_alert_title'),
+                      transI18n('fcr_exam_prep_label_close_screen_share'),
+                      {
+                        onOK: resolve,
+                        btnText: { ok: transI18n('fcr_room_button_leave'), cancel: '' },
+                        actions: ['ok'],
+                      },
+                    );
+                  }),
+                );
+              }
+            }
+          }),
+        );
+      }
+    } else {
+      this._disposers.push(
+        reaction(
+          () => this.classroomStore.roomStore.classroomSchedule.state,
+          async (state) => {
+            if (ClassState.close === state) {
+              if (this.roomScenes.size > 0) {
+                this.roomScenes.forEach((r) => {
+                  r.scene && this.leaveClassroom(r.scene.sceneId);
+                });
+              }
               this.classroomStore.connectionStore.leaveClassroom(
                 LeaveReason.leave,
                 new Promise((resolve) => {
                   this.shareUIStore.addConfirmDialog(
                     transI18n('fcr_alert_title'),
-                    transI18n('fcr_exam_prep_label_close_screen_share'),
+                    transI18n('fcr_room_label_exam_over'),
                     {
                       onOK: resolve,
                       btnText: { ok: transI18n('fcr_room_button_leave'), cancel: '' },
@@ -401,8 +462,8 @@ export class RoomUIStore extends EduUIStoreBase {
                 }),
               );
             }
-          }
-        }),
+          },
+        ),
       );
     }
 
