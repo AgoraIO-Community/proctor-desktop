@@ -3,6 +3,7 @@
   flex: 1;
   flex-direction: column;
   padding-top: 10px;
+  overflow: hidden;
 }
 .fcr-proctor-content .ant-tabs {
   flex: 1;

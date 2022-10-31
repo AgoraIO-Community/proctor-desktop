@@ -22,10 +22,24 @@ export const AllVideos = observer(() => {
   const containerRef = useRef<HTMLDivElement>(null);
   const carouselRef = useRef<CarouselRef>(null);
   const [currentPage, setCurrentPage] = useState(0);
-  const [containerHeight, setContainerHeight] = useState(0);
+  const [containerRect, setContainerRect] = useState({ width: 0, height: 0 });
+
   useEffect(() => {
-    setContainerHeight(containerRef.current?.clientHeight || 0);
+    setContainerRect({
+      width: containerRef.current?.clientWidth || 0,
+      height: containerRef.current?.clientHeight || 0,
+    });
+    window.addEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
   }, []);
+  const handleResize = debounce(() => {
+    setContainerRect({
+      width: containerRef.current?.clientWidth || 0,
+      height: containerRef.current?.clientHeight || 0,
+    });
+  }, 25);
   const onWheel = debounce((e) => {
     if (e.deltaY > 0) {
       next();
@@ -82,7 +96,7 @@ export const AllVideos = observer(() => {
                       className={`fcr-all-videos-tab-page-item fcr-all-videos-tab-page-item-${VideosWallLayoutEnum[
                         videosWallLayout
                       ].toLowerCase()}`}
-                      style={{ height: containerHeight }}>
+                      style={{ ...containerRect }}>
                       {cur.map((userUuidPrefix) => {
                         return (
                           <StudentCard
