@@ -112,9 +112,6 @@ export class EduClassroomUIStore {
     }
     this._installed = true;
 
-    //initialize domain stores
-    this.classroomStore.initialize();
-
     //initialize ui stores
     Object.getOwnPropertyNames(this).forEach((propertyName) => {
       if (propertyName.endsWith('UIStore')) {
@@ -126,9 +123,7 @@ export class EduClassroomUIStore {
       }
     });
 
-    const { initialize } = this.classroomStore.connectionStore;
-
-    initialize();
+    this.classroomStore.initialize();
 
     //@ts-ignore
     window.globalStore = this;
