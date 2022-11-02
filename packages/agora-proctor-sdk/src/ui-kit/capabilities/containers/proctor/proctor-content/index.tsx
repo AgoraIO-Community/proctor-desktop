@@ -67,11 +67,23 @@ export const ProctorContent = observer(() => {
           },
           ...studentTabItems.map((s) => {
             return {
+              closeIcon: (
+                <SvgImg
+                  type={SvgIconEnum.CLOSE}
+                  size={20}
+                  colors={{ iconPrimary: '#000' }}></SvgImg>
+              ),
               label: (
                 <div className="fcr-proctor-content-tab-label">
                   <UserAvatar userUuidPrefix={s.key} />
                   <UserAbnormal userUuidPrefix={s.key} />
-                  <span style={{ paddingLeft: '10px' }}>{s.label}</span>
+                  <span
+                    style={{
+                      paddingLeft: '10px',
+                      color: currentTab === s.key ? '#000' : '#757575',
+                    }}>
+                    {s.label}
+                  </span>
                 </div>
               ),
               key: s.key,

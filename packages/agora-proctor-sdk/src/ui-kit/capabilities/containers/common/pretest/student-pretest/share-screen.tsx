@@ -1,16 +1,12 @@
-import { useStore } from "@/infra/hooks/ui-store";
-import { AgoraMidBorderRadius } from "@/ui-kit/components/common";
-import { observer } from "mobx-react";
-import { useEffect, useRef } from "react";
-import styled from "styled-components";
+import { useStore } from '@/infra/hooks/ui-store';
+import { AgoraLargeBorderRadius, AgoraMidBorderRadius } from '@/ui-kit/components/common';
+import { observer } from 'mobx-react';
+import { useEffect, useRef } from 'react';
+import styled from 'styled-components';
 
 export const ShareScreen = observer(() => {
   const {
-    pretestUIStore: {
-      isScreenSharing,
-      setupLocalScreenShare,
-      startLocalScreenShare,
-    },
+    pretestUIStore: { isScreenSharing, setupLocalScreenShare, startLocalScreenShare },
   } = useStore();
 
   const shareRef = useRef<HTMLDivElement | null>();
@@ -20,19 +16,27 @@ export const ShareScreen = observer(() => {
   }, [isScreenSharing]);
 
   useEffect(() => {
-    isScreenSharing &&
-      setupLocalScreenShare(shareRef.current as HTMLDivElement);
+    isScreenSharing && setupLocalScreenShare(shareRef.current as HTMLDivElement);
   }, [isScreenSharing, setupLocalScreenShare]);
 
   return (
-    <Container
-      ref={(ins) => {
-        shareRef.current = ins;
-      }}
-    ></Container>
+    <Container>
+      <ScreenTrackPlayer
+        ref={(ins) => {
+          shareRef.current = ins;
+        }}></ScreenTrackPlayer>
+      <span>Screen</span>
+    </Container>
   );
 });
-
+const ScreenTrackPlayer = styled.div`
+  width: 278px;
+  height: 155px;
+  margin: 0 auto;
+  background: #d9d9d9;
+  border-radius: 16px;
+  overflow: hidden;
+`;
 const Container = styled.div`
   width: 290px;
   height: 216px;
@@ -42,5 +46,10 @@ const Container = styled.div`
   color: #000;
   font-size: 14px;
   overflow: hidden;
-  ${AgoraMidBorderRadius};
+  padding-top: 4px;
+  text-align: center;
+  ${AgoraLargeBorderRadius};
+  > span {
+    line-height: 55px;
+  }
 `;

@@ -3,6 +3,7 @@ import { isProduction } from '@/infra/utils/env';
 import { AgoraButton } from '@/ui-kit/components/button';
 import { AgoraMidBorderRadius, FlexCenterDiv } from '@/ui-kit/components/common';
 import { AgoraSelect } from '@/ui-kit/components/select';
+import { Select } from '@/ui-kit/components/select/select';
 import { Volume } from '@/ui-kit/components/volume';
 import { EduRteEngineConfig, EduRteRuntimePlatform } from 'agora-edu-core';
 import { Col, Row } from 'antd';
@@ -23,17 +24,13 @@ export const PreTestCamera: FC = observer(() => {
   }, []);
 
   return (
-    <AgoraSelect
-      style={{ width: '100%' }}
+    <Select
       value={currentCameraDeviceId}
       onChange={handleCameraChange}
-      suffixIcon={<SvgImg type={SvgIconEnum.DROPDOWN} colors={{ iconPrimary: '#000' }}></SvgImg>}>
-      {cameraDevicesList.map((device) => (
-        <Option value={device.value} key={device.value}>
-          {device.label}
-        </Option>
-      ))}
-    </AgoraSelect>
+      options={cameraDevicesList.map((device) => ({
+        text: device.label,
+        value: device.value,
+      }))}></Select>
   );
 });
 
@@ -46,17 +43,13 @@ export const PreTestMicrophone: FC = observer(() => {
   }, []);
   return (
     <div style={{ paddingBottom: '20px' }}>
-      <AgoraSelect
-        style={{ width: '100%' }}
+      <Select
         value={currentRecordingDeviceId}
         onChange={handleMicrophoneChange}
-        suffixIcon={<SvgImg type={SvgIconEnum.DROPDOWN} colors={{ iconPrimary: '#000' }}></SvgImg>}>
-        {recordingDevicesList.map((device) => (
-          <Option value={device.value} key={device.value}>
-            {device.label}
-          </Option>
-        ))}
-      </AgoraSelect>
+        options={recordingDevicesList.map((device) => ({
+          text: device.label,
+          value: device.value,
+        }))}></Select>
       <VolumeDance />
     </div>
   );
@@ -91,19 +84,13 @@ export const PreTestSpeaker: FC = observer(() => {
   return (
     <Row gutter={6}>
       <Col span={16}>
-        <AgoraSelect
-          style={{ width: '100%' }}
+        <Select
           value={currentPlaybackDeviceId}
           onChange={handlePlaybackChange}
-          suffixIcon={
-            <SvgImg type={SvgIconEnum.DROPDOWN} colors={{ iconPrimary: '#000' }}></SvgImg>
-          }>
-          {playbackDevicesList.map((device) => (
-            <Option value={device.value} key={device.value}>
-              {device.label}
-            </Option>
-          ))}
-        </AgoraSelect>
+          options={playbackDevicesList.map((device) => ({
+            text: device.label,
+            value: device.value,
+          }))}></Select>
       </Col>
       <Col span={8}>
         <AgoraButton

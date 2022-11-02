@@ -69,9 +69,6 @@ export const StudentCard = observer(
           </div>
           <div className="fcr-student-card-actions">
             <UserFocus userUuidPrefix={userUuidPrefix} />
-            <div className="fcr-student-card-actions-chat">
-              <SvgImg type={SvgIconEnum.CHAT}></SvgImg>
-            </div>
             <UserEvents userUuidPrefix={userUuidPrefix}></UserEvents>
           </div>
         </div>

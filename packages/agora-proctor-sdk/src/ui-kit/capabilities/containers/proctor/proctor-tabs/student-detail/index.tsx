@@ -6,7 +6,7 @@ import {
   UserEvents,
   VideosWallLayoutEnum,
 } from '@/infra/stores/common/type';
-import { Button, Select } from 'antd';
+import { Button } from 'antd';
 import dayjs from 'dayjs';
 import { observer } from 'mobx-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -24,6 +24,7 @@ import { DeviceTypeEnum } from '@/infra/api';
 import { EduClassroomConfig } from 'agora-edu-core';
 import { AgoraRteVideoSourceType } from 'agora-rte-sdk';
 import './index.css';
+import { Select } from '@/ui-kit/components/select/select';
 export const StudentDetail = observer(({ userUuidPrefix }: { userUuidPrefix: string }) => {
   const {
     roomUIStore: { roomSceneByRoomUuid },
@@ -54,7 +55,7 @@ export const StudentDetail = observer(({ userUuidPrefix }: { userUuidPrefix: str
       abnormal: IUserAbnormal;
     }>[]
   >([]);
-  const [abnormal, setAbnormal] = useState(undefined);
+  const [abnormal, setAbnormal] = useState<string | undefined>(undefined);
   const [startTime, setStartTime] = useState(0);
   const [recordList, setRecordList] = useState<
     {
@@ -183,23 +184,20 @@ export const StudentDetail = observer(({ userUuidPrefix }: { userUuidPrefix: str
               {transI18n('fcr_sub_room_label_report_behavior')}
             </div>
             <div className="fcr-student-detail-tab-live-bottom-suspicious-btns">
-              <Select
-                getPopupContainer={(container) => container}
-                value={abnormal}
-                onChange={setAbnormal}
-                popupClassName={'fcr-student-detail-tab-live-bottom-suspicious-select-popup'}
-                className={'fcr-student-detail-tab-live-bottom-suspicious-select'}
-                size="large"
-                placeholder={transI18n('fcr_sub_room_option_report_behavior_default')}
-                suffixIcon={<SvgImg type={SvgIconEnum.DROPDOWN}></SvgImg>}>
-                {UserAbnormals.map((i) => {
-                  return (
-                    <Select.Option key={i.reason} value={i.reason}>
-                      {userAbnormalsI18nMap[i.reason]}
-                    </Select.Option>
-                  );
-                })}
-              </Select>
+              <div>
+                <Select
+                  theme="dark"
+                  value={abnormal}
+                  onChange={setAbnormal}
+                  placeholder={transI18n('fcr_sub_room_option_report_behavior_default')}
+                  options={UserAbnormals.map((i) => {
+                    return {
+                      text: userAbnormalsI18nMap[i.reason],
+                      value: i.reason,
+                    };
+                  })}></Select>
+              </div>
+
               <Button
                 onClick={submitAbnormal}
                 disabled={!abnormal}
@@ -310,7 +308,7 @@ export const UserEventsList = observer(
                 </div>
               </div>
               <div>
-                <SvgImg type={SvgIconEnum.REPLAY} size={35}></SvgImg>
+                <SvgImg type={SvgIconEnum.REPLAY} size={40}></SvgImg>
               </div>
             </div>
           );

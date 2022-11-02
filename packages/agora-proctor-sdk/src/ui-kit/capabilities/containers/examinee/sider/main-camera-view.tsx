@@ -1,6 +1,6 @@
-import { AgoraCard } from "@/ui-kit/components/card";
-import { SupervisorView } from "@/ui-kit/components/supervisor-view";
-import { LocalTrackPlayer } from "../../common/stream/track-player";
+import { AgoraCard } from '@/ui-kit/components/card';
+import { SupervisorView } from '@/ui-kit/components/supervisor-view';
+import { LocalTrackPlayer } from '../../common/stream/track-player';
 
 export const MainCameraView = () => {
   return (
@@ -12,7 +12,7 @@ export const MainCameraView = () => {
 
 const MainCamera = () => {
   return (
-    <div style={{ height: "133px" }}>
+    <div style={{ height: '133px', background: 'F0F0F7' }}>
       <LocalTrackPlayer />
     </div>
   );

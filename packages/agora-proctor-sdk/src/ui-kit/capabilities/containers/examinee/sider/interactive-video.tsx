@@ -6,6 +6,7 @@ import { SvgIconEnum, SvgImg } from '~ui-kit';
 import { RemoteTrackPlayer } from '../../common/stream/track-player';
 import { useMemo } from 'react';
 import { AgoraRteMediaPublishState } from 'agora-rte-sdk';
+import { VolumeIndicator } from '@/ui-kit/components/indicator';
 export const InteractiveVideo = observer(() => {
   const {
     studentViewUIStore: { userAvatar },
@@ -27,9 +28,7 @@ export const InteractiveVideo = observer(() => {
       <StudentPhoto scale={isTeacherCameraStreamEnabled ? 0.5 : 1} backgroundImage={userAvatar} />
       {isTeacherCameraStreamEnabled && (
         <TeacherVideo>
-          {!teacherCameraStream?.isMicMuted && (
-            <SvgImg className={'video-volume'} type={SvgIconEnum.VOLUME}></SvgImg>
-          )}
+          {!teacherCameraStream?.isMicMuted && <VolumeIndicator></VolumeIndicator>}
           {teacherCameraStream?.isCameraMuted ? (
             <SvgImg type={SvgIconEnum.NO_VIDEO} size={36}></SvgImg>
           ) : (

@@ -1,5 +1,6 @@
 import { useStore } from '@/infra/hooks/ui-store';
 import { AgoraButton } from '@/ui-kit/components/button';
+import { VolumeIndicator } from '@/ui-kit/components/indicator';
 import { AgoraSwitch } from '@/ui-kit/components/switch';
 import { ClassState, DEVICE_DISABLE, EduClassroomConfig } from 'agora-edu-core';
 import { AgoraRteMediaPublishState, AgoraRteMediaSourceState } from 'agora-rte-sdk';
@@ -100,9 +101,7 @@ export const ProctorSider = observer(() => {
               }`}>
               <div className="fcr_proctor_sider_info_proctor-actions-video">
                 {localMicTrackState === AgoraRteMediaSourceState.started && (
-                  <SvgImg
-                    className={'fcr_proctor_sider_info_proctor-actions-video-volume'}
-                    type={SvgIconEnum.VOLUME}></SvgImg>
+                  <VolumeIndicator></VolumeIndicator>
                 )}
                 {localCameraTrackState === AgoraRteMediaSourceState.started ? (
                   <LocalTrackPlayer></LocalTrackPlayer>

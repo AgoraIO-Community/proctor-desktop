@@ -54,5 +54,5 @@ const SubCameraContainer = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  background: #f8faff;
+  background: #f0f0f7;
 `;

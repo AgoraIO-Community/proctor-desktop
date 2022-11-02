@@ -14,7 +14,7 @@ import { SubCameraView } from './sub-camera-view';
 export const Sider = observer(() => {
   return (
     <FlexContainer width={247} direction="column" gap={12} style={{ padding: '12px' }}>
-      <AgoraCard background="linear-gradient(180deg, #FAFAFA 0%, #F3F3F3 100%)">
+      <AgoraCard background="linear-gradient(180deg, #F2F3F7 0%, #EAEAEA 100%)">
         <SiderSpace size={17} direction="vertical">
           <HelloHeader>
             {transI18n('fcr_device_test_label_hello')},

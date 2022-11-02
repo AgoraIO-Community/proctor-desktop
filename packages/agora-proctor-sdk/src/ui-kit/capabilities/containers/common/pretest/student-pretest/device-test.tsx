@@ -46,6 +46,7 @@ const ItemTitle = styled(PreTestHeader)<{ marginTop?: string }>`
   font-size: 16px;
   margin-bottom: 8px;
   margin-top: ${(props: any) => (props.marginTop ? props.marginTop : '8px')};
+  padding-left: 8px;
 `;
 
 const Card = styled.div`
