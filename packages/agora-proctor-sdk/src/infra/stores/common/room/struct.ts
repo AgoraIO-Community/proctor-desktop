@@ -315,38 +315,21 @@ class StreamController {
     this._scene.on(AgoraRteEventType.RemoteStreamUpdate, this._updateRemoteStream);
     this._scene.on(AgoraRteEventType.RoomPropertyUpdated, this._handleRoomPropertiesChange);
     this._disposers.push(
-      reaction(
-        () => this.micAccessors,
-        () => {
-          const { recordingDeviceId, mediaControl } = this._classroomStore.mediaStore;
-          if (this._roomScene.roomState.state === ClassroomState.Idle) {
-            // if idle, e.g. pretest
-            if (recordingDeviceId && recordingDeviceId !== DEVICE_DISABLE) {
-              const track = mediaControl.createMicrophoneAudioTrack();
+      computed(() => this.micAccessors).observe(({ oldValue, newValue }) => {
+        const { recordingDeviceId, mediaControl } = this._classroomStore.mediaStore;
+        if (this._roomScene.roomState.state === ClassroomState.Connected) {
+          if (recordingDeviceId && recordingDeviceId !== DEVICE_DISABLE) {
+            const track = mediaControl.createMicrophoneAudioTrack();
+            if (oldValue?.recordingDeviceId !== newValue.recordingDeviceId) {
               track.setRecordingDevice(recordingDeviceId);
-              this._enableLocalAudio(true);
-            } else {
-              //if no device selected, disable device
-              this._enableLocalAudio(false);
-            }
-          } else if (this._roomScene.roomState.state === ClassroomState.Connected) {
-            // once connected, should follow stream
-            if (!this.localMicStreamUuid) {
-              // if no local stream
-              this._enableLocalAudio(false);
-            } else {
-              if (recordingDeviceId && recordingDeviceId !== DEVICE_DISABLE) {
-                const track = mediaControl.createMicrophoneAudioTrack();
-                track.setRecordingDevice(recordingDeviceId);
 
-                this._enableLocalAudio(true);
-              } else {
-                this._enableLocalAudio(false);
-              }
+              this._enableLocalAudio(true);
             }
+          } else {
+            this._enableLocalAudio(false);
           }
-        },
-      ),
+        }
+      }),
     );
     this._disposers.push(
       reaction(
@@ -365,7 +348,6 @@ class StreamController {
         () => this.screenShareTokenAccessor,
         (value) => {
           const { streamUuid, shareStreamToken } = value;
-          console.log(streamUuid, shareStreamToken, 'shareStreamToken');
 
           if (streamUuid && shareStreamToken) {
             if (this._roomScene.rtcState?.get(AGRtcConnectionType.sub) === AGRtcState.Idle) {
@@ -383,6 +365,23 @@ class StreamController {
           }
         },
       ),
+    );
+    this._disposers.push(
+      computed(() => this.cameraAccessors).observe(({ oldValue, newValue }) => {
+        const { cameraDeviceId, mediaControl } = this._classroomStore.mediaStore;
+        if (this._roomScene.roomState.state === ClassroomState.Connected) {
+          if (cameraDeviceId && cameraDeviceId !== DEVICE_DISABLE) {
+            const track = mediaControl.createCameraVideoTrack();
+            if (oldValue?.cameraDeviceId !== newValue.cameraDeviceId) {
+              track.setDeviceId(cameraDeviceId);
+
+              this._enableLocalVideo(true);
+            }
+          } else {
+            this._enableLocalVideo(false);
+          }
+        }
+      }),
     );
     this.dataStore.stateKeeper = new ShareStreamStateKeeper(
       async (targetState: AgoraRteMediaSourceState) => {
@@ -402,40 +401,6 @@ class StreamController {
           });
         }
       },
-    );
-    this._disposers.push(
-      reaction(
-        () => this.cameraAccessors,
-        () => {
-          const { cameraDeviceId, mediaControl } = this._classroomStore.mediaStore;
-          if (this._roomScene.roomState.state === ClassroomState.Idle) {
-            // if idle, e.g. pretest
-            if (cameraDeviceId && cameraDeviceId !== DEVICE_DISABLE) {
-              const track = mediaControl.createCameraVideoTrack();
-              track.setDeviceId(cameraDeviceId);
-              this._enableLocalVideo(true);
-            } else {
-              //if no device selected, disable device
-              this._enableLocalVideo(false);
-            }
-          } else if (this._roomScene.roomState.state === ClassroomState.Connected) {
-            // once connected, should follow stream
-            if (!this.localCameraStreamUuid) {
-              // if no local stream
-              this._enableLocalVideo(false);
-            } else {
-              if (cameraDeviceId && cameraDeviceId !== DEVICE_DISABLE) {
-                const track = mediaControl.createCameraVideoTrack();
-                track.setDeviceId(cameraDeviceId);
-
-                this._enableLocalVideo(true);
-              } else {
-                this._enableLocalVideo(false);
-              }
-            }
-          }
-        },
-      ),
     );
   }
   destroy() {
