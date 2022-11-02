@@ -16,7 +16,12 @@ import { AgoraPopover } from '@/ui-kit/components/popover';
 export const ProctorContent = observer(() => {
   const {
     layoutUIStore: { studentTabItems, currentTab, setCurrentTab, removeStudentTab },
-    usersUIStore: { setVideosWallLayout, studentListByUserUuidPrefix, setFilterTag },
+    usersUIStore: {
+      videosWallLayout,
+      setVideosWallLayout,
+      studentListByUserUuidPrefix,
+      setFilterTag,
+    },
   } = useStore();
   return (
     <div className="fcr-proctor-content">
@@ -37,18 +42,19 @@ export const ProctorContent = observer(() => {
         tabBarExtraContent={
           currentTab === 'ALL_VIDEOS' && (
             <AgoraSegmented
+              value={videosWallLayout}
               className="fcr-proctor-content-layout-segmented"
               onChange={(val) => {
-                setVideosWallLayout(VideosWallLayoutEnum[val]);
+                setVideosWallLayout(val as VideosWallLayoutEnum);
               }}
               options={[
                 {
                   label: <SvgImg type={SvgIconEnum.LAYOUT_COMPACT} size={36}></SvgImg>,
-                  value: 'Compact',
+                  value: VideosWallLayoutEnum.Compact,
                 },
                 {
                   label: <SvgImg type={SvgIconEnum.LAYOUT_LOOSE} size={36}></SvgImg>,
-                  value: 'Loose',
+                  value: VideosWallLayoutEnum.Loose,
                 },
               ]}></AgoraSegmented>
           )
