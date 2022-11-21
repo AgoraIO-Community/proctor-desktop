@@ -1,47 +1,21 @@
-> _其他语言版本：[简体中文](README.zh.md)_
+### agora-proctor-sdk
 
-## proctor Desktop
+For publishing npm package agora-proctor-sdk (Web & Electron). Get more information from https://docs.agora.io
 
-![Exam Room](https://badgen.net/badge/ExamRoom/1.0.0/orange)
-![React](https://badgen.net/badge/React/17.0.0/green)
+### Requirements
 
-## Install
+- TypeScript/JavaScript
+- React
+- Agora Developer Account
+- Chrome Web Browser / Electron Environment
 
-```bash
-# install all dependencies via lerna and npm
-yarn bootstrap
-```
+### Platform Support
 
-## Config
+- > = 66.0 Chrome Browser
+- > = Electron 7.1.2
 
-```bash
-# copy config template to agora-proctor-sdk project
-cp .env.example packages/agora-proctor-sdk/.env
+### Question / Issue Report
 
-# fill the config with your agora.io development environment
-```
+- [https://github.com/AgoraIO-Community/CloudClass-Desktop/issues/new](https://github.com/AgoraIO-Community/CloudClass-Desktop/issues/new)
 
-## How to generate RtmToken using your own AppId and Secret
-
-```bash
-# If .env contains `REACT_APP_AGORA_APP_ID` and `REACT_APP_AGORA_APP_CERTIFICATE` configurations, the client will automatically generate an RTM Token for you
-REACT_APP_AGORA_APP_ID=
-REACT_APP_AGORA_APP_CERTIFICATE=
-```
-
-## Run
-
-```bash
-yarn dev
-```
-
-## Pack the Electron client
-
-```bash
-# Build Web Resources
-yarn build:demo
-# Build a Windows client(Run `yarn build:demo` to build Web resources before pack electron)
-yarn pack:electron:win
-# Build a Mac client(Run `yarn build:demo` to build Web resources before pack electron)
-yarn pack:electron:mac
-```
+- [www.agora.io](https://www.agoar.io)

@@ -1,4 +1,5 @@
 node_modules
+.env
 .env-dev
 .env.dev
 .env.prod
@@ -14,5 +15,4 @@ lib
 packages/agora-log-sdk
 package-lock.json
 *.log
-packages/agora-proctor-sdk/agoraAddonlog.txt
 .vscode/
