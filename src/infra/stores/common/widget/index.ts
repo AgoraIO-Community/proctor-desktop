@@ -277,7 +277,7 @@ export class WidgetUIStore extends EduUIStoreBase {
           ({ classState, examinationUrl }) => {
             if (classState === ClassState.ongoing && examinationUrl) {
               this.createWidget(`webView-${md5(examinationUrl)}`, {
-                properties: { extra: { webViewUrl: encodeURIComponent(examinationUrl) } },
+                properties: { extra: { webViewUrl: examinationUrl } },
                 userProperties: {},
                 trackProperties: {
                   position: { xaxis: 0, yaxis: 0 },
