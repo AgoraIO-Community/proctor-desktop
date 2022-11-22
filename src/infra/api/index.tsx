@@ -1,4 +1,4 @@
-import { Scenarios } from '@proctor/capabilities/scenarios';
+import { Scenarios } from '@proctor/infra/capabilities/scenarios';
 import {
   AgoraEduClassroomEvent,
   EduClassroomConfig,
