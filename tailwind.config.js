@@ -1,5 +1,5 @@
 module.exports = {
-  purge: ['./src/**/*.{ts,tsx}', '../agora-scenario-ui-kit/src/**/*.{ts,tsx}'],
+  purge: ['./src/**/*.{ts,tsx}'],
   darkMode: 'class', // or 'media' or 'class'
 
   theme: {
