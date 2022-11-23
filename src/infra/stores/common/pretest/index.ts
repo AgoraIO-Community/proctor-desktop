@@ -365,58 +365,6 @@ export class PretestUIStore extends EduUIStoreBase {
     return this.classroomStore.mediaStore.isMirror;
   }
 
-  /**
-   * 是否开启美颜
-   * @returns
-   */
-  @computed
-  get isBeauty() {
-    return this.classroomStore.mediaStore.isBeauty;
-  }
-
-  /**
-   * 美白参数 (0 ~ 100)
-   * @returns
-   */
-  @computed
-  get whiteningValue() {
-    return Math.ceil(this.classroomStore.mediaStore.beautyEffectOptions.lighteningLevel * 100);
-  }
-
-  /**
-   * 红润参数 (0 ~ 100)
-   * @returns
-   */
-  @computed
-  get ruddyValue() {
-    return Math.ceil(this.classroomStore.mediaStore.beautyEffectOptions.rednessLevel * 100);
-  }
-
-  /**
-   * 磨皮参数 (0 ~ 100)
-   * @returns
-   */
-  @computed
-  get buffingValue() {
-    return Math.ceil(this.classroomStore.mediaStore.beautyEffectOptions.smoothnessLevel * 100);
-  }
-
-  /**
-   * 美颜调整参数类型
-   * @returns
-   */
-  @computed
-  get activeBeautyValue() {
-    switch (this.activeBeautyType) {
-      case BeautyType.buffing:
-        return this.buffingValue;
-      case BeautyType.ruddy:
-        return this.ruddyValue;
-      case BeautyType.whitening:
-        return this.whiteningValue;
-    }
-  }
-
   @computed
   get headerStep() {
     if (this.currentStep === EnumStep['three'] || this.currentStep === EnumStep['finished']) {
@@ -525,15 +473,6 @@ export class PretestUIStore extends EduUIStoreBase {
   }
 
   /**
-   * 设置美颜开启或关闭
-   * @param v
-   */
-  @bound
-  setBeauty(v: boolean) {
-    this.classroomStore.mediaStore.setBeauty(v);
-  }
-
-  /**
    * 开始扬声器测试
    * @param url
    */
@@ -620,35 +559,6 @@ export class PretestUIStore extends EduUIStoreBase {
   @action.bound
   setActiveBeautyType(value: BeautyType) {
     this.activeBeautyType = value;
-  }
-
-  /**
-   * 设置美颜参数
-   * @param value (0 ~ 100)
-   */
-  @bound
-  setActiveBeautyValue(value: number) {
-    const transformValue = Number((value / 100).toFixed(2));
-    switch (this.activeBeautyType) {
-      case BeautyType.buffing:
-        this.classroomStore.mediaStore.setBeautyEffect({
-          ...this.classroomStore.mediaStore.beautyEffectOptions,
-          smoothnessLevel: transformValue,
-        });
-        break;
-      case BeautyType.ruddy:
-        this.classroomStore.mediaStore.setBeautyEffect({
-          ...this.classroomStore.mediaStore.beautyEffectOptions,
-          rednessLevel: transformValue,
-        });
-        break;
-      case BeautyType.whitening:
-        this.classroomStore.mediaStore.setBeautyEffect({
-          ...this.classroomStore.mediaStore.beautyEffectOptions,
-          lighteningLevel: transformValue,
-        });
-        break;
-    }
   }
 
   /**
@@ -765,7 +675,7 @@ export class PretestUIStore extends EduUIStoreBase {
       const resourceUuid = await this.classroomStore.cloudDriveStore.calcResourceUuid(file);
 
       if (!supportedTypes.includes(ext)) {
-        this.classroomStore.cloudDriveStore.updateProgress(
+        this.classroomStore.cloudDriveStore._updateProgress(
           resourceUuid,
           undefined,
           CloudDriveResourceUploadStatus.Failed,

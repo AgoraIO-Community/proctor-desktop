@@ -22,11 +22,13 @@ module.exports = {
     extensions: ['.ts', '.tsx', '.js', '.jsx'],
     alias: {
       '@proctor': path.resolve(ROOT_PATH, 'src/'),
+      '@classroom': path.resolve(ROOT_PATH, '../agora-classroom-sdk/src/'),
       'agora-plugin-gallery': path.resolve(ROOT_PATH, '../agora-plugin-gallery/src'),
-      'agora-classroom-sdk': path.resolve(ROOT_PATH, '../agora-plugin-gallery/src'),
+      'agora-classroom-sdk': path.resolve(ROOT_PATH, '../agora-classroom-sdk/src/infra/api'),
       ...ALIAS,
     },
   },
+
   module: {
     unknownContextCritical: false,
     rules: [...base],

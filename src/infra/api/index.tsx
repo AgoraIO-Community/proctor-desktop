@@ -263,7 +263,7 @@ export class AgoraProctorSDK {
     const config = new EduClassroomConfig(
       this._appId,
       sessionInfo,
-      option.recordUrl || '',
+      '',
       {
         region: this.region,
         rtcConfigs: {

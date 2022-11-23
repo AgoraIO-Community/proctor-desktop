@@ -18,7 +18,7 @@ const getDialog = (category: DialogCategory, id: string, props?: any): ReactNode
     case DialogCategory.Confirm:
       return <Confirm {...props} id={id} />;
     case DialogCategory.ScreenPicker:
-      return <ScreenPickerDialog {...props} id={id} />;
+    // return <ScreenPickerDialog {...props} id={id} />;
     case DialogCategory.Quit:
       return <Quit {...props} id={id} />;
   }

@@ -27,6 +27,8 @@
     "baseUrl": ".",
     "paths": {
       "@proctor/*": ["src/*"],
+      "agora-classroom-sdk": ["../agora-classroom-sdk/src/infra/api"],
+      "@classroom/*": ["../agora-classroom-sdk/src/*"],
     }
   },
   "include": ["src"],
