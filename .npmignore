@@ -13,6 +13,8 @@ icons/
 dist/
 node_modules/
 guides/
+ci/
+templates
 
 # files
 rollup.config.js
@@ -39,3 +41,5 @@ entitlements.mac.plist
 *.map
 *.*~agoraAddonlog.txt
 docs
+.cz-config.js
+README.md

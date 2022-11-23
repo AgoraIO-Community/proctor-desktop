@@ -16,6 +16,6 @@ For publishing npm package agora-proctor-sdk (Web & Electron). Get more informat
 
 ### Question / Issue Report
 
-- [https://github.com/AgoraIO-Community/CloudClass-Desktop/issues/new](https://github.com/AgoraIO-Community/CloudClass-Desktop/issues/new)
+- [https://github.com/AgoraIO-Community/proctor-desktop/issues/new](https://github.com/AgoraIO-Community/proctor-desktop/issues/new)
 
 - [www.agora.io](https://www.agoar.io)
