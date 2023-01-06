@@ -202,6 +202,7 @@ export class RoomUIStore extends EduUIStoreBase {
   async leaveClassroom(roomUuid: string) {
     await this.roomSceneByRoomUuid(roomUuid)?.leave();
     this.roomScenes.delete(roomUuid);
+    this._sceneSubscriptions.delete(roomUuid);
   }
 
   /**

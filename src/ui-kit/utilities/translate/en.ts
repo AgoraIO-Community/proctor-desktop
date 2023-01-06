@@ -29,7 +29,7 @@ export const en = {
   fcr_sub_room_button_report_behavior_submit: 'Submit',
   fcr_exam_prep_label_exam_prep: '	Exam Prep',
   fcr_exam_prep_label_device_test: 'Device Test',
-  fcr_exam_prep_label_take_photo: '	Take your photo',
+  fcr_exam_prep_label_take_photo: 'Take photo',
   fcr_exam_prep_label_share_screen: '	Share screen',
   fcr_exam_prep_label_test_exam_device: 'Please test exam device',
   fcr_exam_prep_label_camera: 'Camera',
