@@ -1,4 +1,12 @@
-import { bound, Injectable, Log, MediaPlayerEvents, StreamMediaPlayer } from 'agora-rte-sdk';
+import {
+  bound,
+  Injectable,
+  Log,
+  MediaPlayerEvents,
+  StreamMediaPlayer,
+  Lodash,
+  Scheduler,
+} from 'agora-rte-sdk';
 import { action, observable, runInAction } from 'mobx';
 
 export enum MediaDeviceType {
@@ -20,10 +28,9 @@ export class MediaController {
   @observable totalDuration: number = 0;
   @observable currentTime: number = 0;
   @observable isPlaying: boolean = false;
-
   private _lastReloadTime: number = 0;
-  private _reloadTimer: number = -1;
-
+  private _reloadTask: Scheduler.Task | null = null;
+  private _syncTask: Scheduler.Task | null = null;
   get mainScreenPlyr() {
     return this.mediaPlyrMap.get(MediaDeviceType.MainScreen)?.plyr;
   }
@@ -55,13 +62,26 @@ export class MediaController {
       });
     }
   }
-
+  @Lodash.throttled(3000)
+  loadHlsSource(hls: any, url: any) {
+    hls.loadSource(url);
+  }
   setView(type: MediaDeviceType, dom: HTMLElement) {
     const mediaPlyr = this.mediaPlyrMap.get(type);
     if (mediaPlyr) {
       mediaPlyr.plyr.setView(dom);
       mediaPlyr.plyr.play(true, true);
       this.mediaPlyrMap.set(type, { ...mediaPlyr, container: dom });
+      const hls = (mediaPlyr.plyr as any)._hls;
+      hls.on('hlsError', (_: any, data: any) => {
+        if (!data.fatal) {
+          switch (data.type) {
+            case 'networkError':
+              this.loadHlsSource(hls, mediaPlyr.url);
+              break;
+          }
+        }
+      });
       if (type === MediaDeviceType.MainScreen) {
         this.addMediaElementListeners();
       } else {
@@ -101,7 +121,6 @@ export class MediaController {
   setTotalDuration() {
     const mediaElement = this.mediaPlyrMap.get(MediaDeviceType.MainScreen)?.plyr?.mediaElement;
     if (mediaElement) {
-      if (this.currentTime) mediaElement.currentTime = this.currentTime;
       this.logger.info(`setTotalDuration, ${mediaElement.duration || 0}`);
       this.totalDuration = mediaElement.duration || 0;
     }
@@ -110,19 +129,36 @@ export class MediaController {
   setCurrentTime() {
     const mediaElement = this.mediaPlyrMap.get(MediaDeviceType.MainScreen)?.plyr?.mediaElement;
     if (mediaElement) {
-      this.logger.info(`setCurrentTime, time: ${this.currentTime}`);
       this.currentTime = mediaElement.currentTime || 0;
     }
+  }
+  @bound
+  syncPlyrStates() {
+    this.mediaPlyrMap.forEach((p) => {
+      if (p.plyr.mediaElement) {
+        const mediaElement = p.plyr.mediaElement;
+        const isPlaying = !!(
+          mediaElement.currentTime > 0 &&
+          !mediaElement.paused &&
+          !mediaElement.ended &&
+          mediaElement.readyState > 2
+        );
+        if (isPlaying !== !this.isPlaying) {
+          this.isPlaying ? mediaElement.play() : mediaElement.pause();
+        }
+        if (Math.abs((mediaElement.currentTime || 0) - this.currentTime) > 2) {
+          mediaElement.currentTime = this.currentTime;
+        }
+      }
+    });
   }
   addMediaElementListeners() {
     this.logger.info(`addMediaElementListeners`);
     this.mainScreenPlyr?.mediaElement?.addEventListener('play', this.play);
     this.mainScreenPlyr?.mediaElement?.addEventListener('pause', this.pause);
-
     this.mainScreenPlyr?.mediaElement?.addEventListener('loadedmetadata', this.setTotalDuration);
-
+    this.mainScreenPlyr?.mediaElement?.addEventListener('canplay', this.onCanplay, { once: true });
     this.mainScreenPlyr?.mediaElement?.addEventListener('timeupdate', this.setCurrentTime);
-
     this.mainScreenPlyr?.mediaElement?.addEventListener('ended', this.throllteReload);
   }
   removeMediaElementListeners() {
@@ -130,31 +166,39 @@ export class MediaController {
     this.mainScreenPlyr?.mediaElement?.removeEventListener('play', this.play);
     this.mainScreenPlyr?.mediaElement?.removeEventListener('pause', this.pause);
     this.mainScreenPlyr?.mediaElement?.removeEventListener('loadedmetadata', this.setTotalDuration);
-
     this.mainScreenPlyr?.mediaElement?.removeEventListener('timeupdate', this.setCurrentTime);
-
     this.mainScreenPlyr?.mediaElement?.removeEventListener('ended', this.throllteReload);
+    this.mainScreenPlyr?.mediaElement?.removeEventListener('canplay', this.onCanplay);
   }
   @bound
+  onCanplay() {
+    if (this.mainScreenPlyr?.mediaElement) {
+      this.mainScreenPlyr.mediaElement.currentTime = this.currentTime;
+
+      this._syncTask = Scheduler.shared.addIntervalTask(this.syncPlyrStates, 3000);
+    }
+  }
+
+  @bound
   throllteReload() {
-    if (this._reloadTimer !== -1) return;
+    if (this._reloadTask) return;
     const now = new Date().getTime();
     if (now - this._lastReloadTime >= 30000) {
       this._lastReloadTime = now;
       this.reload();
     } else {
-      this._reloadTimer = window.setTimeout(() => {
+      this._reloadTask = Scheduler.shared.addDelayTask(() => {
         this.reload();
         this._lastReloadTime = new Date().getTime();
-        this._reloadTimer = -1;
+        this._reloadTask = null;
       }, 30000);
     }
   }
   @bound
   reload() {
     this.logger.info(`reload`);
-
     this.removeMediaElementListeners();
+    this._syncTask?.stop();
     this.mediaPlyrMap.forEach((p, k) => {
       p.plyr.dispose();
       if (p.url && p.container) {
@@ -166,11 +210,11 @@ export class MediaController {
   @bound
   destroy() {
     this.logger.info(`destroy`);
-
-    window.clearTimeout(this._reloadTimer);
-    this._reloadTimer = -1;
     this._lastReloadTime = 0;
     this.removeMediaElementListeners();
+    this._syncTask?.stop();
+    this._reloadTask?.stop();
+    this._reloadTask = null;
     this.mediaPlyrMap.forEach((p) => {
       p.plyr.dispose();
     });

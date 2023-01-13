@@ -22,10 +22,21 @@ import './index.css';
 
 import { DeviceTypeEnum } from '@proctor/infra/api';
 import { EduClassroomConfig } from 'agora-edu-core';
-import { AgoraRteVideoSourceType } from 'agora-rte-sdk';
+import { AgoraRteVideoSourceType, Scheduler } from 'agora-rte-sdk';
 import './index.css';
 import { Select } from '@proctor/infra/capabilities/components/select/select';
 import { useI18n } from 'agora-common-libs';
+type RecordType = 'audio' | 'video' | 'av';
+interface RecordItem {
+  startTime: number;
+  recordDetails: {
+    streamUuid: string;
+    type: RecordType;
+    url: string;
+    startTime: number;
+  }[];
+}
+
 export const StudentDetail = observer(({ userUuidPrefix }: { userUuidPrefix: string }) => {
   const {
     roomUIStore: { roomSceneByRoomUuid },
@@ -37,6 +48,7 @@ export const StudentDetail = observer(({ userUuidPrefix }: { userUuidPrefix: str
       generateGroupUuid,
     },
   } = useStore();
+  const queryRecordTask = useRef<Scheduler.Task>();
   const studentHlsVideosRef = useRef<{
     seek: (time: number) => void;
   }>(null);
@@ -58,17 +70,42 @@ export const StudentDetail = observer(({ userUuidPrefix }: { userUuidPrefix: str
   >([]);
   const [abnormal, setAbnormal] = useState<string | undefined>(undefined);
   const [startTime, setStartTime] = useState(0);
-  const [recordList, setRecordList] = useState<
-    {
-      startTime: number;
-      recordDetails: {
-        streamUuid: string;
-        type: 'audio' | 'video' | 'av';
-        url: string;
-        startTime: number;
-      }[];
-    }[]
-  >([]);
+  const [record, setRecord] = useState<RecordItem>();
+  const getRecord = (
+    record: RecordItem | undefined,
+    recordType: RecordType,
+    userUuid: string,
+    videoSourceType: AgoraRteVideoSourceType,
+  ) =>
+    record?.recordDetails?.find((i) => {
+      return (
+        i.type === recordType &&
+        Array.from(roomScene?.streamController?.streamByUserUuid.get(userUuid) || []).find(
+          (i) =>
+            roomScene?.streamController?.streamByStreamUuid.get(i)?.videoSourceType ===
+            videoSourceType,
+        ) === i.streamUuid
+      );
+    });
+
+  const mainDeviceScreenRecordUrl = getRecord(
+    record,
+    'video',
+    mainDeviceUserUuid,
+    AgoraRteVideoSourceType.ScreenShare,
+  )?.url;
+  const mainDeviceCameraRecordUrl = getRecord(
+    record,
+    'av',
+    mainDeviceUserUuid,
+    AgoraRteVideoSourceType.Camera,
+  )?.url;
+  const subDeviceCameraRecordUrl = getRecord(
+    record,
+    'video',
+    subDeviceUserUuid,
+    AgoraRteVideoSourceType.Camera,
+  )?.url;
 
   const queryUserAbnormal = async () => {
     const res = await queryUserEvents(
@@ -86,14 +123,10 @@ export const StudentDetail = observer(({ userUuidPrefix }: { userUuidPrefix: str
       ).sort((a, b) => b.sequence - a.sequence),
     );
   };
-  const queryRecords = async () => {
-    queryRecordList(roomUuid!).then((res) => {
-      setRecordList(res.list);
-    });
-  };
   useEffect(() => {
     queryUserAbnormal();
     queryRecords();
+    return () => queryRecordTask.current?.stop();
   }, []);
   const submitAbnormal = useCallback(async () => {
     await updateUserTags(
@@ -106,43 +139,37 @@ export const StudentDetail = observer(({ userUuidPrefix }: { userUuidPrefix: str
     queryUserAbnormal();
   }, [abnormal]);
 
-  const currentRecord = useMemo(() => {
-    return recordList[recordList.length - 1 < 0 ? 0 : recordList.length - 1];
-  }, [recordList]);
-
-  const mainDeviceScreenVideo = currentRecord?.recordDetails?.find((i) => {
-    return (
-      i.type === 'video' &&
-      roomScene?.streamController?.streamByStreamUuid.get(i.streamUuid)?.videoSourceType ===
-        AgoraRteVideoSourceType.ScreenShare
-    );
-  });
-
-  const mainDeviceCameraVideo = currentRecord?.recordDetails?.find((i) => {
-    return (
-      i.type === 'av' &&
-      Array.from(roomScene?.streamController?.streamByUserUuid.get(mainDeviceUserUuid) || []).find(
-        (i) =>
-          roomScene?.streamController?.streamByStreamUuid.get(i)?.videoSourceType ===
-          AgoraRteVideoSourceType.Camera,
-      ) === i.streamUuid
-    );
-  });
-  const subDeviceCameraVideo = currentRecord?.recordDetails?.find((i) => {
-    return (
-      i.type === 'video' &&
-      Array.from(roomScene?.streamController?.streamByUserUuid.get(subDeviceUserUuid) || []).find(
-        (i) =>
-          roomScene?.streamController?.streamByStreamUuid.get(i)?.videoSourceType ===
-          AgoraRteVideoSourceType.Camera,
-      ) === i.streamUuid
-    );
-  });
-  useEffect(() => {
-    if (currentRecord && currentRecord.startTime !== startTime) {
-      setStartTime(currentRecord.startTime);
+  const queryRecords = async () => {
+    const { list } = (await queryRecordList(roomUuid!)) as { list: RecordItem[] };
+    const currentRecord = list[list.length - 1 < 0 ? 0 : list.length - 1];
+    const mainDeviceScreenRecordUrl = getRecord(
+      currentRecord,
+      'video',
+      mainDeviceUserUuid,
+      AgoraRteVideoSourceType.ScreenShare,
+    )?.url;
+    const mainDeviceCameraRecordUrl = getRecord(
+      currentRecord,
+      'av',
+      mainDeviceUserUuid,
+      AgoraRteVideoSourceType.Camera,
+    )?.url;
+    const subDeviceCameraRecordUrl = getRecord(
+      currentRecord,
+      'video',
+      subDeviceUserUuid,
+      AgoraRteVideoSourceType.Camera,
+    )?.url;
+    if (!mainDeviceScreenRecordUrl || !mainDeviceCameraRecordUrl || !subDeviceCameraRecordUrl) {
+      queryRecordTask.current = Scheduler.shared.addDelayTask(queryRecords, 3000);
     }
-  }, [currentRecord, startTime]);
+    setRecord(currentRecord);
+  };
+  useEffect(() => {
+    if (record && record.startTime !== startTime) {
+      setStartTime(record.startTime);
+    }
+  }, [record, startTime]);
   const onUserEventClick = (ts: number) => {
     studentHlsVideosRef.current?.seek(dayjs.duration(Math.abs(ts - startTime), 'ms').asSeconds());
   };
@@ -154,9 +181,9 @@ export const StudentDetail = observer(({ userUuidPrefix }: { userUuidPrefix: str
       <div className="fcr-student-detail-tab-replay">
         <StudentHLSVideos
           ref={studentHlsVideosRef}
-          mainDeviceScreenVideo={mainDeviceScreenVideo?.url}
-          mainDeviceCameraVideo={mainDeviceCameraVideo?.url}
-          subDeviceCameraVideo={subDeviceCameraVideo?.url}
+          mainDeviceScreenVideo={mainDeviceScreenRecordUrl}
+          mainDeviceCameraVideo={mainDeviceCameraRecordUrl}
+          subDeviceCameraVideo={subDeviceCameraRecordUrl}
           layout={VideosWallLayoutEnum.Compact}
         />
         <div className="fcr-student-detail-tab-replay-bottom">
