@@ -25,22 +25,22 @@ type RemoteTrackPlayerProps = {
 type LocalTrackPlayerProps = Omit<RemoteTrackPlayerProps, 'stream'>;
 export const LocalTrackPlayer: FC<LocalTrackPlayerProps> = observer(({ style, className }) => {
   const {
-    streamUIStore: { setupLocalVideo, isMirror },
+    streamUIStore: { setupLocalVideo },
   } = useStore();
   const ref = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     if (ref.current) {
-      setupLocalVideo(ref.current, isMirror);
+      setupLocalVideo(ref.current, false);
     }
-  }, [isMirror, setupLocalVideo]);
+  }, [setupLocalVideo]);
 
   return <div style={style} className={`fcr-track-player ${className}`} ref={ref}></div>;
 });
 export const RemoteTrackPlayer = observer(
   forwardRef<{ fullScreen: () => void }, RemoteTrackPlayerProps>(
     (
-      { style, className, stream, mirrorMode = true, fromScene, subscribeLowStream = true },
+      { style, className, stream, mirrorMode = false, fromScene, subscribeLowStream = true },
       ref,
     ) => {
       const {
