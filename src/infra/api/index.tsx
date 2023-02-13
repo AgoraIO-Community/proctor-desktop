@@ -6,7 +6,6 @@ import {
   EduMediaEncryptionMode,
   EduRegion,
   EduRoleTypeEnum,
-  EduRoomServiceTypeEnum,
   EduRoomTypeEnum,
   Platform,
 } from 'agora-edu-core';
@@ -226,7 +225,6 @@ export class AgoraProctorSDK {
       userUuid,
       userName,
       roleType,
-      roomServiceType = EduRoomServiceTypeEnum.LiveStandard,
       rtmToken,
       roomUuid,
       roomName,
@@ -245,7 +243,6 @@ export class AgoraProctorSDK {
       roomUuid,
       roomName,
       roomType,
-      roomServiceType,
       duration,
       flexProperties: {},
       token: rtmToken,
