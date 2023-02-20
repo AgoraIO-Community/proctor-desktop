@@ -6,7 +6,6 @@ import {
   ClassState,
   EduClassroomConfig,
   EduRoleTypeEnum,
-  EduRoomServiceTypeEnum,
   LeaveReason,
   RecordMode,
   RecordStatus,

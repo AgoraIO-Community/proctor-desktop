@@ -1,7 +1,6 @@
 import {
   AgoraEduClassroomEvent,
   EduRoleTypeEnum,
-  EduRoomServiceTypeEnum,
   EduRoomTypeEnum,
   EduRtcConfig,
   Platform,
@@ -72,7 +71,6 @@ export type LaunchOption = {
   roomUuid: string; // 房间uuid
   roleType: EduRoleTypeEnum; // 角色
   roomType: EduRoomTypeEnum; // 房间类型
-  roomServiceType?: EduRoomServiceTypeEnum; // 房间服务类型
   roomName: string; // 房间名称
   listener: ListenerCallback; // launch状态
   pretest: boolean; // 开启设备检测
