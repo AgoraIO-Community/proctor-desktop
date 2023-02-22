@@ -51,14 +51,6 @@ export class SubscriptionUIStore extends EduUIStoreBase {
         }
       )
     );
-    this._disposers.push(
-      reaction(
-        () => this.classroomStore.roomStore.isCDNMode,
-        (isCDNMode) => {
-          this.setCDNMode(isCDNMode);
-        }
-      )
-    );
   }
 
   onDestroy(): void {

@@ -28,7 +28,6 @@ import {
   AgoraStream,
   AGRtcConnectionType,
   bound,
-  Injectable,
   Log,
   Logger,
   AGRtcState,
@@ -39,7 +38,7 @@ import { action, computed, observable, reaction, runInAction } from 'mobx';
 import { computedFn } from 'mobx-utils';
 
 export class RoomScene {
-  protected logger!: Injectable.Logger;
+  protected logger!: Logger;
   @observable streamController: StreamController | null = null;
 
   @observable checkInData?: CheckInData;
@@ -115,6 +114,7 @@ export class RoomScene {
         return ClassroomState.Error;
     }
   }
+  @bound
   async leave() {
     if (this.rtcState?.get(AGRtcConnectionType.sub) !== AGRtcState.Idle) {
       this.classroomStore.mediaStore.stopScreenShareCapture();
@@ -279,6 +279,7 @@ class StreamController {
       }
     }
   });
+  @bound
   async joinRTC(options?: AgoraRteSceneJoinRTCOptions) {
     //join rtc
     let [err] = await to(this._scene?.joinRTC(options) || Promise.resolve());
@@ -403,6 +404,7 @@ class StreamController {
       },
     );
   }
+  @bound
   destroy() {
     this._disposers.forEach((fn) => fn());
     this.dataStore.stateKeeper?.stop();

@@ -1,11 +1,11 @@
 import {
   bound,
-  Injectable,
   Log,
   MediaPlayerEvents,
   StreamMediaPlayer,
   Lodash,
   Scheduler,
+  Logger,
 } from 'agora-rte-sdk';
 import { action, observable, runInAction } from 'mobx';
 
@@ -21,7 +21,7 @@ interface MediaInstance {
 }
 @Log.attach({ proxyMethods: false })
 export class MediaController {
-  logger!: Injectable.Logger;
+  logger!: Logger;
 
   mediaPlyrMap: Map<MediaDeviceType, MediaInstance> = new Map();
 
@@ -52,6 +52,7 @@ export class MediaController {
     });
     this.isPlaying = false;
   }
+  @bound
   setVideoUrl(type: MediaDeviceType, url: string, forceReload?: boolean) {
     this.logger.info(`setVideoUrl,type: ${type}, url: ${url}`);
 
@@ -66,6 +67,8 @@ export class MediaController {
   loadHlsSource(hls: any, url: any) {
     hls.loadSource(url);
   }
+
+  @bound
   setView(type: MediaDeviceType, dom: HTMLElement) {
     const mediaPlyr = this.mediaPlyrMap.get(type);
     if (mediaPlyr) {
@@ -108,6 +111,7 @@ export class MediaController {
     }
   }
 
+  @bound
   syncPlyrCurrentTime(time: number) {
     this.logger.info(`syncPlyrCurrentTime: ${time}`);
     this.mediaPlyrMap.forEach((p) => {
@@ -219,6 +223,7 @@ export class MediaController {
       p.plyr.dispose();
     });
   }
+  @bound
   requestFullscreen(type: MediaDeviceType) {
     const plyr = this.mediaPlyrMap.get(type);
     if (plyr && plyr.plyr.mediaElement) {

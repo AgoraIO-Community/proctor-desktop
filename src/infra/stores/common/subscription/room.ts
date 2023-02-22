@@ -9,13 +9,13 @@ import {
   AgoraStream,
   AgoraUser,
   AGRtcConnectionType,
-  Injectable,
   Log,
+  Logger,
 } from 'agora-rte-sdk';
 import { AGRtcChannel } from 'agora-rte-sdk/lib/core/rtc/channel';
 
 export abstract class SceneSubscription {
-  protected logger!: Injectable.Logger;
+  protected logger!: Logger;
 
   protected _active = false;
   protected _isCdnMode = false;

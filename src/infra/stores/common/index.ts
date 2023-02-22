@@ -181,6 +181,7 @@ export class EduClassroomUIStore {
   /**
    * 销毁所有 UIStore
    */
+  @bound
   destroy() {
     Object.getOwnPropertyNames(this).forEach((propertyName) => {
       if (propertyName.endsWith('UIStore')) {

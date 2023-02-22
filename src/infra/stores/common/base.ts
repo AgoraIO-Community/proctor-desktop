@@ -1,14 +1,14 @@
-import { Injectable } from 'agora-rte-sdk';
 import { EduClassroomStore } from 'agora-edu-core';
 import { EduShareUIStore } from './share-ui';
 import { Board } from '@proctor/infra/protocol/board';
 import { Extension } from '@proctor/infra/protocol';
 import { Getters } from './getters';
+import { Logger } from 'agora-rte-sdk';
 
 export abstract class EduUIStoreBase {
   private static _boardApi = new Board();
   private static _extensionApi = new Extension();
-  protected logger!: Injectable.Logger;
+  protected logger!: Logger;
   /**
    * 参数覆盖
    */

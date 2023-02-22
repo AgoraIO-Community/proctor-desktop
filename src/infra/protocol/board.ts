@@ -1,5 +1,5 @@
 import { AgoraWidgetController, EduClassroomConfig, EduRoleTypeEnum } from 'agora-edu-core';
-import { bound, Injectable, Log } from 'agora-rte-sdk';
+import { bound, Log, Logger } from 'agora-rte-sdk';
 import { action, computed, observable, runInAction, toJS } from 'mobx';
 import { AgoraProctorSDK } from '../api';
 import { withTimeout } from '../utils/ipc';
@@ -8,7 +8,7 @@ import { BoardConnectionState, BoardMountState, FcrBoardShape, FcrBoardTool } fr
 
 @Log.attach({ proxyMethods: false })
 export class Board {
-  private logger!: Injectable.Logger;
+  private logger!: Logger;
   private _controller?: AgoraWidgetController;
   @observable
   grantedUsers = new Set<string>();

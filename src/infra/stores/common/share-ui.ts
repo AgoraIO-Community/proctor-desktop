@@ -3,7 +3,7 @@ import { getEduErrorMessage, getErrorServCode } from '@proctor/infra/utils/error
 import { sendToMainProcess } from '@proctor/infra/utils/ipc';
 import { ChannelType } from '@proctor/infra/utils/ipc-channels';
 import { transI18n } from 'agora-common-libs';
-import { AGError, AGRteErrorCode, bound, Injectable, Lodash, Log, Scheduler } from 'agora-rte-sdk';
+import { AGError, AGRteErrorCode, bound, Lodash, Log, Logger, Scheduler } from 'agora-rte-sdk';
 import { action, observable, runInAction } from 'mobx';
 import { v4 as uuidv4 } from 'uuid';
 import { getRootDimensions } from './layout/helper';
@@ -43,7 +43,7 @@ export interface DialogType {
 
 @Log.attach({ proxyMethods: false })
 export class EduShareUIStore {
-  protected logger!: Injectable.Logger;
+  protected logger!: Logger;
   readonly classroomViewportClassName = 'classroom-viewport';
   readonly classroomViewportTransitionDuration = 300;
   readonly navHeight = 27;
@@ -249,6 +249,7 @@ export class EduShareUIStore {
   /**
    * 更新教室视口尺寸信息
    */
+  @bound
   @Lodash.debounced(500)
   updateClassroomViewportSize() {
     const { width, height } = getRootDimensions(this._containerNode);
@@ -373,6 +374,7 @@ export class EduShareUIStore {
     sendToMainProcess(ChannelType.CloseBrowserWindow, windowID);
   }
 
+  @bound
   addViewportResizeObserver(callback: () => void) {
     const observer = new ResizeObserver(callback);
 
