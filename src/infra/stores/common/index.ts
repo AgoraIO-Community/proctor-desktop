@@ -6,7 +6,7 @@ import {
   EduClassroomStore,
   LeaveReason,
 } from 'agora-edu-core';
-import { AGError, AgoraRteLogLevel, Log } from 'agora-rte-sdk';
+import { AGError, bound, Log } from 'agora-rte-sdk';
 import { EduUIStoreBase } from './base';
 import { DeviceSettingUIStore } from './device-setting/index';
 import { LayoutUIStore } from './layout';
@@ -20,7 +20,7 @@ import { StudentViewUIStore } from './student-view';
 import { SubscriptionUIStore } from './subscription';
 import { UsersUIStore } from './users';
 import { WidgetUIStore } from './widget';
-@Log.attach({ level: AgoraRteLogLevel.INFO })
+@Log.attach()
 export class EduClassroomUIStore {
   protected _classroomStore: EduClassroomStore;
   protected _shareUIStore: EduShareUIStore;
@@ -106,6 +106,7 @@ export class EduClassroomUIStore {
    * 初始化所有 UIStore
    * @returns
    */
+  @bound
   initialize() {
     if (this._installed) {
       return;
@@ -132,6 +133,7 @@ export class EduClassroomUIStore {
   /**
    * 加入教室，之后加入 RTC 频道
    */
+  @bound
   async join() {
     const { joinClassroom, joinRTC } = this.classroomStore.connectionStore;
     try {
