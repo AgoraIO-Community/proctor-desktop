@@ -25,7 +25,7 @@ import { EduClassroomConfig } from 'agora-edu-core';
 import { AgoraRteVideoSourceType, Scheduler } from 'agora-rte-sdk';
 import './index.css';
 import { Select } from '@proctor/infra/capabilities/components/select/select';
-import { useI18n } from 'agora-common-libs';
+import { useI18n } from 'agora-common-libs/lib/i18n';
 type RecordType = 'audio' | 'video' | 'av';
 interface RecordItem {
   startTime: number;

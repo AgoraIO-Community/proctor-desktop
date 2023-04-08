@@ -6,7 +6,7 @@ import { useCallback, useEffect } from 'react';
 import styled, { css } from 'styled-components';
 import { TrackArea } from '../../common/root-box';
 import { WidgetContainer } from '../../common/widget';
-import { useI18n } from 'agora-common-libs';
+import { useI18n } from 'agora-common-libs/lib/i18n';
 
 export const Content = observer(() => {
   const {

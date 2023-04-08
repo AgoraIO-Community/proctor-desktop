@@ -2,7 +2,7 @@ import {
   AgoraMidBorderRadius,
   AgoraLargeBorderRadius,
 } from '@proctor/infra/capabilities/components/common';
-import { useI18n } from 'agora-common-libs';
+import { useI18n } from 'agora-common-libs/lib/i18n';
 import { Col, Row, Space } from 'antd';
 import styled from 'styled-components';
 import { PreTestCamera, PreTestMicrophone, PreTestSpeaker, PureVideo } from '../media-info';

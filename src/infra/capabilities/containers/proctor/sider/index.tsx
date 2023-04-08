@@ -11,7 +11,7 @@ import { SvgIconEnum, SvgImg } from '@proctor/ui-kit';
 import { LocalTrackPlayer } from '../../common/stream/track-player';
 import { BtnWithCloseCheck } from '../../examinee/sider/room-operation';
 import './index.css';
-import { useI18n } from 'agora-common-libs';
+import { useI18n } from 'agora-common-libs/lib/i18n';
 export const ProctorSider = observer(() => {
   const {
     navigationBarUIStore: { startClass, classState },

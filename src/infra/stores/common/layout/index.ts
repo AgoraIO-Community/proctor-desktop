@@ -4,7 +4,7 @@ import { EduUIStoreBase } from '../base';
 import uuidv4 from 'uuid';
 import { bound } from 'agora-rte-sdk';
 import { iterateMap } from 'agora-edu-core';
-import { transI18n } from 'agora-common-libs';
+import { transI18n } from 'agora-common-libs/lib/i18n';
 export class LayoutUIStore extends EduUIStoreBase {
   @observable currentTab = 'ALL_VIDEOS';
 

@@ -6,8 +6,8 @@ import {
   Platform,
 } from 'agora-edu-core';
 import { AGVideoEncoderConfiguration, AGMediaOptions } from 'agora-rte-sdk';
-import { AgoraWidgetBase } from '../stores/common/widget/widget-base';
-import { FcrMultiThemeMode } from '../types/config';
+import { FcrMultiThemeMode } from 'agora-common-libs/lib/ui';
+import { AgoraWidgetBase } from 'agora-common-libs/lib/widget';
 
 export type AgoraRegion = Uppercase<AgoraRegionString>;
 
@@ -100,14 +100,6 @@ export type LaunchWindowOption = {
 };
 
 export { AgoraExtensionRoomEvent, AgoraExtensionWidgetEvent } from '../protocol/events';
-export { AgoraWidgetTrackMode } from '../stores/common/widget/type';
-export { AgoraWidgetBase } from '../stores/common/widget/widget-base';
-export type {
-  AgoraMultiInstanceWidget,
-  AgoraTrackSyncedWidget,
-  AgoraWidgetLifecycle,
-  AgoraWidgetRenderable,
-} from '../stores/common/widget/widget-base';
 
 export type BoardWindowAnimationOptions = {
   minFPS?: number;

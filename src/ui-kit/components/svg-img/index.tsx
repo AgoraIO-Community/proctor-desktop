@@ -3,8 +3,8 @@ import classnames from 'classnames';
 import { BaseProps } from '../util/type';
 import { getPath, getViewBox, PathOptions } from './svg-dict';
 import { SvgIconEnum } from './type';
-import { themeContext } from '../theme';
 import './index.css';
+import { themeContext } from 'agora-common-libs/lib/ui';
 
 export type SvgImgProps = BaseProps & {
   type: SvgIconEnum;

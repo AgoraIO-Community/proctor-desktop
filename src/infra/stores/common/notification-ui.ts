@@ -1,6 +1,6 @@
 import { getEduErrorMessage } from '@proctor/infra/utils/error';
 import { ToastFilter } from '@proctor/infra/utils/toast-filter';
-import { transI18n } from 'agora-common-libs';
+import { transI18n } from 'agora-common-libs/lib/i18n';
 import {
   AgoraEduClassroomEvent,
   ClassroomState,

@@ -7,7 +7,7 @@ import { FC } from 'react';
 import styled from 'styled-components';
 import { SvgIconEnum, SvgImg } from '@proctor/ui-kit';
 import { StudentPretest, TeacherPretest } from './student-pretest';
-import { useI18n } from 'agora-common-libs';
+import { useI18n } from 'agora-common-libs/lib/i18n';
 
 interface pretestProps {
   onOk: () => void;

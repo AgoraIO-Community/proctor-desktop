@@ -12,7 +12,7 @@ import { FC, useCallback, useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import { SvgIconEnum, SvgImg } from '@proctor/ui-kit';
 import PretestAudio from './assets/pretest-audio.mp3';
-import { useI18n } from 'agora-common-libs';
+import { useI18n } from 'agora-common-libs/lib/i18n';
 
 const { Option } = AgoraSelect;
 export const PreTestCamera: FC = observer(() => {
@@ -20,7 +20,7 @@ export const PreTestCamera: FC = observer(() => {
     pretestUIStore: { cameraDevicesList, currentCameraDeviceId, setCameraDevice },
   } = useStore();
 
-  const handleCameraChange = useCallback((value) => {
+  const handleCameraChange = useCallback((value: string) => {
     setCameraDevice(value);
   }, []);
 
@@ -39,7 +39,7 @@ export const PreTestMicrophone: FC = observer(() => {
   const {
     pretestUIStore: { recordingDevicesList, currentRecordingDeviceId, setRecordingDevice },
   } = useStore();
-  const handleMicrophoneChange = useCallback((value) => {
+  const handleMicrophoneChange = useCallback((value: string) => {
     setRecordingDevice(value);
   }, []);
   return (
@@ -68,7 +68,7 @@ export const PreTestSpeaker: FC = observer(() => {
   } = useStore();
   const t = useI18n();
   const urlRef = useRef<string>(PretestAudio);
-  const handlePlaybackChange = useCallback((value) => {
+  const handlePlaybackChange = useCallback((value: string) => {
     setPlaybackDevice(value);
   }, []);
 

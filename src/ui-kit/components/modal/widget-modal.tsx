@@ -3,7 +3,7 @@ import classnames from 'classnames';
 import { SvgImg, SvgIconEnum } from '@proctor/ui-kit';
 import { AutoSizer } from 'react-virtualized';
 import './widget-modal.css';
-import { themeContext } from '../theme';
+import { themeContext } from 'agora-common-libs/lib/ui';
 
 type WidgetModalProps = {
   title: string;

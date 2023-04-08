@@ -7,7 +7,7 @@ import { DeviceTest } from './device-test';
 import { ImageSnapshot } from './image-snapshot';
 import { ShareScreen } from './share-screen';
 import { useMemo } from 'react';
-import { useI18n } from 'agora-common-libs';
+import { useI18n } from 'agora-common-libs/lib/i18n';
 export const StudentPretest = observer(() => {
   const {
     pretestUIStore: { currentStep, headerStep },

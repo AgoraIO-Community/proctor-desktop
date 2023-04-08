@@ -1,17 +1,14 @@
-import { FC, createContext } from 'react';
-import { FcrTheme } from '@proctor/ui-kit';
-import { FcrUIConfig } from '../types/config';
+import { FC, PropsWithChildren, createContext } from 'react';
+import { FcrTheme, FcrUIConfig, ThemeProvider } from 'agora-common-libs/lib/ui';
+import { I18nProvider } from 'agora-common-libs/lib/i18n';
+
 export const uiConfigContext = createContext({} as FcrUIConfig);
-import { I18nProvider, ThemeProvider } from 'agora-common-libs';
 
 const { Provider, Consumer } = uiConfigContext;
 
-export const Providers: FC<{ language: string; uiConfig: FcrUIConfig; theme: FcrTheme }> = ({
-  children,
-  language,
-  uiConfig,
-  theme,
-}) => {
+export const Providers: FC<
+  PropsWithChildren<{ language: string; uiConfig: FcrUIConfig; theme: FcrTheme }>
+> = ({ children, language, uiConfig, theme }) => {
   return (
     <I18nProvider language={language}>
       <ThemeProvider value={theme}>

@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC, PropsWithChildren } from 'react';
 import classnames from 'classnames';
 import { BaseProps } from '@proctor/ui-kit/components/util/type';
 import { CSSTransition } from 'react-transition-group';
@@ -10,7 +10,7 @@ interface OverlayWrapProps extends BaseProps {
   onExited?: (() => void) | undefined;
 }
 
-export const OverlayWrap: FC<OverlayWrapProps> = ({
+export const OverlayWrap: FC<PropsWithChildren<OverlayWrapProps>> = ({
   opened,
   onExited,
   className,

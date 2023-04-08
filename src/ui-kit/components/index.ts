@@ -16,7 +16,6 @@ export * from './sound-player';
 export * from './spin';
 export * from './svg-img';
 export * from './svga-player';
-export * from './theme';
 export * from './time-picker';
 export * from './toast';
 export * from './tree';
