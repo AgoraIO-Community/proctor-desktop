@@ -62,11 +62,11 @@
 }
 
 .fcr-btn:focus {
-  @apply outline-none;
+  @apply fcr-outline-none;
 }
 
 .fcr-btn[disabled] {
-  @apply disabled:opacity-50 pointer-events-none;
+  @apply fcr-opacity-50 fcr-pointer-events-none;
 }
 
 .fcr-btn.fcr-btn-xs[disabled],
