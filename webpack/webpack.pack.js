@@ -1,7 +1,6 @@
 const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
 const webpackMerge = require('webpack-merge');
-const { InjectManifest } = require('workbox-webpack-plugin');
 const path = require('path');
 const webpack = require('webpack');
 const dotenv = require('dotenv-webpack');
