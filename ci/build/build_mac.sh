@@ -69,66 +69,8 @@
 # ========== Guidelines End=============
 # --------------------------------------------------------------------------------------------------------------------------
 
-echo Package_Publish: $Package_Publish
-echo is_tag_fetch: $is_tag_fetch
-echo arch: $arch
-echo source_root: %source_root%
-echo output: /tmp/jenkins/${project}_out
-echo build_date: $build_date
-echo build_time: $build_time
-echo release_version: $release_version
-echo short_version: $short_version
-echo pwd: `pwd`
+. ../apaas-cicd-web/utilities/tools.sh
+. ../apaas-cicd-web/build/$ci_script_version/dependency.sh
+. ../apaas-cicd-web/build/$ci_script_version/build.sh
 
-
-echo "-----install------"
-sh ./scripts/install-apaas-modules.sh
-echo "-----install finished------"
-
-
-
-if ["$record" = ""]
-
-    then
-        if [ "$Env" = "Prod" ] 
-            then
-                REACT_APP_AGORA_APP_SDK_DOMAIN=http://api-solutions-dev.bj2.agoralab.co
-                REACT_APP_AGORA_APP_TOKEN_DOMAIN=http://api-solutions-dev.bj2.agoralab.co   
-                export PROCTORING_DEMO_PUBLISH_PATH=proctoring/test
-            else 
-                REACT_APP_AGORA_APP_SDK_DOMAIN=http://api-solutions-dev.bj2.agoralab.co
-                REACT_APP_AGORA_APP_TOKEN_DOMAIN=http://api-solutions-dev.bj2.agoralab.co   
-                export PROCTORING_DEMO_PUBLISH_PATH=proctoring/test
-                # echo REACT_APP_AGORA_APP_SDK_DOMAIN:$REACT_APP_AGORA_APP_SDK_DOMAIN
-                # echo REACT_APP_AGORA_APP_TOKEN_DOMAIN:$REACT_APP_AGORA_APP_TOKEN_DOMAIN
-                # echo PROCTORING_DEMO_PUBLISH_PATH:$PROCTORING_DEMO_PUBLISH_PATH
-                echo "-----build------"
-                yarn ci:build:web
-                echo "-----build finished------"
-                echo "-----publish started------"
-                aws s3 sync ./packages/agora-proctor-demo/build/. s3://agora-adc-artifacts/$PROCTORING_DEMO_PUBLISH_PATH/ --cache-control no-cache
-                global_url=https://solutions-apaas.agora.io/$PROCTORING_DEMO_PUBLISH_PATH/index.html
-                echo global_url: $global_url
-                echo "-----publish success------"
-            fi
-                
-    else 
-            
-            echo "-----build------"
-            yarn release:proctor:sdk
-
-            echo "-----build finished------"
-            mkdir -p record_temp
-            cp templates/record_page_test.html ./record_temp/record_page_test.html || true
-            cp packages/agora-proctor-sdk/lib/* ./record_temp/. || true
-            url=https://agora-adc-artifacts.s3.cn-north-1.amazonaws.com.cn/apaas/proctor/record/test/$record/record_page_test.html
-            echo $url
-            aws s3 sync ./record_temp/. s3://agora-adc-artifacts/apaas/proctor/record/test/$record
-    fi
-    
-
-
-
-
-
-
+build_lib
