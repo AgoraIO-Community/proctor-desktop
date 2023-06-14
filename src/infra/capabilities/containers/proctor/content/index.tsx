@@ -12,7 +12,7 @@ import './index.css';
 import { AgoraTabs } from '@proctor/infra/capabilities/components/tabs';
 import { AgoraSegmented } from '@proctor/infra/capabilities/components/segmented';
 import { AgoraPopover } from '@proctor/infra/capabilities/components/popover';
-import { useI18n } from 'agora-common-libs/lib/i18n';
+import { useI18n } from 'agora-common-libs';
 
 export const ProctorContent = observer(() => {
   const {

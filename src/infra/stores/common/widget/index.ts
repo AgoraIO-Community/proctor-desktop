@@ -18,7 +18,7 @@ import {
   AgoraWidgetLifecycle,
   AgoraWidgetTrackController,
   AgoraWidgetTrackMode,
-} from 'agora-common-libs/lib/widget';
+} from 'agora-common-libs';
 import { AgoraExtensionWidgetEvent, AgoraProctorSDK } from '@proctor/infra/api';
 
 @Log.attach({ proxyMethods: false })

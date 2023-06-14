@@ -2,7 +2,7 @@ import { ConfirmDialogAction } from '@proctor/infra/stores/common/type';
 import { observer } from 'mobx-react';
 import { Button, Modal } from '@proctor/ui-kit';
 import { BaseDialogProps } from '.';
-import { useI18n } from 'agora-common-libs/lib/i18n';
+import { useI18n } from 'agora-common-libs';
 
 export const Confirm: React.FC<
   BaseDialogProps & {

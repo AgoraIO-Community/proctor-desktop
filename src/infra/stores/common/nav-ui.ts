@@ -24,7 +24,7 @@ import { SvgIconEnum } from '@proctor/ui-kit';
 import { NetworkStateColors } from '@proctor/ui-kit/utilities/state-color';
 import { EduUIStoreBase } from './base';
 import { DialogCategory } from './share-ui';
-import { transI18n } from 'agora-common-libs/lib/i18n';
+import { transI18n } from 'agora-common-libs';
 
 export interface EduNavAction<P = undefined> {
   id: 'Record' | 'AskForHelp' | 'Settings' | 'Exit' | 'Camera' | 'Mic' | 'Share';

@@ -10,7 +10,7 @@ import {
   EduClassroomConfig,
   EduEventCenter,
 } from 'agora-edu-core';
-import { transI18n } from 'agora-common-libs/lib/i18n';
+import { transI18n } from 'agora-common-libs';
 
 export type SettingToast = {
   id: string;

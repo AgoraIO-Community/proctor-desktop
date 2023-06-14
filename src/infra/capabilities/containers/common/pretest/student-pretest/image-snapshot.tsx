@@ -4,7 +4,7 @@ import { AgoraMidBorderRadius } from '@proctor/infra/capabilities/components/com
 import { observer } from 'mobx-react';
 import styled from 'styled-components';
 import { PureVideo } from '../media-info';
-import { useI18n } from 'agora-common-libs/lib/i18n';
+import { useI18n } from 'agora-common-libs';
 
 export const ImageSnapshot = observer(() => {
   const {

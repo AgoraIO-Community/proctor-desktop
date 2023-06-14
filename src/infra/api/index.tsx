@@ -33,11 +33,11 @@ import {
   LaunchMediaOptions,
   LaunchOption,
 } from './type';
-import { addResourceBundle } from 'agora-common-libs/lib/i18n';
+import { addResourceBundle } from 'agora-common-libs';
 import { en } from '@proctor/ui-kit/utilities/translate/en';
 import { zh } from '@proctor/ui-kit/utilities/translate/zh';
-import { FcrMultiThemeMode, FcrTheme, FcrUIConfig } from 'agora-common-libs/lib/ui';
-import { AgoraWidgetBase } from 'agora-common-libs/lib/widget';
+import { FcrMultiThemeMode, FcrTheme, FcrUIConfig } from 'agora-common-libs';
+import { AgoraWidgetBase } from 'agora-common-libs';
 
 export * from './type';
 export class AgoraProctorSDK {

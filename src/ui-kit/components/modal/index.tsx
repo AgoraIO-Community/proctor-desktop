@@ -4,7 +4,7 @@ import { BaseProps } from '@proctor/ui-kit/components/util/type';
 import { OverlayWrap } from '../overlay-wrap';
 import { SvgIconEnum, SvgImg } from '../svg-img';
 import './index.css';
-import { themeContext } from 'agora-common-libs/lib/ui';
+import { themeContext } from 'agora-common-libs';
 export interface ModalProps extends BaseProps {
   /** 标题 */
   title?: string | React.ReactNode;

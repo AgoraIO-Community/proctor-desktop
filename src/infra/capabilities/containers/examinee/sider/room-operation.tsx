@@ -5,7 +5,7 @@ import { observer } from 'mobx-react';
 import { useCallback, useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { SvgIconEnum, SvgImg } from '@proctor/ui-kit';
-import { useI18n } from 'agora-common-libs/lib/i18n';
+import { useI18n } from 'agora-common-libs';
 
 const RoomTimer = observer(() => {
   const {

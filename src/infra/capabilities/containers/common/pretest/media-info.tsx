@@ -12,7 +12,7 @@ import { FC, useCallback, useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import { SvgIconEnum, SvgImg } from '@proctor/ui-kit';
 import PretestAudio from './assets/pretest-audio.mp3';
-import { useI18n } from 'agora-common-libs/lib/i18n';
+import { useI18n } from 'agora-common-libs';
 
 const { Option } = AgoraSelect;
 export const PreTestCamera: FC = observer(() => {

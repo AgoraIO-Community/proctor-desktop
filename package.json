@@ -12,12 +12,12 @@
     "Education"
   ],
   "main": "lib/proctor_sdk.bundle.js",
-  "types": "lib/agora-proctor-sdk/src/infra/api/index.d.ts",
+  "types": "lib/infra/api/index.d.ts",
   "scripts": {
     "build:types": "tsc -p tsconfig.json",
     "build:docs": "npx typedoc",
     "pack:npm": "run-s bundle:npm build:types",
-    "bundle:npm": "cross-env NODE_ENV=production NODE_OPTIONS=--max_old_space_size=4096 webpack --config ./webpack/webpack.pack.js"
+    "bundle:npm": "cross-env NODE_ENV=production NODE_OPTIONS=--max_old_space_size=4096 webpack --config ./webpack.config.js"
   },
   "eslintConfig": {
     "extends": [

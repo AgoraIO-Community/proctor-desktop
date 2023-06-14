@@ -2,7 +2,7 @@ import { EduRoomTypeEnum } from 'agora-edu-core';
 import { humpToLine } from '.';
 import { baseTheme } from '../configs/base-theme';
 import { room1V1Class, roomMidClass, roomBigClass } from '../configs/base-ui-config';
-import { FcrMultiThemes, FcrTheme, FcrUIConfig } from 'agora-common-libs/lib/ui';
+import { FcrMultiThemes, FcrTheme, FcrUIConfig } from 'agora-common-libs';
 
 const fcrGlobalStyleSheetId = 'FcrStyleSheet';
 

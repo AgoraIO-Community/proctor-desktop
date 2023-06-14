@@ -34,7 +34,7 @@ import { EduUIStoreBase } from '../base';
 import { CameraPlaceholderType } from '../type';
 import { EduStreamUI, StreamBounds } from './struct';
 import { EduStreamTool, EduStreamToolCategory } from './tool';
-import { transI18n } from 'agora-common-libs/lib/i18n';
+import { transI18n } from 'agora-common-libs';
 export enum StreamIconColor {
   active = '#357bf6',
   deactive = '#bdbdca',

@@ -8,7 +8,7 @@ import { useEffect, useRef, useLayoutEffect } from 'react';
 import styled from 'styled-components';
 import { AgoraButton } from '@proctor/infra/capabilities/components/button';
 import { SvgIconEnum, SvgImg } from '@proctor/ui-kit';
-import { useI18n } from 'agora-common-libs/lib/i18n';
+import { useI18n } from 'agora-common-libs';
 
 export const ShareScreen = observer(() => {
   const {

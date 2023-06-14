@@ -1,4 +1,4 @@
-import { useI18n } from 'agora-common-libs/lib/i18n';
+import { useI18n } from 'agora-common-libs';
 
 type Delegate = (message: string) => void;
 

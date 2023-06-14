@@ -1,6 +1,6 @@
 import { FC, PropsWithChildren, createContext } from 'react';
-import { FcrTheme, FcrUIConfig, ThemeProvider } from 'agora-common-libs/lib/ui';
-import { I18nProvider } from 'agora-common-libs/lib/i18n';
+import { FcrTheme, FcrUIConfig, ThemeProvider } from 'agora-common-libs';
+import { I18nProvider } from 'agora-common-libs';
 
 export const uiConfigContext = createContext({} as FcrUIConfig);
 

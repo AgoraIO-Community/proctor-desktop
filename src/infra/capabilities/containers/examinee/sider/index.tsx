@@ -1,7 +1,7 @@
 import { AgoraCard } from '@proctor/infra/capabilities/components/card';
 import { AgoraBaseTextColor } from '@proctor/infra/capabilities/components/common';
 import { FlexContainer } from '@proctor/infra/capabilities/components/container';
-import { useI18n } from 'agora-common-libs/lib/i18n';
+import { useI18n } from 'agora-common-libs';
 import { EduClassroomConfig } from 'agora-edu-core';
 import { Space } from 'antd';
 import { observer } from 'mobx-react';

@@ -7,7 +7,7 @@ import cameraImage from '../assets/camera.png';
 import microphoneImage from '../assets/microphone.png';
 import photoImage from '../assets/photo.png';
 import screenShareImage from '../assets/screen-share.png';
-import { useI18n } from 'agora-common-libs/lib/i18n';
+import { useI18n } from 'agora-common-libs';
 
 export const Conclusion = observer(() => {
   const t = useI18n();

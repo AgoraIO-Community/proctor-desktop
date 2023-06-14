@@ -26,7 +26,7 @@ import { DeviceTypeEnum } from '@proctor/infra/api';
 import { MediaController, MediaDeviceType } from './media-control';
 import { Tag } from '@proctor/infra/capabilities/components/tag';
 import { AgoraSlider } from '@proctor/infra/capabilities/components/slider';
-import { useI18n } from 'agora-common-libs/lib/i18n';
+import { useI18n } from 'agora-common-libs';
 export const StudentCard = observer(
   ({ userUuidPrefix, renderVideos }: { userUuidPrefix: string; renderVideos: boolean }) => {
     const {
