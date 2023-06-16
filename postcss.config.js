@@ -4,7 +4,8 @@ const path = require('path');
 const autoprefixer = require('autoprefixer');
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const tailwindcss = require('tailwindcss');
+const tailwindConfig = require('./tailwind.config');
 
 module.exports = {
-  plugins: [autoprefixer(), tailwindcss(path.resolve(__dirname, './tailwind.config.js'))],
+  plugins: [autoprefixer(), tailwindcss(tailwindConfig)],
 };
