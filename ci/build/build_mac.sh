@@ -20,6 +20,6 @@ if [ "$debug" == "true" ]; then
     echo "--------------------------------------------"
 fi
 
-check_dependencies $source_root $build_branch "${lib_dependencies[*]}"
+check_dependencies $source_root $build_branch "${lib_dependencies[*]}" true
 
 build_lib $source_root $ci_source_root agora-proctor-sdk $build_branch
