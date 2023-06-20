@@ -39,6 +39,9 @@
     ]
   },
   "devDependencies": {
+    "@types/webpack-env": "1.18.1",
+    "@types/react-virtualized": "9.21.22",
+    "@types/js-md5": "0.7.0",
     "@netless/fetch-progress": "0.0.1",
     "@netless/iframe-bridge": "2.1.4",
     "@tailwindcss/forms": "0.2.1",
@@ -86,7 +89,12 @@
     "@babel/runtime-corejs3": "7.13.10",
     "postcss": "8.4.4",
     "postcss-import": "14.0.1",
-    "postcss-loader": "4.0.3"
+    "postcss-loader": "4.0.3",
+    "babel-loader": "9.1.2",
+    "style-loader": "3.3.3",
+    "css-loader": "6.8.1",
+    "core-js": "3.19.3",
+    "webpack-bundle-analyzer": "4.9.0"
   },
   "dependencies": {
     "@use-gesture/react": "10.2.11",
@@ -113,7 +121,6 @@
     "dayjs": "1.10.4",
     "deep-diff": "1.0.2",
     "devtron": "1.4.0",
-    "dexie": "3.0.2",
     "electron-screenshots": "0.0.13",
     "eruda": "2.2.1",
     "extract-zip": "2.0.1",
@@ -171,7 +178,8 @@
     "cz-customizable": "6.9.1",
     "tinycolor2": "1.4.2",
     "mobx-utils": "5.6.2",
-    "await-to-js": "3.0.0"
+    "await-to-js": "3.0.0",
+    "react-virtualized": "9.22.3"
   },
   "config": {
     "commitizen": {

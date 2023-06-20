@@ -11,8 +11,8 @@ import {
   AGRtcConnectionType,
   Log,
   Logger,
-} from 'agora-rte-sdk';
-import { AGRtcChannel } from 'agora-rte-sdk/lib/core/rtc/channel';
+  AGRtcChannel,
+} from "agora-rte-sdk";
 
 export abstract class SceneSubscription {
   protected logger!: Logger;
@@ -37,64 +37,67 @@ export abstract class SceneSubscription {
     this._mediaControl = _scene.engine.getAgoraMediaControl();
     this._active = true;
     scene.on(AgoraRteEventType.UserAdded, (users: AgoraUser[]) => {
-      this.logger.info(`user-added [${users.join(',')}]`);
+      this.logger.info(`user-added [${users.join(",")}]`);
     });
 
     scene.on(AgoraRteEventType.UserUpdated, (user: AgoraUser) => {
       this.logger.info(`user-updated ${user}`);
     });
 
-    scene.on(AgoraRteEventType.UserRemoved, (users: AgoraUser[], type?: number) => {
-      this.logger.info(`user-removed [${users.join(',')}]`);
-      this._handleUserRemoved(users, scene, type);
-    });
+    scene.on(
+      AgoraRteEventType.UserRemoved,
+      (users: AgoraUser[], type?: number) => {
+        this.logger.info(`user-removed [${users.join(",")}]`);
+        this._handleUserRemoved(users, scene, type);
+      }
+    );
 
     scene.on(
       AgoraRteEventType.LocalStreamAdded,
       (streams: AgoraStream[], operator?: AgoraRteOperator) => {
-        this.logger.info(`local-stream-added [${streams.join(',')}]`);
+        this.logger.info(`local-stream-added [${streams.join(",")}]`);
         this.handleLocalStreamAdded(streams);
-      },
+      }
     );
 
     scene.on(
       AgoraRteEventType.LocalStreamUpdate,
       (streams: AgoraStream[], operator?: AgoraRteOperator) => {
-        this.logger.info(`local-stream-upsert [${streams.join(',')}]`);
+        this.logger.info(`local-stream-upsert [${streams.join(",")}]`);
         this.handleLocalStreamUpdated(streams);
-      },
+      }
     );
 
     scene.on(
       AgoraRteEventType.LocalStreamRemove,
       (streams: AgoraStream[], operator?: AgoraRteOperator) => {
-        this.logger.info(`local-stream-removed [${streams.join(',')}]`);
+        this.logger.info(`local-stream-removed [${streams.join(",")}]`);
         this.handleLocalStreamRemoved(streams);
-      },
+      }
     );
 
     scene.on(
       AgoraRteEventType.RemoteStreamAdded,
       (streams: AgoraStream[], operator?: AgoraRteOperator) => {
-        this.logger.info(`remote-stream-added [${streams.join(',')}]`);
+        this.logger.info(`remote-stream-added [${streams.join(",")}]`);
         this.handleRemoteStreamAdded(streams);
-      },
+      }
     );
 
     scene.on(
       AgoraRteEventType.RemoteStreamUpdate,
       (streams: AgoraStream[], operator?: AgoraRteOperator) => {
-        this.logger.info(`remote-stream-upsert [${streams.join(',')}]`);
+        this.logger.info(`remote-stream-upsert [${streams.join(",")}]`);
         this.handleRemoteStreamUpdated(streams);
-      },
+      }
     );
 
     scene.on(
       AgoraRteEventType.RemoteStreamRemove,
       (streams: AgoraStream[], operator?: AgoraRteOperator) => {
-        this.logger.info(`remote-stream-removed [${streams.join(',')}]`);
+        this.logger.info(`remote-stream-removed [${streams.join(",")}]`);
         this.handleRemoteStreamRemoved(streams);
-      },
+      }
     );
   }
 
@@ -105,7 +108,11 @@ export abstract class SceneSubscription {
   abstract handleRemoteStreamUpdated(streams: AgoraStream[]): void;
   abstract handleRemoteStreamRemoved(streams: AgoraStream[]): void;
 
-  private _handleUserRemoved(users: AgoraUser[], scene: AgoraRteScene, type?: number) {
+  private _handleUserRemoved(
+    users: AgoraUser[],
+    scene: AgoraRteScene,
+    type?: number
+  ) {
     let removedLocalStreams: AgoraStream[] = [];
     let removedRemoteStreams: AgoraStream[] = [];
 
@@ -145,7 +152,7 @@ export class MainRoomSubscription extends SceneSubscription {
     if (streams.length === 0) {
       return;
     }
-    this.logger.info(`_handleLocalStreamAdded [${streams.join(',')}]`);
+    this.logger.info(`_handleLocalStreamAdded [${streams.join(",")}]`);
 
     if (!this.active) {
       return;
@@ -153,7 +160,8 @@ export class MainRoomSubscription extends SceneSubscription {
 
     streams.forEach((s) => {
       const type =
-        s.streamName === 'secondary' || s.videoSourceType === AgoraRteVideoSourceType.ScreenShare
+        s.streamName === "secondary" ||
+        s.videoSourceType === AgoraRteVideoSourceType.ScreenShare
           ? AGRtcConnectionType.sub
           : AGRtcConnectionType.main;
 
@@ -161,7 +169,9 @@ export class MainRoomSubscription extends SceneSubscription {
         case AgoraRteMediaPublishState.Published: {
           if (s.videoSourceType === AgoraRteVideoSourceType.Camera) {
             scene.rtcChannel.muteLocalVideoStream(false, type);
-          } else if (s.videoSourceType === AgoraRteVideoSourceType.ScreenShare) {
+          } else if (
+            s.videoSourceType === AgoraRteVideoSourceType.ScreenShare
+          ) {
             scene.rtcChannel.muteLocalScreenStream(false, type);
           }
           break;
@@ -169,7 +179,9 @@ export class MainRoomSubscription extends SceneSubscription {
         case AgoraRteMediaPublishState.Unpublished: {
           if (s.videoSourceType === AgoraRteVideoSourceType.Camera) {
             scene.rtcChannel.muteLocalVideoStream(true, type);
-          } else if (s.videoSourceType === AgoraRteVideoSourceType.ScreenShare) {
+          } else if (
+            s.videoSourceType === AgoraRteVideoSourceType.ScreenShare
+          ) {
             // scene.rtcChannel.muteLocalScreenStream(true, type);
           }
           break;
@@ -193,7 +205,7 @@ export class MainRoomSubscription extends SceneSubscription {
     if (streams.length === 0) {
       return;
     }
-    this.logger.info(`_handleLocalStreamChanged [${streams.join(',')}]`);
+    this.logger.info(`_handleLocalStreamChanged [${streams.join(",")}]`);
 
     if (!this.active) {
       return;
@@ -201,7 +213,8 @@ export class MainRoomSubscription extends SceneSubscription {
 
     streams.forEach((s) => {
       const type =
-        s.streamName === 'secondary' || s.videoSourceType === AgoraRteVideoSourceType.ScreenShare
+        s.streamName === "secondary" ||
+        s.videoSourceType === AgoraRteVideoSourceType.ScreenShare
           ? AGRtcConnectionType.sub
           : AGRtcConnectionType.main;
 
@@ -209,7 +222,9 @@ export class MainRoomSubscription extends SceneSubscription {
         case AgoraRteMediaPublishState.Published: {
           if (s.videoSourceType === AgoraRteVideoSourceType.Camera) {
             scene.rtcChannel.muteLocalVideoStream(false, type);
-          } else if (s.videoSourceType === AgoraRteVideoSourceType.ScreenShare) {
+          } else if (
+            s.videoSourceType === AgoraRteVideoSourceType.ScreenShare
+          ) {
             scene.rtcChannel.muteLocalScreenStream(false, type);
           }
           break;
@@ -217,7 +232,9 @@ export class MainRoomSubscription extends SceneSubscription {
         case AgoraRteMediaPublishState.Unpublished: {
           if (s.videoSourceType === AgoraRteVideoSourceType.Camera) {
             scene.rtcChannel.muteLocalVideoStream(true, type);
-          } else if (s.videoSourceType === AgoraRteVideoSourceType.ScreenShare) {
+          } else if (
+            s.videoSourceType === AgoraRteVideoSourceType.ScreenShare
+          ) {
             // scene.rtcChannel.muteLocalScreenStream(true, type);
           }
           break;
@@ -242,7 +259,7 @@ export class MainRoomSubscription extends SceneSubscription {
       return;
     }
 
-    this.logger.info(`_handleLocalStreamRemoved [${streams.join(',')}]`);
+    this.logger.info(`_handleLocalStreamRemoved [${streams.join(",")}]`);
 
     if (!this.active) {
       return;
@@ -250,7 +267,8 @@ export class MainRoomSubscription extends SceneSubscription {
 
     streams.forEach((s) => {
       const type =
-        s.streamName === 'secondary' || s.videoSourceType === AgoraRteVideoSourceType.ScreenShare
+        s.streamName === "secondary" ||
+        s.videoSourceType === AgoraRteVideoSourceType.ScreenShare
           ? AGRtcConnectionType.sub
           : AGRtcConnectionType.main;
 
@@ -266,7 +284,8 @@ export class MainRoomSubscription extends SceneSubscription {
 
       if (s.audioSourceType === AgoraRteAudioSourceType.Mic) {
         scene.rtcChannel.muteLocalAudioStream(true, type);
-        type === AGRtcConnectionType.main && this._mediaControl.createMicrophoneAudioTrack().stop();
+        type === AGRtcConnectionType.main &&
+          this._mediaControl.createMicrophoneAudioTrack().stop();
       } else if (s.audioSourceType === AgoraRteAudioSourceType.None) {
         // no action needed
       }
@@ -279,7 +298,7 @@ export class MainRoomSubscription extends SceneSubscription {
       return;
     }
 
-    this.logger.info(`_handleRemoteStreamsAdded [${streams.join(',')}]`);
+    this.logger.info(`_handleRemoteStreamsAdded [${streams.join(",")}]`);
 
     if (!this.active) {
       return;
@@ -291,7 +310,7 @@ export class MainRoomSubscription extends SceneSubscription {
         case AgoraRteMediaPublishState.Published:
           scene.rtcChannel.muteRemoteVideoStream(
             s.streamUuid,
-            s.playUrl && this.isCDNMode ? true : false,
+            s.playUrl && this.isCDNMode ? true : false
           );
           break;
         case AgoraRteMediaPublishState.Unpublished:
@@ -303,7 +322,7 @@ export class MainRoomSubscription extends SceneSubscription {
         case AgoraRteMediaPublishState.Published:
           scene.rtcChannel.muteRemoteAudioStream(
             s.streamUuid,
-            s.playUrl && this.isCDNMode ? true : false,
+            s.playUrl && this.isCDNMode ? true : false
           );
           break;
         case AgoraRteMediaPublishState.Unpublished:
@@ -315,7 +334,7 @@ export class MainRoomSubscription extends SceneSubscription {
 
   handleRemoteStreamUpdated(streams: AgoraStream[]) {
     const scene = this._scene;
-    this.logger.info(`_handleRemoteStreamsChanged [${streams.join(',')}]`);
+    this.logger.info(`_handleRemoteStreamsChanged [${streams.join(",")}]`);
 
     if (!this.active) {
       return;
@@ -327,7 +346,7 @@ export class MainRoomSubscription extends SceneSubscription {
         case AgoraRteMediaPublishState.Published:
           scene.rtcChannel.muteRemoteVideoStream(
             s.streamUuid,
-            s.playUrl && this.isCDNMode ? true : false,
+            s.playUrl && this.isCDNMode ? true : false
           );
           break;
         case AgoraRteMediaPublishState.Unpublished:
@@ -339,7 +358,7 @@ export class MainRoomSubscription extends SceneSubscription {
         case AgoraRteMediaPublishState.Published:
           scene.rtcChannel.muteRemoteAudioStream(
             s.streamUuid,
-            s.playUrl && this.isCDNMode ? true : false,
+            s.playUrl && this.isCDNMode ? true : false
           );
           break;
         case AgoraRteMediaPublishState.Unpublished:
@@ -354,7 +373,7 @@ export class MainRoomSubscription extends SceneSubscription {
     if (streams.length === 0) {
       return;
     }
-    this.logger.info(`_handleRemoteStreamsRemoved [${streams.join(',')}]`);
+    this.logger.info(`_handleRemoteStreamsRemoved [${streams.join(",")}]`);
 
     // remote stream added, try subscribing
     streams.forEach((s) => {
@@ -365,7 +384,9 @@ export class MainRoomSubscription extends SceneSubscription {
 
   get active() {
     if (!this._active) {
-      this.logger.info(`Scene with id: ${this._scene.sceneId} is inactive, do not operate stream`);
+      this.logger.info(
+        `Scene with id: ${this._scene.sceneId} is inactive, do not operate stream`
+      );
     }
     return this._active;
   }

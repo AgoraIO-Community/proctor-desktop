@@ -1,19 +1,19 @@
 import React from "react";
 
-const ctxRequire = require.context('./paths', false, /\.tsx$/);
+const ctxRequire = require.context("./paths", false, /\.tsx$/);
 
 const paths: Record<string, SvgPath> = {};
 
-ctxRequire.keys().forEach(async (path) => {
+ctxRequire.keys().forEach(async (path: string) => {
   const m = ctxRequire(path) as SvgPath;
-  const key = path.replace('./', '').replace('.tsx', '');
+  const key = path.replace("./", "").replace(".tsx", "");
   paths[key] = m;
 });
 
 export type PathOptions = {
-  iconPrimary: string,
-  iconSecondary: string,
-  [key: string]: string
+  iconPrimary: string;
+  iconSecondary: string;
+  [key: string]: string;
 };
 
 export type SvgPath = {
@@ -28,8 +28,7 @@ export const getPath = (name: string, props: PathOptions) => {
     return svg.path(props);
   }
 
-  return <path />
-
+  return <path />;
 };
 
 export const getViewBox = (name: string) => {
@@ -39,5 +38,5 @@ export const getViewBox = (name: string) => {
     return svg.viewBox;
   }
 
-  return '0 0 0 0';
+  return "0 0 0 0";
 };

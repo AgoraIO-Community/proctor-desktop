@@ -1,13 +1,23 @@
-import { AgoraProctorSDK, WindowID } from '@proctor/infra/api';
-import { getEduErrorMessage, getErrorServCode } from '@proctor/infra/utils/error';
-import { sendToMainProcess } from '@proctor/infra/utils/ipc';
-import { ChannelType } from '@proctor/infra/utils/ipc-channels';
-import { transI18n } from 'agora-common-libs';
-import { AGError, AGRteErrorCode, bound, Lodash, Log, Logger, Scheduler } from 'agora-rte-sdk';
-import { action, observable, runInAction } from 'mobx';
-import { v4 as uuidv4 } from 'uuid';
-import { getRootDimensions } from './layout/helper';
-import { ConfirmDialogAction, OrientationEnum } from './type';
+import { AgoraProctorSDK, WindowID } from "@proctor/infra/api";
+import {
+  getEduErrorMessage,
+  getErrorServCode,
+} from "@proctor/infra/utils/error";
+import { ChannelType } from "@proctor/infra/utils/ipc-channels";
+import { transI18n } from "agora-common-libs";
+import {
+  AGError,
+  AGRteErrorCode,
+  bound,
+  Lodash,
+  Log,
+  Logger,
+  Scheduler,
+} from "agora-rte-sdk";
+import { action, observable, runInAction } from "mobx";
+import { v4 as uuidv4 } from "uuid";
+import { getRootDimensions } from "./layout/helper";
+import { ConfirmDialogAction, OrientationEnum } from "./type";
 
 export enum DialogCategory {
   CloudDriver,
@@ -33,7 +43,7 @@ export interface ToastType {
   type?: ToastTypeEnum;
 }
 
-export type ToastTypeEnum = 'success' | 'error' | 'warning';
+export type ToastTypeEnum = "success" | "error" | "warning";
 
 export interface DialogType {
   id: string;
@@ -44,13 +54,13 @@ export interface DialogType {
 @Log.attach({ proxyMethods: false })
 export class EduShareUIStore {
   protected logger!: Logger;
-  readonly classroomViewportClassName = 'classroom-viewport';
+  readonly classroomViewportClassName = "classroom-viewport";
   readonly classroomViewportTransitionDuration = 300;
   readonly navHeight = 27;
   private _viewportAspectRatio = 9 / 16;
   private _classroomMinimumSize = { width: 1024, height: 576 };
   private _containerNode = window;
-  private _matchMedia = window.matchMedia('(orientation: portrait)');
+  private _matchMedia = window.matchMedia("(orientation: portrait)");
   private _resizeEventListenerAdded = false;
 
   /**
@@ -75,7 +85,12 @@ export class EduShareUIStore {
    * 视口尺寸信息
    */
   @observable
-  classroomViewportSize: { width: number; height: number; h5Width?: number; h5Height?: number } = {
+  classroomViewportSize: {
+    width: number;
+    height: number;
+    h5Width?: number;
+    h5Height?: number;
+  } = {
     width: 0,
     height: 0,
     h5Width: 1024,
@@ -123,15 +138,17 @@ export class EduShareUIStore {
     opts?: {
       onOK?: () => void;
       okBtnText?: string;
-    },
+    }
   ) {
     //this should be called at ui store only
     const id = uuidv4();
-    let title = '';
+    let title = "";
 
     if (error.codeList && error.codeList.length > 0) {
       const servCode = getErrorServCode(error);
-      title = `Error ${error.codeList[error.codeList.length - 1]}${servCode ? `-${servCode}` : ''}`;
+      title = `Error ${error.codeList[error.codeList.length - 1]}${
+        servCode ? `-${servCode}` : ""
+      }`;
     } else {
       title = `Unknown Error`;
     }
@@ -142,9 +159,11 @@ export class EduShareUIStore {
 
     if (
       error.codeList &&
-      error.codeList.includes(AGRteErrorCode.RTE_ERR_RESTFUL_NETWORK_TIMEOUT_ERR)
+      error.codeList.includes(
+        AGRteErrorCode.RTE_ERR_RESTFUL_NETWORK_TIMEOUT_ERR
+      )
     ) {
-      message = transI18n('error.network_timeout');
+      message = transI18n("error.network_timeout");
     } else {
       message = getEduErrorMessage(error) || message;
     }
@@ -153,7 +172,7 @@ export class EduShareUIStore {
       id,
       title,
       content: message,
-      okBtnText: okBtnText ?? transI18n('fcr_room_button_leave_confirm'),
+      okBtnText: okBtnText ?? transI18n("fcr_room_button_leave_confirm"),
       onOK: () => {
         onOK && onOK();
         this.removeDialog(id);
@@ -185,7 +204,7 @@ export class EduShareUIStore {
       onCancel?: () => void;
       btnText?: Record<ConfirmDialogAction, string>;
       timeout?: number;
-    } = {},
+    } = {}
   ) {
     const id = uuidv4();
     this.addDialog(DialogCategory.Confirm, {
@@ -242,7 +261,9 @@ export class EduShareUIStore {
    */
   @action.bound
   removeDialog(id: string) {
-    this.dialogQueue = this.dialogQueue.filter((item: DialogType) => item.id !== id);
+    this.dialogQueue = this.dialogQueue.filter(
+      (item: DialogType) => item.id !== id
+    );
   }
 
   /** Actions */
@@ -273,7 +294,10 @@ export class EduShareUIStore {
         scopeSize.width >= this._classroomMinimumSize.width ||
         scopeSize.height >= this._classroomMinimumSize.height
       ) {
-        this.classroomViewportSize = { width: scopeSize.width, height: scopeSize.height };
+        this.classroomViewportSize = {
+          width: scopeSize.width,
+          height: scopeSize.height,
+        };
       } else {
         this.classroomViewportSize = {
           width: this._classroomMinimumSize.width,
@@ -304,7 +328,10 @@ export class EduShareUIStore {
   @bound
   addWindowResizeEventListener() {
     if (!this._resizeEventListenerAdded) {
-      this._containerNode.addEventListener('resize', this.updateClassroomViewportSize);
+      this._containerNode.addEventListener(
+        "resize",
+        this.updateClassroomViewportSize
+      );
 
       this.updateClassroomViewportSize();
 
@@ -318,7 +345,10 @@ export class EduShareUIStore {
   @bound
   removeWindowResizeEventListener() {
     if (this._resizeEventListenerAdded) {
-      this._containerNode.removeEventListener('resize', this.updateClassroomViewportSize);
+      this._containerNode.removeEventListener(
+        "resize",
+        this.updateClassroomViewportSize
+      );
 
       this._resizeEventListenerAdded = false;
     }
@@ -336,49 +366,12 @@ export class EduShareUIStore {
   }
 
   @bound
-  showWindow(windowID: WindowID) {
-    sendToMainProcess(ChannelType.ShowBrowserWindow, windowID);
-  }
-
-  @bound
-  hideWindow(windowID: WindowID) {
-    sendToMainProcess(ChannelType.HideBrowserWindow, windowID);
-  }
-
-  @bound
-  openWindow(
-    windowID: WindowID,
-    payload: {
-      args?: Record<string, string | number | boolean>;
-      options?: Record<string, string | number | boolean>;
-    },
-  ) {
-    sendToMainProcess(
-      ChannelType.OpenBrowserWindow,
-      windowID,
-      payload.args,
-      payload.options,
-      AgoraProctorSDK.language,
-    );
-  }
-  @bound
-  moveWindowToTargetScreen(
-    windowID: WindowID,
-    screenId: string,
-    options: Record<string, string | number | boolean>,
-  ) {
-    sendToMainProcess(ChannelType.MoveWindowToTargetScreen, windowID, screenId, options);
-  }
-  @bound
-  closeWindow(windowID: WindowID) {
-    sendToMainProcess(ChannelType.CloseBrowserWindow, windowID);
-  }
-
-  @bound
   addViewportResizeObserver(callback: () => void) {
     const observer = new ResizeObserver(callback);
 
-    const viewport = document.querySelector(`.${this.classroomViewportClassName}`);
+    const viewport = document.querySelector(
+      `.${this.classroomViewportClassName}`
+    );
     if (viewport) {
       observer.observe(viewport);
     }
