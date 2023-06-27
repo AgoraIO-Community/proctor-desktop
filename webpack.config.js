@@ -28,7 +28,7 @@ const config = {
     new webpack.DefinePlugin({
       NODE_ENV: JSON.stringify("production"),
     }),
-    new BundleAnalyzerPlugin(),
+    // new BundleAnalyzerPlugin(),
   ],
 };
 
