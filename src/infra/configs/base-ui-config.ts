@@ -11,7 +11,7 @@ import {
   FcrTeacherVideo,
   FcrUIBaseProps,
   FcrUIConfig,
-} from '@proctor/infra/types/config';
+} from 'agora-common-libs';
 
 class FcrUIConfigImpl implements FcrUIConfig {
   get version(): string {

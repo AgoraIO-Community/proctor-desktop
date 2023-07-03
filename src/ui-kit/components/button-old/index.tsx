@@ -1,5 +1,5 @@
 import classnames from 'classnames';
-import { EventHandler, FC, SyntheticEvent, useEffect, useRef } from 'react';
+import { EventHandler, FC, PropsWithChildren, SyntheticEvent, useEffect, useRef } from 'react';
 import { BaseProps } from '../util/type';
 import './index.css';
 
@@ -25,7 +25,7 @@ export interface ButtonProps extends BaseProps {
   onMouseLeave?: EventHandler<SyntheticEvent<HTMLButtonElement>>;
 }
 
-export const Button: FC<ButtonProps> = ({
+export const Button: FC<PropsWithChildren<ButtonProps>> = ({
   type = 'primary',
   size = 'sm',
   disabled,

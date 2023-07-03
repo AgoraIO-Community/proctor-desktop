@@ -43,11 +43,17 @@ def doPublish(buildVariables) {
           "type": "ARTIFACTORY",
           "archivePattern": "*.zip",
           "serverPath": "ProctorSDK/${shortVersion}/${buildVariables.buildDate}/${env.platform}",
-          "serverRepo": "CSDC_repo" // ATTENTIONS: Update the artifactoryRepo if needed.
+          "serverRepo": "AD_repo" // ATTENTIONS: Update the artifactoryRepo if needed.
         ]
     ]
-    archive.archiveFiles(archiveInfos)
+    archiveUrls = archive.archiveFiles(archiveInfos) ?: []
+    archiveUrls = archiveUrls as Set
+    if (archiveUrls) {
+        def content = archiveUrls.join("\n")
+        writeFile(file: 'package_urls', text: content, encoding: "utf-8")
+    }
+    archiveArtifacts(artifacts: "package_urls", allowEmptyArchive:true)
     sh "rm -rf *.zip || true"
 }
 
-pipelineLoad(this, "ProctorSDK", "build", "mac", "proctor_mac")
+pipelineLoad(this, "ProctorSDK", "build", "mac", "edu_mac")

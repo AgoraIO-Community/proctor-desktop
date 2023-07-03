@@ -1,12 +1,4 @@
 import {
-  AgoraProctorSDK,
-  AgoraExtensionWidgetEvent,
-  AgoraMultiInstanceWidget,
-  AgoraTrackSyncedWidget,
-  AgoraWidgetBase,
-  AgoraWidgetLifecycle,
-} from '@proctor/infra/api';
-import {
   AgoraWidgetController,
   AgoraWidgetTrack,
   ClassState,
@@ -19,8 +11,15 @@ import md5 from 'js-md5';
 import { cloneDeep } from 'lodash';
 import { action, computed, IReactionDisposer, Lambda, observable, reaction } from 'mobx';
 import { EduUIStoreBase } from '../base';
-import { AgoraWidgetTrackMode } from './type';
-import { AgoraWidgetTrackController } from './widget-track';
+import {
+  AgoraMultiInstanceWidget,
+  AgoraTrackSyncedWidget,
+  AgoraWidgetBase,
+  AgoraWidgetLifecycle,
+  AgoraWidgetTrackController,
+  AgoraWidgetTrackMode,
+} from 'agora-common-libs';
+import { AgoraExtensionWidgetEvent, AgoraProctorSDK } from '@proctor/infra/api';
 
 @Log.attach({ proxyMethods: false })
 export class WidgetUIStore extends EduUIStoreBase {

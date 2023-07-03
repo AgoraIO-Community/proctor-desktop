@@ -1,9 +1,8 @@
 import { EduRoomTypeEnum } from 'agora-edu-core';
-import { FcrTheme } from '@proctor/ui-kit';
 import { humpToLine } from '.';
-import { FcrMultiThemes, FcrUIConfig } from '../types/config';
 import { baseTheme } from '../configs/base-theme';
 import { room1V1Class, roomMidClass, roomBigClass } from '../configs/base-ui-config';
+import { FcrMultiThemes, FcrTheme, FcrUIConfig } from 'agora-common-libs';
 
 const fcrGlobalStyleSheetId = 'FcrStyleSheet';
 
@@ -47,7 +46,9 @@ export const applyTheme = (theme: FcrTheme) => {
   let cssString = '';
 
   for (const colorName in theme) {
-    cssString += `--fcr_system_${humpToLine(colorName)}_color: ${theme[colorName]};`;
+    cssString += `--fcr_system_${humpToLine(colorName)}_color: ${
+      theme[colorName as keyof typeof theme]
+    };`;
   }
 
   const fcrStyleSheet = document.querySelector(`#${fcrGlobalStyleSheetId}`);

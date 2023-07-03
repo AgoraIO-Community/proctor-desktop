@@ -9,15 +9,11 @@ import {
   EduRoomTypeEnum,
   Platform,
 } from 'agora-edu-core';
-import { FcrWebviewWidget } from 'agora-plugin-gallery';
 import { ApiBase } from 'agora-rte-sdk';
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 import { render, unmountComponentAtNode } from 'react-dom';
-import { FcrTheme } from '@proctor/ui-kit';
 import { EduContext } from '../contexts';
-
-import { FcrMultiThemeMode, FcrUIConfig } from '../types/config';
 import {
   applyTheme,
   loadTheme,
@@ -31,18 +27,18 @@ import 'antd/dist/antd.css';
 import './polyfills';
 import { Providers } from './providers';
 import {
-  AgoraWidgetBase,
   BoardWindowAnimationOptions,
   ConfigParams,
   ConvertMediaOptionsConfig,
   LaunchMediaOptions,
   LaunchOption,
-  LaunchWindowOption,
 } from './type';
 import { addResourceBundle } from 'agora-common-libs';
 import { en } from '@proctor/ui-kit/utilities/translate/en';
 import { zh } from '@proctor/ui-kit/utilities/translate/zh';
-
+import { FcrMultiThemeMode, FcrTheme, FcrUIConfig } from 'agora-common-libs';
+import { AgoraWidgetBase } from 'agora-common-libs';
+import '@proctor/ui-kit/styles/global.css';
 export * from './type';
 export class AgoraProctorSDK {
   private static _config: any = {};
@@ -254,7 +250,6 @@ export class AgoraProctorSDK {
     this._checkStudentScreenShareState = checkStudentScreenShareState === false ? false : true;
     this._widgets = {
       ...option.widgets,
-      [this._getWidgetName(FcrWebviewWidget)]: FcrWebviewWidget,
     };
 
     const config = new EduClassroomConfig(
@@ -306,33 +301,6 @@ export class AgoraProctorSDK {
       </Providers>,
       dom,
     );
-    return () => {
-      unmountComponentAtNode(dom);
-    };
-  }
-
-  /**
-   * 运行窗口UI
-   * @param dom
-   * @param option
-   * @returns
-   */
-  static launchWindow(dom: HTMLElement, option: LaunchWindowOption) {
-    const mapping = {};
-
-    const Component = mapping[option.windowID];
-
-    const themeMode = option.uiMode ?? FcrMultiThemeMode.light;
-    this._selectUITheme(themeMode, option.roomType);
-    applyTheme(this._theme);
-
-    render(
-      <Providers language={option.language} uiConfig={this.uiConfig} theme={this.theme}>
-        {Component && <Component {...option.args} />}
-      </Providers>,
-      dom,
-    );
-
     return () => {
       unmountComponentAtNode(dom);
     };
