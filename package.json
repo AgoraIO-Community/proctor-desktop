@@ -90,7 +90,7 @@
     "postcss": "8.4.4",
     "postcss-import": "14.0.1",
     "postcss-loader": "4.0.3",
-    "babel-loader": "9.1.2",
+    "babel-loader": "8.2.2",
     "style-loader": "3.3.3",
     "css-loader": "6.8.1",
     "core-js": "3.20.1",
