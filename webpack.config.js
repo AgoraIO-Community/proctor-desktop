@@ -1,7 +1,7 @@
 const webpackMerge = require("webpack-merge");
 const path = require("path");
 const webpack = require("webpack");
-const { BundleAnalyzerPlugin } = require("webpack-bundle-analyzer");
+// const { BundleAnalyzerPlugin } = require("webpack-bundle-analyzer");
 
 const baseConfig = require("agora-common-libs/presets/webpack.config.base.js");
 const productionConfig = require("agora-common-libs/presets/webpack.config.pack.js");
