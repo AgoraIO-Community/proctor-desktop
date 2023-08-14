@@ -38,7 +38,7 @@ export const TrackArea = ({ top = 0, boundaryName }: { top?: number; boundaryNam
   return (
     <div
       ref={dom}
-      className={`${boundaryName} w-full absolute`}
+      className={`${boundaryName} fcr-w-full fcr-absolute`}
       style={{ height: `calc( 100% - ${top}px )`, top, zIndex: -1 }}
     />
   );

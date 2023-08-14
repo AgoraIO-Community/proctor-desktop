@@ -29,13 +29,6 @@ export class LayoutUIStore extends EduUIStoreBase {
 
   @computed
   get loadingText() {
-    if (this.classroomStore.remoteControlStore.remoteControlRequesting) {
-      const studentName = this.classroomStore.remoteControlStore.currentStudent?.userName;
-      return transI18n('fcr_share_reminded_student_agree', {
-        reason1: studentName,
-        reason2: studentName,
-      });
-    }
     return '';
   }
 
@@ -103,11 +96,8 @@ export class LayoutUIStore extends EduUIStoreBase {
    */
   @computed get loading(): boolean {
     const classroomState = this.classroomStore.connectionStore.classroomState;
-    const remoteControlRequesting = this.classroomStore.remoteControlStore.remoteControlRequesting;
     return (
-      classroomState === ClassroomState.Connecting ||
-      classroomState === ClassroomState.Reconnecting ||
-      remoteControlRequesting
+      classroomState === ClassroomState.Connecting || classroomState === ClassroomState.Reconnecting
     );
   }
 
