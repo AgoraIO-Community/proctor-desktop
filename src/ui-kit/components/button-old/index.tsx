@@ -1,6 +1,5 @@
 import classnames from 'classnames';
 import { EventHandler, FC, PropsWithChildren, SyntheticEvent, useEffect, useRef } from 'react';
-import { BaseProps } from '../util/type';
 import './index.css';
 
 type ButtonType = 'primary' | 'secondary' | 'ghost' | 'danger';
@@ -14,7 +13,7 @@ function createRipple(container: HTMLDivElement, y: number, x: number, type: But
   container.appendChild(circleElement);
   setTimeout(() => circleElement.remove(), 900);
 }
-export interface ButtonProps extends BaseProps {
+export interface ButtonProps {
   type?: ButtonType;
   size?: 'xs' | 'sm' | 'lg';
   disabled?: boolean;
@@ -23,6 +22,8 @@ export interface ButtonProps extends BaseProps {
   onClick?: EventHandler<SyntheticEvent<HTMLButtonElement>>;
   onMouseOver?: EventHandler<SyntheticEvent<HTMLButtonElement>>;
   onMouseLeave?: EventHandler<SyntheticEvent<HTMLButtonElement>>;
+  className?: string;
+  style?: React.CSSProperties;
 }
 
 export const Button: FC<PropsWithChildren<ButtonProps>> = ({

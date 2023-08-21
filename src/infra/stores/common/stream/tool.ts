@@ -1,4 +1,4 @@
-import { IconWithState } from '@proctor/ui-kit/components/util/type';
+import { SvgIconEnum } from '@proctor/ui-kit/components/svg-img/type';
 
 /**
  * 视频窗工具类型
@@ -12,6 +12,11 @@ export enum EduStreamToolCategory {
   star,
   stream_window_off,
 }
+
+export type IconWithState = {
+  icon: SvgIconEnum;
+  color?: string;
+};
 
 /**
  * 视频窗工具对象

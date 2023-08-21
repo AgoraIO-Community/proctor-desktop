@@ -1,18 +1,19 @@
 import React, { FC, useContext, useState, MouseEvent } from 'react';
 import classnames from 'classnames';
-import { BaseProps } from '../util/type';
 import { getPath, getViewBox, PathOptions } from './svg-dict';
 import { SvgIconEnum } from './type';
 import './index.css';
 import { themeContext } from 'agora-common-libs';
 
-export type SvgImgProps = BaseProps & {
+export type SvgImgProps = {
   type: SvgIconEnum;
   colors?: Partial<PathOptions>;
   size?: number;
   onClick?: (e: MouseEvent) => void;
   onMouseDown?: (e: MouseEvent) => void;
   onMouseUp?: (e: MouseEvent) => void;
+  className?: string;
+  style?: React.CSSProperties;
 };
 
 export const SvgImg: FC<SvgImgProps> = ({
@@ -55,7 +56,7 @@ export const SvgImg: FC<SvgImgProps> = ({
   );
 };
 
-export type SvgIconProps = BaseProps & {
+export type SvgIconProps = {
   type: SvgIconEnum;
   colors?: Partial<PathOptions>;
   hoverType: SvgIconEnum;
@@ -63,6 +64,8 @@ export type SvgIconProps = BaseProps & {
   size?: number;
   onClick?: any;
   canHover?: boolean;
+  className?: string;
+  style?: React.CSSProperties;
 };
 
 // Icon that has hoverable surroundings

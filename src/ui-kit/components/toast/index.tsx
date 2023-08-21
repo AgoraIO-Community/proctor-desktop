@@ -1,6 +1,5 @@
 import { CSSProperties, FC, PropsWithChildren, useCallback, useEffect, useRef } from 'react';
 import classnames from 'classnames';
-import { BaseProps } from '@proctor/ui-kit/components/util/type';
 import Notification from 'rc-notification';
 import './index.css';
 import { useTimeout } from '@proctor/ui-kit/utilities/hooks';
@@ -24,12 +23,14 @@ const toastDict: Record<string, { iconType: SvgIconEnum; color: string }> = {
   },
 };
 
-export interface ToastProps extends BaseProps {
+export interface ToastProps {
   type?: 'success' | 'error' | 'warning';
   text?: string;
   duration?: number;
   closeToast?: CallableFunction;
   canStop?: boolean;
+  className?: string;
+  style?: CSSProperties;
 }
 
 type ToastType = FC<PropsWithChildren<ToastProps>> & {
