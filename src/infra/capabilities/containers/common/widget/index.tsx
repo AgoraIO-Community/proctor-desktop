@@ -4,7 +4,10 @@ import React, { FC, PropsWithChildren, useEffect, useRef, useState } from 'react
 import { createPortal } from 'react-dom';
 import './index.css';
 import { TrackCore } from './track';
-import { AgoraTrackSyncedWidget, AgoraWidgetBase } from 'agora-common-libs';
+import {
+  AgoraWidgetTrackSynced,
+  AgoraCloudClassWidget as AgoraWidgetBase,
+} from 'agora-common-libs';
 
 export const WidgetContainer = observer(() => {
   const {
@@ -46,7 +49,7 @@ const Widget = observer(({ widget }: { widget: AgoraWidgetBase }) => {
   }, []);
 
   const renderWidgetInner = () => {
-    const tsw = widget as unknown as AgoraTrackSyncedWidget;
+    const tsw = widget as unknown as AgoraWidgetTrackSynced;
     if (tsw.track) {
       return (
         <WidgetTrackControl widget={widget}>
@@ -82,7 +85,7 @@ const Widget = observer(({ widget }: { widget: AgoraWidgetBase }) => {
 
 const WidgetTrackControl: FC<PropsWithChildren<{ widget: AgoraWidgetBase }>> = observer(
   ({ widget, children }) => {
-    const tsw = widget as unknown as AgoraTrackSyncedWidget;
+    const tsw = widget;
 
     const {
       track,
@@ -124,7 +127,7 @@ const WidgetTrackControl: FC<PropsWithChildren<{ widget: AgoraWidgetBase }>> = o
         cancel={dragCancelClassName}
         handle={dragHandleClassName}
         boundaryName={boundaryClassName}
-        track={track}
+        track={track!}
         zIndex={zIndex}
         onChange={updateToRemote}
         onZIndexChange={handleZIndexUpdate}>

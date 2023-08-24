@@ -7,7 +7,7 @@ import {
 } from 'agora-edu-core';
 import { AGVideoEncoderConfiguration, AGMediaOptions } from 'agora-rte-sdk';
 import { FcrMultiThemeMode } from 'agora-common-libs';
-import { AgoraWidgetBase } from 'agora-common-libs';
+import { AgoraCloudClassWidget as AgoraWidgetBase } from 'agora-common-libs';
 
 export type AgoraRegion = Uppercase<AgoraRegionString>;
 

@@ -13,8 +13,8 @@ import { action, computed, IReactionDisposer, Lambda, observable, reaction } fro
 import { EduUIStoreBase } from '../base';
 import {
   AgoraMultiInstanceWidget,
-  AgoraTrackSyncedWidget,
-  AgoraWidgetBase,
+  AgoraWidgetTrackSynced,
+  AgoraCloudClassWidget as AgoraWidgetBase,
   AgoraWidgetLifecycle,
   AgoraWidgetTrackController,
   AgoraWidgetTrackMode,
@@ -203,16 +203,16 @@ export class WidgetUIStore extends EduUIStoreBase {
   }
 
   private _callWidgetUpdateTrack(widget: AgoraWidgetBase, trackProps: unknown) {
-    if ((widget as unknown as AgoraTrackSyncedWidget).updateToLocal) {
-      (widget as unknown as AgoraTrackSyncedWidget).updateToLocal(trackProps as AgoraWidgetTrack);
-      (widget as unknown as AgoraTrackSyncedWidget).updateZIndexToLocal(
+    if ((widget as unknown as AgoraWidgetTrackSynced).updateToLocal) {
+      (widget as unknown as AgoraWidgetTrackSynced).updateToLocal(trackProps as AgoraWidgetTrack);
+      (widget as unknown as AgoraWidgetTrackSynced).updateZIndexToLocal(
         (trackProps as AgoraWidgetTrack).zIndex ?? 0,
       );
     }
   }
 
   private _getWidgetTrackMode(widget: AgoraWidgetBase) {
-    return (widget as unknown as AgoraTrackSyncedWidget).trackMode;
+    return (widget as unknown as AgoraWidgetTrackSynced).trackMode;
   }
 
   private _callWidgetInstall(widget: AgoraWidgetBase, controller: AgoraWidgetController) {
@@ -290,7 +290,6 @@ export class WidgetUIStore extends EduUIStoreBase {
 
     this._registeredWidgets = this._getEnabledWidgets();
 
-    this.classroomStore.widgetStore.addWidgetStateListener(this._stateListener);
     // switch between widget controllers of scenes
     this._disposers.push(
       reaction(
@@ -333,6 +332,8 @@ export class WidgetUIStore extends EduUIStoreBase {
               messageType: AgoraExtensionWidgetEvent.WidgetBecomeInactive,
               onMessage: this._handleBecomeInactive,
             });
+
+            oldController.removeWidgetStateListener(this._stateListener);
           }
           // install widgets
           if (controller) {
@@ -348,6 +349,7 @@ export class WidgetUIStore extends EduUIStoreBase {
               messageType: AgoraExtensionWidgetEvent.WidgetBecomeInactive,
               onMessage: this._handleBecomeInactive,
             });
+            controller.addWidgetStateListener(this._stateListener);
           }
         },
       ),

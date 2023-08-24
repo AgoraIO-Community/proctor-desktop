@@ -37,7 +37,7 @@ import { addResourceBundle } from 'agora-common-libs';
 import { en } from '@proctor/ui-kit/utilities/translate/en';
 import { zh } from '@proctor/ui-kit/utilities/translate/zh';
 import { FcrMultiThemeMode, FcrTheme, FcrUIConfig } from 'agora-common-libs';
-import { AgoraWidgetBase } from 'agora-common-libs';
+import { AgoraCloudClassWidget as AgoraWidgetBase } from 'agora-common-libs';
 import '@proctor/ui-kit/styles/global.css';
 export * from './type';
 export class AgoraProctorSDK {
