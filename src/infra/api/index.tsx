@@ -9,7 +9,7 @@ import {
   EduRoomTypeEnum,
   Platform,
 } from 'agora-edu-core';
-import { ApiBase } from 'agora-rte-sdk';
+import { ApiBase, useHLS } from 'agora-rte-sdk';
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 import { render, unmountComponentAtNode } from 'react-dom';
@@ -39,6 +39,7 @@ import { zh } from '@proctor/ui-kit/utilities/translate/zh';
 import { FcrMultiThemeMode, FcrTheme, FcrUIConfig } from 'agora-common-libs';
 import { AgoraCloudClassWidget as AgoraWidgetBase } from 'agora-common-libs';
 import '@proctor/ui-kit/styles/global.css';
+import HLS from 'hls.js';
 export * from './type';
 export class AgoraProctorSDK {
   private static _config: any = {};
@@ -67,6 +68,7 @@ export class AgoraProctorSDK {
   }
   private static _convertMediaOptions(opts?: LaunchMediaOptions): ConvertMediaOptionsConfig {
     const config: ConvertMediaOptionsConfig = {};
+
     if (opts) {
       const {
         cameraEncoderConfiguration,
@@ -215,6 +217,7 @@ export class AgoraProctorSDK {
 
   static launch(dom: HTMLElement, option: LaunchOption) {
     EduContext.reset();
+    useHLS(HLS);
     this._validateOptions(option);
     const {
       pretest,
