@@ -1,10 +1,6 @@
 {
   "name": "agora-proctor-sdk",
   "version": "1.0.5",
-  "homepage": ".",
-  "sideEffects": [
-    "*.css"
-  ],
   "keywords": [
     "agora",
     "WebRTC",
@@ -19,12 +15,6 @@
     "pack:npm": "run-s bundle:npm build:types",
     "ci:build": "run-s bundle:npm build:types",
     "bundle:npm": "cross-env NODE_ENV=production NODE_OPTIONS=--max_old_space_size=4096 webpack --config ./webpack.config.js"
-  },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "prettier"
-    ]
   },
   "browserslist": {
     "production": [
