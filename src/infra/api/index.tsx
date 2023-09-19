@@ -279,7 +279,9 @@ export class AgoraProctorSDK {
       config.host = this._config.host;
     }
 
-    config.ignoreUrlRegionPrefix = ['dev', 'pre'].some((v) => config.host.includes(v));
+    config.ignoreUrlRegionPrefix = ['dev', 'pre'].some((v) =>
+      this._config.host ? this._config.host.includes(v) : false,
+    );
 
     EduClassroomConfig.setConfig(config);
 
