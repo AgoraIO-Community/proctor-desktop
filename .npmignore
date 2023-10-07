@@ -43,3 +43,4 @@ docs
 .cz-config.js
 README.md
 Jenkinsfile_bitbucket.groovy
+webpack.config.js
