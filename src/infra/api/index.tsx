@@ -33,7 +33,7 @@ import {
   LaunchMediaOptions,
   LaunchOption,
 } from './type';
-import { addResourceBundle } from 'agora-common-libs';
+import { addResourceBundle, changeLanguage } from 'agora-common-libs';
 import { en } from '@proctor/ui-kit/utilities/translate/en';
 import { zh } from '@proctor/ui-kit/utilities/translate/zh';
 import { FcrMultiThemeMode, FcrTheme, FcrUIConfig } from 'agora-common-libs';
@@ -210,11 +210,6 @@ export class AgoraProctorSDK {
     }
   }
 
-  private static _getWidgetName(widgetClass: unknown) {
-    const Clz = widgetClass as typeof AgoraWidgetBase;
-    return Object.create(Clz.prototype).widgetName;
-  }
-
   static launch(dom: HTMLElement, option: LaunchOption) {
     EduContext.reset();
     useHLS(HLS);
@@ -254,6 +249,8 @@ export class AgoraProctorSDK {
     this._widgets = {
       ...option.widgets,
     };
+
+    changeLanguage(option.language);
 
     const config = new EduClassroomConfig(
       this._appId,
