@@ -1,4 +1,4 @@
-import { ConvertMediaOptionsConfig } from '@proctor/infra/api';
+import { AgoraProctorSDK, ConvertMediaOptionsConfig } from '@proctor/infra/api';
 import { transI18n } from 'agora-common-libs';
 import {
   AGServiceErrorCode,
@@ -135,7 +135,7 @@ export class EduClassroomUIStore {
    */
   @bound
   async join() {
-    const { joinClassroom, joinRTC } = this.classroomStore.connectionStore;
+    const { joinClassroom, joinRTC, setCloudProxy } = this.classroomStore.connectionStore;
     try {
       await joinClassroom();
     } catch (e) {
@@ -172,6 +172,9 @@ export class EduClassroomUIStore {
     // }
 
     try {
+      if (AgoraProctorSDK.cloudProxy) {
+        setCloudProxy(AgoraProctorSDK.cloudProxy);
+      }
       await joinRTC();
     } catch (e) {
       this.shareUIStore.addGenericErrorDialog(e as AGError);

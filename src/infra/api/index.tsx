@@ -8,6 +8,7 @@ import {
   EduRoleTypeEnum,
   EduRoomTypeEnum,
   Platform,
+  AgoraCloudProxyType,
 } from 'agora-edu-core';
 import { ApiBase, useHLS } from 'agora-rte-sdk';
 import dayjs from 'dayjs';
@@ -53,6 +54,7 @@ export class AgoraProctorSDK {
   //default use GLOBAL region(including CN)
   private static region: EduRegion = EduRegion.CN;
   private static _checkStudentScreenShareState?: boolean = true;
+  private static _cloudProxy?: AgoraCloudProxyType;
   private static _convertRegion(region: string): EduRegion {
     switch (region) {
       case 'CN':
@@ -174,6 +176,10 @@ export class AgoraProctorSDK {
     return this._checkStudentScreenShareState;
   }
 
+  static get cloudProxy() {
+    return this._cloudProxy;
+  }
+
   private static _validateOptions(option: LaunchOption) {
     const isInvalid = (value: string) => value === undefined || value === null || value === '';
 
@@ -207,6 +213,11 @@ export class AgoraProctorSDK {
       throw new Error('AgoraProctorSDK: roomName is required');
     } else if (isInvalid(option.roomUuid)) {
       throw new Error('AgoraProctorSDK: roomUuid is required');
+    } else if (
+      typeof option.cloudProxy !== 'undefined' &&
+      ![AgoraCloudProxyType.None, AgoraCloudProxyType.TCP, AgoraCloudProxyType.UDP]
+    ) {
+      throw new Error(`AgoraEduSDK: ${option.cloudProxy} is not valid value for cloudProxy`);
     }
   }
 

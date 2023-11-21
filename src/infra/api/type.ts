@@ -4,6 +4,7 @@ import {
   EduRoomTypeEnum,
   EduRtcConfig,
   Platform,
+  AgoraCloudProxyType,
 } from 'agora-edu-core';
 import { AGVideoEncoderConfiguration, AGMediaOptions } from 'agora-rte-sdk';
 import { FcrMultiThemeMode } from 'agora-common-libs';
@@ -86,6 +87,7 @@ export type LaunchOption = {
   uiMode?: FcrMultiThemeMode;
   shareUrl?: string; // 分享URL
   checkStudentScreenShareState?: boolean;
+  cloudProxy?: AgoraCloudProxyType; //云代理
 };
 
 /**
