@@ -10,7 +10,7 @@ import {
   Platform,
   AgoraCloudProxyType,
 } from 'agora-edu-core';
-import { ApiBase, useHLS } from 'agora-rte-sdk';
+import { ApiBase, Logger, useHLS } from 'agora-rte-sdk';
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 import { render, unmountComponentAtNode } from 'react-dom';
@@ -41,6 +41,7 @@ import { FcrMultiThemeMode, FcrTheme, FcrUIConfig } from 'agora-common-libs';
 import { AgoraCloudClassWidget as AgoraWidgetBase } from 'agora-common-libs';
 import '@proctor/ui-kit/styles/global.css';
 import HLS from 'hls.js';
+import { isLocked, lock, unlock } from './lock';
 export * from './type';
 export class AgoraProctorSDK {
   private static _config: any = {};
@@ -222,6 +223,14 @@ export class AgoraProctorSDK {
   }
 
   static launch(dom: HTMLElement, option: LaunchOption) {
+    if (isLocked()) {
+      Logger.error(
+        '[AgoraProctorSDK]failed to launch as you have already launched a proctor, you need to destory it by call the function returned by the launch method before you relaunch it',
+      );
+      return () => {
+        /** noop */
+      };
+    }
     EduContext.reset();
     useHLS(HLS);
     this._validateOptions(option);
@@ -314,8 +323,10 @@ export class AgoraProctorSDK {
       </Providers>,
       dom,
     );
+    lock();
     return () => {
       unmountComponentAtNode(dom);
+      unlock();
     };
   }
 
