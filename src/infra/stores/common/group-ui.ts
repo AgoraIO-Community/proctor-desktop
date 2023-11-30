@@ -700,6 +700,7 @@ export class GroupUIStore extends EduUIStoreBase {
       await this.classroomStore.connectionStore.checkIn(
         EduClassroomConfig.shared.sessionInfo,
         SceneType.Main,
+        'check-in',
       );
     } catch (e) {
       this.shareUIStore.addGenericErrorDialog(e as AGError);
