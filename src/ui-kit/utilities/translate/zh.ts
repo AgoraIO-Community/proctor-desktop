@@ -78,6 +78,7 @@ export const zh = {
   fcr_sub_room_label_AI_description: 'AI消息',
   fcr_sub_room_label_Human_description: '人工消息',
   fcr_sub_room_label_web_disconnected: '断网',
+  fcr_rct_no_driver: '您使用的浏览器不支持在线教室，请更换chrome浏览器',
 
   /** old */
   edu_error: {

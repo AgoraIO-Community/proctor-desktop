@@ -172,7 +172,11 @@ export class EduClassroomUIStore {
     // }
 
     try {
-      await joinRTC();
+      if (window.RTCPeerConnection && window.WebSocket) {
+        await joinRTC();
+      }else{
+        this.shareUIStore.addToast(transI18n('fcr_rct_no_driver'));
+      }
     } catch (e) {
       this.shareUIStore.addGenericErrorDialog(e as AGError);
     }

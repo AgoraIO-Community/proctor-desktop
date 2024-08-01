@@ -77,6 +77,7 @@ export const en = {
   fcr_sub_room_label_AI_description: 'Description from AI',
   fcr_sub_room_label_Human_description: 'Description from human being',
   fcr_sub_room_label_web_disconnected: 'Web disconnected',
+  fcr_rct_no_driver: 'The browser you are using does not support the FCR classroom. Please switch to the Chrome browser.',
 
   /** old */
   edu_error: {
