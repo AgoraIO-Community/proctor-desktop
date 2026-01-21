@@ -244,7 +244,7 @@ export class AgoraProctorSDK {
       userUuid,
       userName,
       roleType,
-      rtmToken,
+      token,
       roomUuid,
       roomName,
       roomType,
@@ -264,7 +264,7 @@ export class AgoraProctorSDK {
       roomType,
       duration,
       flexProperties: {},
-      token: rtmToken,
+      token,
       startTime,
     };
 
